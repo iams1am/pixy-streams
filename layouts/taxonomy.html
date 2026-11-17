@@ -1,0 +1,25 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    <p class="page-description">Every genre in the catalogue.</p>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="content-main">
+    {{ .Content }}
+    <div class="specialties-grid">
+      {{ range .Pages }}
+      <a class="specialty-item" href="{{ .RelPermalink }}">
+        <svg class="specialty-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>{{ .Title }}</span>
+        <span class="specialty-count">{{ len .Pages }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}

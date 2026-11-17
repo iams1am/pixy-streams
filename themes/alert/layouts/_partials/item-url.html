@@ -1,0 +1,8 @@
+{{- /* Returns the link for a catalogue item: its own page, or an external source. */ -}}
+{{- $item := . -}}
+{{- $href := $item.href | default "" -}}
+{{- if not $href -}}
+  {{- $section := cond (eq $item.kind "movie") "movies" "anime" -}}
+  {{- $href = printf "/%s/%s/" $section $item.slug -}}
+{{- end -}}
+{{- return partial "link.html" $href -}}

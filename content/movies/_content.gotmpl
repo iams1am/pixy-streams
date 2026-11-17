@@ -1,0 +1,27 @@
+{{ $catalog := site.Data.catalog.movies }}
+{{ if and $catalog $catalog.items }}
+{{ range $index, $item := $catalog.items }}
+{{ $.AddPage (dict
+  "path" $item.slug
+  "title" $item.title
+  "type" "catalog"
+  "params" (dict
+    "genres" $item.genres
+    "catalog" "movie"
+    "source" $item.source
+    "source_url" $item.source_url
+    "overview" $item.overview
+    "poster" $item.poster
+    "backdrop" $item.backdrop
+    "accent" $item.accent
+    "score" $item.score
+    "meta" $item.meta
+    "year" $item.year
+    "original_title" $item.original_title
+    "trailer" $item.trailer
+    "watch" $item.watch
+    "weight" $index
+  )
+) }}
+{{ end }}
+{{ end }}

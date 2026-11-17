@@ -1,0 +1,19 @@
+{{- /* Filters catalogue items by `list` and/or `group`, capped at `limit`. */ -}}
+{{- $items := .items | default slice -}}
+{{- $list := .list | default "" -}}
+{{- $group := .group | default "" -}}
+{{- $limit := .limit | default 12 -}}
+{{- $out := slice -}}
+{{- range $items -}}
+  {{- $keep := true -}}
+  {{- if $list -}}
+    {{- $keep = in (.lists | default slice) $list -}}
+  {{- end -}}
+  {{- if and $keep $group -}}
+    {{- $keep = eq .group $group -}}
+  {{- end -}}
+  {{- if and $keep (lt (len $out) $limit) -}}
+    {{- $out = $out | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

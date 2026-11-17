@@ -1,0 +1,66 @@
+{{ define "main" }}
+{{ $kind := .Params.catalog }}
+<article class="catalog-detail">
+  <header class="catalog-hero"{{ with .Params.backdrop }} style="--hero-backdrop: url('{{ . }}')"{{ end }}>
+    <div class="container catalog-hero-inner">
+      <div class="catalog-poster">
+        {{ if .Params.poster }}
+        <img src="{{ .Params.poster }}" alt="{{ .Title }}" loading="lazy">
+        {{ else }}
+        <span class="poster-fallback"{{ with .Params.accent }} style="--poster-accent: {{ . }}"{{ end }}>{{ .Title }}</span>
+        {{ end }}
+      </div>
+      <div class="catalog-hero-text">
+        <p class="hero-eyebrow">
+          {{ with $kind }}{{ . | upper }}{{ end }}{{ with .Params.source }} · {{ . }}{{ end }}
+        </p>
+        <h1>{{ .Title }}</h1>
+        {{ with .Params.original_title }}<p class="catalog-original">{{ . }}</p>{{ end }}
+        {{ with .Params.meta }}<p class="hero-meta">{{ . }}</p>{{ end }}
+        {{ with .Params.score }}<p class="catalog-score">{{ . }}<span>/10</span></p>{{ end }}
+        <div class="hero-actions">
+          {{ with .Params.trailer }}
+          <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener">Watch trailer</a>
+          {{ end }}
+          {{ with .Params.source_url }}
+          <a class="btn btn-ghost" href="{{ . }}" target="_blank" rel="noopener">More details</a>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-content">
+    <div class="content-main">
+      {{ with .Params.overview }}
+      <h2>Overview</h2>
+      <p>{{ . }}</p>
+      {{ end }}
+
+      {{ with .Params.genres }}
+      <div class="catalog-genres">
+        {{ range . }}
+        <a class="chip" href="{{ partial "link.html" (printf "/genres/%s/" (. | urlize)) }}">{{ . }}</a>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ with .Params.watch }}
+      <h2>Where to watch</h2>
+      <ul class="watch-list">
+        {{ range . }}
+        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a></li>
+        {{ end }}
+      </ul>
+      {{ end }}
+
+      {{ .Content }}
+
+      <p class="catalog-note">
+        Pixy Streams lists metadata and links to official sources only. Playback
+        happens on the service that holds the rights.
+      </p>
+    </div>
+  </div>
+</article>
+{{ end }}

@@ -3,7 +3,6 @@ languageCode = "en-us"
 title = "Pixy Streams"
 theme = "alert"
 
-# Set to false once real catalog data is wired up (P1)
 [params]
   description = "Discover movies, anime and live sport in one place."
   tagline = "Movies, anime and sport - all in one place"

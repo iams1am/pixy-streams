@@ -130,22 +130,8 @@ rows:
         href: "/sports/"
         badge: "Highlights"
 
-genres:
-  - "Action"
-  - "Adventure"
-  - "Anime"
-  - "Comedy"
-  - "Crime"
-  - "Documentary"
-  - "Drama"
-  - "Fantasy"
-  - "Horror"
-  - "Mystery"
-  - "Romance"
-  - "Sci-Fi"
-  - "Sport"
-  - "Thriller"
-
+# Genre chips are generated from the `genres` taxonomy, so this file no longer
+# carries a genre list.
 stats:
   - number: "3"
     label: "Verticals"

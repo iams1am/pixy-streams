@@ -1,0 +1,46 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </div>
+</div>
+
+{{ $catalog := site.Data.catalog.anime }}
+{{ if $catalog }}
+  {{ partial "rail.html" (dict
+    "id" "seasonal"
+    "title" "Airing this season"
+    "subtitle" (printf "Popular picks from %s" $catalog.season)
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "seasonal" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "top-anime"
+    "title" "Top anime"
+    "subtitle" "The highest-rated series by community score"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "top" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "movies"
+    "title" "Anime films"
+    "subtitle" "Standalone films, no prior seasons required"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "films" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "trending-anime"
+    "title" "Trending right now"
+    "subtitle" "What the community is watching today"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "trending" "limit" 14))) }}
+{{ end }}
+
+{{ partial "genre-chips.html" . }}
+
+{{ with .Content }}
+<section class="mission-section">
+  <div class="container">
+    <h2>About the anime catalogue</h2>
+    <div class="mission-content">{{ . }}</div>
+  </div>
+</section>
+{{ end }}
+{{ end }}

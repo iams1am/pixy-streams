@@ -13,64 +13,79 @@ where-to-watch links. It does not host or stream copyrighted video.
 | Static site generator | Hugo (extended, v0.154+) |
 | Theme | `alert` - custom, in `themes/alert/` |
 | Styling | Hand-written CSS with light/dark tokens, no framework |
-| Hosting | GitHub Pages via GitHub Actions |
-| Data | TMDB (film/TV), AniList (anime), TheSportsDB + football-data.org (sport) |
+| Hosting | GitHub Pages, served from the `gh-pages` branch |
+| Catalogue build | `node scripts/fetch-catalog.mjs` (no dependencies) |
+| Data | TMDB (film), AniList (anime), ESPN + TheSportsDB (sport) |
 
 ## Structure
 
 ```
-hugo.toml             site config, navigation, taxonomies
-content/              page + section copy
+hugo.toml                   site config, navigation, taxonomies
+scripts/fetch-catalog.mjs   build-time catalogue fetch and normalisation
+data/catalog/               generated: anime.json, movies.json, sports.json
+data/home.yaml              hero fallback, stats, quick links
+content/
+  _index.md                 homepage copy
+  movies/_content.gotmpl    generates one page per movie
+  anime/_content.gotmpl     generates one page per anime title
   movies/ anime/ sports/ my-list/ about/
-data/home.yaml        homepage hero + catalog rails
-themes/alert/         design system: CSS, JS, templates
-  assets/css/main.css
-  assets/js/main.js
-  layouts/
-.github/workflows/    build + deploy to Pages
+layouts/
+  catalog/page.html         title page for a generated catalogue entry
+  movies|anime|sports/section.html   rails for each vertical
+  term.html taxonomy.html   genre browsing
+themes/alert/               design system: CSS, JS, shared partials
 ```
 
 ## Local development
 
 ```bash
-hugo server -D          # http://localhost:1313
-hugo --gc --minify      # production build into public/
+node scripts/fetch-catalog.mjs    # refresh data/catalog/*.json
+hugo server -D                    # http://localhost:1313
+hugo --gc --minify                # production build into public/
 ```
 
-No Node install, no package manager, no build step beyond Hugo.
+Node 20+ is only needed to refresh the catalogue. The generated JSON is committed,
+so a plain `hugo` build works without Node or network access.
 
-## Deployment
+## Catalogue pipeline
 
-Live at <https://iams1am.github.io/pixy-streams/>, served from the `gh-pages`
-branch.
+`scripts/fetch-catalog.mjs` talks to each source, normalises the results into one
+shape, and writes `data/catalog/<vertical>.json`. Templates read those files; Hugo
+then generates the rails, section pages and one page per title.
 
-The push token behind `gh` does not carry the `workflow` scope, so
-`.github/workflows/deploy.yml` cannot be pushed yet. Until it can, publish with:
+| Source | Needs a key | Provides |
+|---|---|---|
+| AniList GraphQL | no | seasonal, trending and top anime, films, trailers, official streaming links |
+| ESPN scoreboards | no | football, NBA and F1 fixtures, results, team crests |
+| TMDB | yes | trending, top-rated and now-playing films with artwork |
+| TheSportsDB | optional | fallback fixtures source when ESPN is unavailable |
 
 ```bash
-hugo --gc --minify --cleanDestinationDir
-cd public && git init -q -b gh-pages && git add -A \
-  && git commit -q -m "Deploy" \
-  && git push -f https://github.com/iams1am/pixy-streams.git gh-pages && cd ..
+node scripts/fetch-catalog.mjs                  # everything
+node scripts/fetch-catalog.mjs --only=anime     # one vertical
+TMDB_API_KEY=xxx node scripts/fetch-catalog.mjs --only=movies
 ```
 
-To switch to the Actions pipeline later: run `gh auth refresh -s workflow`, then
-remove the `.github/workflows/deploy.yml` line from `.git/info/exclude` and commit
-the file.
+Environment variables: `TMDB_API_KEY` (or `TMDB_READ_TOKEN`), `SPORTSDB_KEY`.
+Without a TMDB key the movies vertical keeps the curated seed in
+`data/catalog/movies.json` and the script reports `kept … cached items` instead of
+failing. A source that errors also leaves its previous JSON untouched, so a flaky
+API never breaks a build.
+
+Keys are read at build time only. Nothing secret is shipped to the browser, which
+is why this is a build step rather than client-side `fetch()`.
 
 ## Editing the homepage
 
-`data/home.yaml` drives everything above the fold:
+`data/home.yaml` covers what is not in the catalogue:
 
-- `hero` - eyebrow, title, meta line, synopsis, two CTAs, backdrop image
-- `rows` - any number of catalog rails; each has a title, subtitle, "view all" link
-  and a list of `{ title, meta, poster, href, badge }` items
-- `genres` - genre chips
+- `hero` - fallback hero, used only when the catalogue has no featured title
+- `rows` - fallback rails, used only when `data/catalog/` is empty
 - `stats` - the four-number strip
 - `quick_links` - the jump-back-in cards (icon: `film`, `sparkles`, `trophy`, `bookmark`)
 
-Images currently point at `placehold.co`; swap in real artwork when the catalog
-pipeline is wired up.
+The featured hero, the rails and the genre chips are all derived from the
+catalogue and the `genres` taxonomy, so they need no manual editing.
 
 ## Navigation
 
@@ -91,19 +106,42 @@ entry `parent = "<identifier>"`; the header renders `MenuEntry.Children`.
   weight = 1
 ```
 
+Internal links in templates go through `partials/link.html`, which prefixes the
+site base path so the site works from the `/pixy-streams/` subpath.
+
+## Deployment
+
+Live at <https://iams1am.github.io/pixy-streams/>, served from the `gh-pages`
+branch.
+
+The push token behind `gh` does not carry the `workflow` scope, so
+`.github/workflows/deploy.yml` cannot be pushed yet. Until it can, publish with:
+
+```bash
+node scripts/fetch-catalog.mjs
+hugo --gc --minify --cleanDestinationDir
+cd public && git init -q -b gh-pages && git add -A \
+  && git commit -q -m "Deploy" \
+  && git push -f https://github.com/iams1am/pixy-streams.git gh-pages && cd ..
+```
+
+To switch to the Actions pipeline later: run `gh auth refresh -s workflow`, then
+remove the `.github/workflows/deploy.yml` line from `.git/info/exclude` and commit
+the file.
+
 ## Roadmap
 
-- **Done** - rebrand, streaming homepage, rails, genres, sections, nav dropdowns
-- **Next** - build-time catalog fetch (TMDB + AniList) and generated title pages
-- **Then** - search index, watchlist in `localStorage`, trailer modal
-- **Then** - sports fixtures and near-live scores
+- **Done** - rebrand, streaming homepage, rails, genres, nav dropdowns
+- **Done** - build-time catalogue fetch, generated title pages, live posters
+- **Next** - client-side search index, watchlist in `localStorage`, trailer modal
+- **Then** - scheduled catalogue refresh and a TMDB key for live movie artwork
 - **Later** - per-title playback slot for public-domain / licensed media
 
 ## Attribution
 
-Film and TV data and artwork come from TMDB. This product uses the TMDB API but is
-not endorsed or certified by TMDB. Anime data from AniList, sports data from
-TheSportsDB and football-data.org.
+Film data and artwork come from TMDB. This product uses the TMDB API but is not
+endorsed or certified by TMDB. Anime data from AniList, fixtures from ESPN, with
+TheSportsDB as a fallback.
 
 ## Licence
 

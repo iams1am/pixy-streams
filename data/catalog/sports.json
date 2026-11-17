@@ -1,0 +1,1176 @@
+{
+  "source": "ESPN",
+  "source_url": "https://www.espn.com",
+  "generated_at": "2026-11-17T17:33:00.282Z",
+  "count": 28,
+  "items": [
+    {
+      "slug": "401910002-toronto-raptors-vs-new-york-knicks",
+      "id": "espn-401910002",
+      "title": "Toronto Raptors vs New York Knicks",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "National Basketball Association",
+      "home": {
+        "name": "Toronto Raptors",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/tor.png",
+        "record": "5-8"
+      },
+      "away": {
+        "name": "New York Knicks",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ny.png",
+        "record": "7-6"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-18",
+      "time": "00:30",
+      "kickoff": "2026-11-18T00:30Z",
+      "venue": "Scotiabank Arena",
+      "overview": "Tue, November 17th at 7:30 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "National Basketball Association · Wed 18 Nov, 00:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401910002/knicks-raptors",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401910002/knicks-raptors"
+    },
+    {
+      "slug": "401910003-minnesota-timberwolves-vs-portland-trail-blazers",
+      "id": "espn-401910003",
+      "title": "Minnesota Timberwolves vs Portland Trail Blazers",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "National Basketball Association",
+      "home": {
+        "name": "Minnesota Timberwolves",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/min.png",
+        "record": "10-4"
+      },
+      "away": {
+        "name": "Portland Trail Blazers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/por.png",
+        "record": "9-4"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-18",
+      "time": "01:00",
+      "kickoff": "2026-11-18T01:00Z",
+      "venue": "Target Center",
+      "overview": "Tue, November 17th at 8:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "National Basketball Association · Wed 18 Nov, 01:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401910003/trail-blazers-timberwolves",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401910003/trail-blazers-timberwolves"
+    },
+    {
+      "slug": "401910004-san-antonio-spurs-vs-detroit-pistons",
+      "id": "espn-401910004",
+      "title": "San Antonio Spurs vs Detroit Pistons",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "National Basketball Association",
+      "home": {
+        "name": "San Antonio Spurs",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/sa.png",
+        "record": "12-2"
+      },
+      "away": {
+        "name": "Detroit Pistons",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/det.png",
+        "record": "8-4"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-18",
+      "time": "01:00",
+      "kickoff": "2026-11-18T01:00Z",
+      "venue": "Frost Bank Center",
+      "overview": "Tue, November 17th at 8:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "National Basketball Association · Wed 18 Nov, 01:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401910004/pistons-spurs",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401910004/pistons-spurs"
+    },
+    {
+      "slug": "401910006-la-clippers-vs-utah-jazz",
+      "id": "espn-401910006",
+      "title": "LA Clippers vs Utah Jazz",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "National Basketball Association",
+      "home": {
+        "name": "LA Clippers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lac.png",
+        "record": "4-8"
+      },
+      "away": {
+        "name": "Utah Jazz",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/utah.png",
+        "record": "1-13"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-18",
+      "time": "03:30",
+      "kickoff": "2026-11-18T03:30Z",
+      "venue": "Intuit Dome",
+      "overview": "Tue, November 17th at 10:30 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "National Basketball Association · Wed 18 Nov, 03:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401910006/jazz-clippers",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401910006/jazz-clippers"
+    },
+    {
+      "slug": "401910005-los-angeles-lakers-vs-charlotte-hornets",
+      "id": "espn-401910005",
+      "title": "Los Angeles Lakers vs Charlotte Hornets",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "National Basketball Association",
+      "home": {
+        "name": "Los Angeles Lakers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png",
+        "record": "12-2"
+      },
+      "away": {
+        "name": "Charlotte Hornets",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/cha.png",
+        "record": "4-9"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-18",
+      "time": "04:00",
+      "kickoff": "2026-11-18T04:00Z",
+      "venue": "crypto.com Arena",
+      "overview": "Tue, November 17th at 11:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "National Basketball Association · Wed 18 Nov, 04:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401910005/hornets-lakers",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401910005/hornets-lakers"
+    },
+    {
+      "slug": "600057449-heineken-las-vegas-grand-prix",
+      "id": "espn-600057449",
+      "title": "Heineken Las Vegas Grand Prix",
+      "kind": "event",
+      "group": "motorsport",
+      "sport": "Motorsport",
+      "league": "Formula 1",
+      "home": null,
+      "away": null,
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-20",
+      "time": "00:30",
+      "kickoff": "2026-11-20T00:30Z",
+      "venue": "",
+      "overview": "Thu, November 19th at 7:30 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Motorsport"
+      ],
+      "meta": "Formula 1 · Fri 20 Nov, 00:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/f1/race/_/id/600057449",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/f1/race/_/id/600057449"
+    },
+    {
+      "slug": "401884736-bayern-munich-vs-fc-cologne",
+      "id": "espn-401884736",
+      "title": "Bayern Munich vs FC Cologne",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "German Bundesliga",
+      "home": {
+        "name": "Bayern Munich",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/132.png",
+        "record": "6-3-0"
+      },
+      "away": {
+        "name": "FC Cologne",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/122.png",
+        "record": "2-3-4"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-20",
+      "time": "19:30",
+      "kickoff": "2026-11-20T19:30Z",
+      "venue": "Allianz Arena",
+      "overview": "Fri, November 20th at 2:30 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "German Bundesliga · Fri 20 Nov, 19:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401884736/fc-cologne-bayern-munich",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401884736/fc-cologne-bayern-munich"
+    },
+    {
+      "slug": "401882805-athletic-club-vs-espanyol",
+      "id": "espn-401882805",
+      "title": "Athletic Club vs Espanyol",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Spanish LALIGA",
+      "home": {
+        "name": "Athletic Club",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/93.png",
+        "record": "4-4-3"
+      },
+      "away": {
+        "name": "Espanyol",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/88.png",
+        "record": "3-3-6"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-20",
+      "time": "20:00",
+      "kickoff": "2026-11-20T20:00Z",
+      "venue": "San Mamés",
+      "overview": "Fri, November 20th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Spanish LALIGA · Fri 20 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401882805/espanyol-athletic-club",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401882805/espanyol-athletic-club"
+    },
+    {
+      "slug": "401879233-manchester-city-vs-fulham",
+      "id": "espn-401879233",
+      "title": "Manchester City vs Fulham",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Manchester City",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/382.png",
+        "record": "7-0-3"
+      },
+      "away": {
+        "name": "Fulham",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/370.png",
+        "record": "2-4-4"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "12:30",
+      "kickoff": "2026-11-21T12:30Z",
+      "venue": "Etihad Stadium",
+      "overview": "Sat, November 21st at 7:30 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 12:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401879233/fulham-manchester-city",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401879233/fulham-manchester-city"
+    },
+    {
+      "slug": "401875056-como-vs-cagliari",
+      "id": "espn-401875056",
+      "title": "Como vs Cagliari",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Italian Serie A",
+      "home": {
+        "name": "Como",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2572.png",
+        "record": "7-2-2"
+      },
+      "away": {
+        "name": "Cagliari",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2925.png",
+        "record": "5-1-5"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "14:00",
+      "kickoff": "2026-11-21T14:00Z",
+      "venue": "Giuseppe Sinigaglia",
+      "overview": "Sat, November 21st at 9:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Italian Serie A · Sat 21 Nov, 14:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401875056/cagliari-como",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401875056/cagliari-como"
+    },
+    {
+      "slug": "401874981-lazio-vs-lecce",
+      "id": "espn-401874981",
+      "title": "Lazio vs Lecce",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Italian Serie A",
+      "home": {
+        "name": "Lazio",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/112.png",
+        "record": "9-2-0"
+      },
+      "away": {
+        "name": "Lecce",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/113.png",
+        "record": "3-1-7"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "14:00",
+      "kickoff": "2026-11-21T14:00Z",
+      "venue": "Olimpico",
+      "overview": "Sat, November 21st at 9:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Italian Serie A · Sat 21 Nov, 14:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401874981/lecce-lazio",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401874981/lecce-lazio"
+    },
+    {
+      "slug": "401879238-afc-bournemouth-vs-nottingham-forest",
+      "id": "espn-401879238",
+      "title": "AFC Bournemouth vs Nottingham Forest",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "AFC Bournemouth",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/349.png",
+        "record": "4-3-3"
+      },
+      "away": {
+        "name": "Nottingham Forest",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/393.png",
+        "record": "2-3-5"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "15:00",
+      "kickoff": "2026-11-21T15:00Z",
+      "venue": "Vitality Stadium",
+      "overview": "Sat, November 21st at 10:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 15:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401879238/nottingham-forest-afc-bournemouth",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401879238/nottingham-forest-afc-bournemouth"
+    },
+    {
+      "slug": "401878756-aston-villa-vs-sunderland",
+      "id": "espn-401878756",
+      "title": "Aston Villa vs Sunderland",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Aston Villa",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png",
+        "record": "3-4-3"
+      },
+      "away": {
+        "name": "Sunderland",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/366.png",
+        "record": "2-2-6"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "15:00",
+      "kickoff": "2026-11-21T15:00Z",
+      "venue": "Villa Park",
+      "overview": "Sat, November 21st at 10:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 15:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401878756/sunderland-aston-villa",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401878756/sunderland-aston-villa"
+    },
+    {
+      "slug": "401879236-chelsea-vs-leeds-united",
+      "id": "espn-401879236",
+      "title": "Chelsea vs Leeds United",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Chelsea",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/363.png",
+        "record": "5-1-4"
+      },
+      "away": {
+        "name": "Leeds United",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png",
+        "record": "3-5-2"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "15:00",
+      "kickoff": "2026-11-21T15:00Z",
+      "venue": "Stamford Bridge",
+      "overview": "Sat, November 21st at 10:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 15:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401879236/leeds-united-chelsea",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401879236/leeds-united-chelsea"
+    },
+    {
+      "slug": "401879235-coventry-city-vs-crystal-palace",
+      "id": "espn-401879235",
+      "title": "Coventry City vs Crystal Palace",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Coventry City",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/388.png",
+        "record": "3-0-7"
+      },
+      "away": {
+        "name": "Crystal Palace",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/384.png",
+        "record": "2-1-7"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "15:00",
+      "kickoff": "2026-11-21T15:00Z",
+      "venue": "Coventry Building Society Arena",
+      "overview": "Sat, November 21st at 10:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 15:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401879235/crystal-palace-coventry-city",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401879235/crystal-palace-coventry-city"
+    },
+    {
+      "slug": "401878754-tottenham-hotspur-vs-ipswich-town",
+      "id": "espn-401878754",
+      "title": "Tottenham Hotspur vs Ipswich Town",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Tottenham Hotspur",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/367.png",
+        "record": "3-3-4"
+      },
+      "away": {
+        "name": "Ipswich Town",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/373.png",
+        "record": "3-2-5"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "15:00",
+      "kickoff": "2026-11-21T15:00Z",
+      "venue": "Tottenham Hotspur Stadium",
+      "overview": "Sat, November 21st at 10:00 AM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 15:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401878754/ipswich-town-tottenham-hotspur",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401878754/ipswich-town-tottenham-hotspur"
+    },
+    {
+      "slug": "401874967-parma-vs-as-roma",
+      "id": "espn-401874967",
+      "title": "Parma vs AS Roma",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Italian Serie A",
+      "home": {
+        "name": "Parma",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/115.png",
+        "record": "2-2-7"
+      },
+      "away": {
+        "name": "AS Roma",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/104.png",
+        "record": "8-3-0"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "17:00",
+      "kickoff": "2026-11-21T17:00Z",
+      "venue": "Ennio Tardini",
+      "overview": "Sat, November 21st at 12:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Italian Serie A · Sat 21 Nov, 17:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401874967/as-roma-parma",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401874967/as-roma-parma"
+    },
+    {
+      "slug": "401879232-newcastle-united-vs-arsenal",
+      "id": "espn-401879232",
+      "title": "Newcastle United vs Arsenal",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "English Premier League",
+      "home": {
+        "name": "Newcastle United",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/361.png",
+        "record": "3-3-4"
+      },
+      "away": {
+        "name": "Arsenal",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png",
+        "record": "9-0-1"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "17:30",
+      "kickoff": "2026-11-21T17:30Z",
+      "venue": "St. James' Park",
+      "overview": "Sat, November 21st at 12:30 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "English Premier League · Sat 21 Nov, 17:30 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401879232/arsenal-newcastle-united",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401879232/arsenal-newcastle-united"
+    },
+    {
+      "slug": "401875067-napoli-vs-torino",
+      "id": "espn-401875067",
+      "title": "Napoli vs Torino",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Italian Serie A",
+      "home": {
+        "name": "Napoli",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/114.png",
+        "record": "4-3-4"
+      },
+      "away": {
+        "name": "Torino",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/239.png",
+        "record": "4-2-5"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-21",
+      "time": "19:45",
+      "kickoff": "2026-11-21T19:45Z",
+      "venue": "Stadio Diego Armando Maradona",
+      "overview": "Sat, November 21st at 2:45 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Italian Serie A · Sat 21 Nov, 19:45 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401875067/torino-napoli",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401875067/torino-napoli"
+    },
+    {
+      "slug": "401915380-bodo-glimt-vs-lask-linz",
+      "id": "espn-401915380",
+      "title": "Bodo/Glimt vs LASK Linz",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Bodo/Glimt",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2980.png",
+        "record": "1-1-2"
+      },
+      "away": {
+        "name": "LASK Linz",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/4411.png",
+        "record": "2-0-2"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "17:45",
+      "kickoff": "2026-11-24T17:45Z",
+      "venue": "Aspmyra Stadion",
+      "overview": "Tue, November 24th at 12:45 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 17:45 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915380/lask-linz-bodoglimt",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915380/lask-linz-bodoglimt"
+    },
+    {
+      "slug": "401915300-galatasaray-vs-aston-villa",
+      "id": "espn-401915300",
+      "title": "Galatasaray vs Aston Villa",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Galatasaray",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/432.png",
+        "record": "2-0-2"
+      },
+      "away": {
+        "name": "Aston Villa",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png",
+        "record": "3-0-1"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "17:45",
+      "kickoff": "2026-11-24T17:45Z",
+      "venue": "RAMS Park",
+      "overview": "Tue, November 24th at 12:45 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 17:45 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915300/aston-villa-galatasaray",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915300/aston-villa-galatasaray"
+    },
+    {
+      "slug": "401915295-arsenal-vs-borussia-dortmund",
+      "id": "espn-401915295",
+      "title": "Arsenal vs Borussia Dortmund",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Arsenal",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png",
+        "record": "3-1-0"
+      },
+      "away": {
+        "name": "Borussia Dortmund",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/124.png",
+        "record": "3-0-1"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Emirates Stadium",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915295/borussia-dortmund-arsenal",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915295/borussia-dortmund-arsenal"
+    },
+    {
+      "slug": "401915296-como-vs-aek-athens",
+      "id": "espn-401915296",
+      "title": "Como vs AEK Athens",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Como",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2572.png",
+        "record": "3-0-1"
+      },
+      "away": {
+        "name": "AEK Athens",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/887.png",
+        "record": "1-0-3"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Giuseppe Sinigaglia",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915296/aek-athens-como",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915296/aek-athens-como"
+    },
+    {
+      "slug": "401915294-feyenoord-rotterdam-vs-fc-porto",
+      "id": "espn-401915294",
+      "title": "Feyenoord Rotterdam vs FC Porto",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Feyenoord Rotterdam",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/142.png",
+        "record": "1-0-3"
+      },
+      "away": {
+        "name": "FC Porto",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/437.png",
+        "record": "1-0-3"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "De Kuip",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915294/fc-porto-feyenoord-rotterdam",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915294/fc-porto-feyenoord-rotterdam"
+    },
+    {
+      "slug": "401915379-manchester-city-vs-napoli",
+      "id": "espn-401915379",
+      "title": "Manchester City vs Napoli",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Manchester City",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/382.png",
+        "record": "3-0-1"
+      },
+      "away": {
+        "name": "Napoli",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/114.png",
+        "record": "1-0-3"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Etihad Stadium",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915379/napoli-manchester-city",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915379/napoli-manchester-city"
+    },
+    {
+      "slug": "401915299-rb-leipzig-vs-lens",
+      "id": "espn-401915299",
+      "title": "RB Leipzig vs Lens",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "RB Leipzig",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/11420.png",
+        "record": "1-0-3"
+      },
+      "away": {
+        "name": "Lens",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/175.png",
+        "record": "1-0-3"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Red Bull Arena",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915299/lens-rb-leipzig",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915299/lens-rb-leipzig"
+    },
+    {
+      "slug": "401915298-real-madrid-vs-psv-eindhoven",
+      "id": "espn-401915298",
+      "title": "Real Madrid vs PSV Eindhoven",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Real Madrid",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/86.png",
+        "record": "4-0-0"
+      },
+      "away": {
+        "name": "PSV Eindhoven",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/148.png",
+        "record": "1-1-2"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Santiago Bernabéu",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915298/psv-eindhoven-real-madrid",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915298/psv-eindhoven-real-madrid"
+    },
+    {
+      "slug": "401915297-slovan-bratislava-vs-real-betis",
+      "id": "espn-401915297",
+      "title": "Slovan Bratislava vs Real Betis",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "UEFA Champions League",
+      "home": {
+        "name": "Slovan Bratislava",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/521.png",
+        "record": "0-0-4"
+      },
+      "away": {
+        "name": "Real Betis",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/244.png",
+        "record": "3-0-1"
+      },
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-24",
+      "time": "20:00",
+      "kickoff": "2026-11-24T20:00Z",
+      "venue": "Národny Futbalovy Stadión",
+      "overview": "Tue, November 24th at 3:00 PM EST",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "UEFA Champions League · Tue 24 Nov, 20:00 UTC",
+      "badge": "",
+      "trailer": "",
+      "watch": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915297/real-betis-slovan-bratislava",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915297/real-betis-slovan-bratislava"
+    }
+  ]
+}

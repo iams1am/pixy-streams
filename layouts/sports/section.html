@@ -1,0 +1,44 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </div>
+</div>
+
+{{ $catalog := site.Data.catalog.sports }}
+{{ if $catalog }}
+  {{ partial "rail.html" (dict
+    "id" "results"
+    "title" "Latest results"
+    "subtitle" "Full-time scores from the last round of fixtures"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "results" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "football"
+    "title" "Football"
+    "subtitle" "Next up in the Premier League, La Liga, Serie A, Bundesliga and Europe"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "football" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "basketball"
+    "title" "Basketball"
+    "subtitle" "The next tip-offs on the NBA calendar"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "basketball" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "motorsport"
+    "title" "Motorsport"
+    "subtitle" "Grand Prix weekends and sessions"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "motorsport" "limit" 14))) }}
+{{ end }}
+
+{{ with .Content }}
+<section class="mission-section">
+  <div class="container">
+    <h2>About the sports desk</h2>
+    <div class="mission-content">{{ . }}</div>
+  </div>
+</section>
+{{ end }}
+{{ end }}

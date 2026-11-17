@@ -1,0 +1,31 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <p class="hero-eyebrow">Genre</p>
+    <h1>{{ .Title }}</h1>
+    <p class="page-description">{{ len .Pages }} title{{ if ne (len .Pages) 1 }}s{{ end }} in this genre.</p>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="content-main">
+    {{ .Content }}
+
+    <div class="genre-grid">
+      {{ range .Pages }}
+      <a class="rail-card" href="{{ .RelPermalink }}">
+        <div class="rail-poster">
+          {{ if .Params.poster }}
+          <img src="{{ .Params.poster }}" alt="{{ .Title }}" loading="lazy">
+          {{ else }}
+          <span class="poster-fallback"{{ with .Params.accent }} style="--poster-accent: {{ . }}"{{ end }}>{{ .Title }}</span>
+          {{ end }}
+        </div>
+        <h2 class="rail-title">{{ .Title }}</h2>
+        {{ with .Params.meta }}<p class="rail-meta">{{ . }}</p>{{ end }}
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}

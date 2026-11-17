@@ -1,0 +1,40 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </div>
+</div>
+
+{{ $catalog := site.Data.catalog.movies }}
+{{ if $catalog }}
+  {{ partial "rail.html" (dict
+    "id" "trending"
+    "title" "Trending now"
+    "subtitle" "The films getting the most attention this week"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "trending" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "top-rated"
+    "title" "Top rated"
+    "subtitle" "The highest-scoring films in the catalogue"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "top_rated" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "new-releases"
+    "title" "New releases"
+    "subtitle" "Recently added, newest first"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "new_releases" "limit" 14))) }}
+{{ end }}
+
+{{ partial "genre-chips.html" . }}
+
+{{ with .Content }}
+<section class="mission-section">
+  <div class="container">
+    <h2>About the movie catalogue</h2>
+    <div class="mission-content">{{ . }}</div>
+  </div>
+</section>
+{{ end }}
+{{ end }}

@@ -3,14 +3,10 @@ title: "Anime"
 description: "Seasonal line-ups, all-time favourites and anime films."
 ---
 
-<h2 id="seasonal">Airing this season</h2>
+Series and films, refreshed every season: what is broadcasting right now, the
+highest-rated shows of all time and the theatrical releases you can watch without
+starting a twelve-episode commitment first.
 
-What is broadcasting right now, with episode counts and weekly release slots.
-
-<h2 id="top-anime">Top anime</h2>
-
-The highest-rated series across every season, ranked by community score.
-
-<h2 id="movies">Anime movies</h2>
-
-Standalone films and theatrical releases, no prior seasons required.
+Season, episode count and community score come from AniList. Each title page lists
+the official streaming services carrying it, so you can pick the one you already pay
+for instead of hunting for a mirror.

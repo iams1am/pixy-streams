@@ -1,0 +1,7 @@
+{{- /* Prints an internal path prefixed with the site base path, so subpath deployments work. */ -}}
+{{- $path := . | default "" -}}
+{{- if or (hasPrefix $path "http") (hasPrefix $path "//") (hasPrefix $path "#") (hasPrefix $path "mailto:") -}}
+{{- $path -}}
+{{- else -}}
+{{- printf "%s%s" site.Home.RelPermalink (strings.TrimPrefix "/" $path) -}}
+{{- end -}}

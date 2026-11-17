@@ -3,17 +3,10 @@ title: "Sports"
 description: "Fixtures, results and highlights across football, basketball and motorsport."
 ---
 
-<h2 id="football">Football</h2>
+The next fixtures and the last results from the Premier League, La Liga, Serie A,
+Bundesliga, the Champions League, the NBA and Formula 1, pulled from public
+scoreboards on every build.
 
-League tables, fixtures and results for the major European competitions.
-
-<h2 id="basketball">Basketball</h2>
-
-Schedules and scores from the NBA and EuroLeague.
-
-<h2 id="motorsport">Motorsport</h2>
-
-Grand Prix weekends, qualifying and race results.
-
-Live in-play data is limited on free tiers, so scores refresh on a short delay
-rather than in real time.
+Kick-off times are shown in UTC so they mean the same thing wherever you are.
+Schedules shift, so treat this as a guide and check the broadcaster before you
+make plans around it.
