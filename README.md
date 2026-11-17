@@ -39,6 +39,25 @@ hugo --gc --minify      # production build into public/
 
 No Node install, no package manager, no build step beyond Hugo.
 
+## Deployment
+
+Live at <https://iams1am.github.io/pixy-streams/>, served from the `gh-pages`
+branch.
+
+The push token behind `gh` does not carry the `workflow` scope, so
+`.github/workflows/deploy.yml` cannot be pushed yet. Until it can, publish with:
+
+```bash
+hugo --gc --minify --cleanDestinationDir
+cd public && git init -q -b gh-pages && git add -A \
+  && git commit -q -m "Deploy" \
+  && git push -f https://github.com/iams1am/pixy-streams.git gh-pages && cd ..
+```
+
+To switch to the Actions pipeline later: run `gh auth refresh -s workflow`, then
+remove the `.github/workflows/deploy.yml` line from `.git/info/exclude` and commit
+the file.
+
 ## Editing the homepage
 
 `data/home.yaml` drives everything above the fold:
