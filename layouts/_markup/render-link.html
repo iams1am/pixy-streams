@@ -1,0 +1,2 @@
+{{- $href := partial "link.html" .Destination -}}
+<a href="{{ $href }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if hasPrefix $href "http" }} target="_blank" rel="noopener"{{ end }}>{{ .Text }}</a>

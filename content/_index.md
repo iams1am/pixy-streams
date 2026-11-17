@@ -8,6 +8,6 @@ in film and television, follow the anime seasons as they air, and keep up with t
 sport you actually care about - without hopping between five different apps to work
 out what is on.
 
-Every title page gives you the essentials: cast, runtime, ratings, the official
-trailer, and a direct link to the service that holds the rights to it. We point you
-to the right door instead of pretending to be the cinema.
+Every title page gives you the essentials: the community rating, genres, runtime,
+the official trailer, and a direct link to the service that holds the rights to it.
+We point you to the right door instead of pretending to be the cinema.

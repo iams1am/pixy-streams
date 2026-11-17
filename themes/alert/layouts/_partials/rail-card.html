@@ -14,7 +14,7 @@
   {{- else -}}
   <div class="rail-poster">
     {{- if $item.poster -}}
-    <img src="{{ $item.poster }}" alt="{{ $item.title }}" loading="lazy">
+    <img src="{{ $item.poster }}" alt="{{ $item.title }}" loading="lazy" decoding="async">
     {{- else -}}
     {{ partial "poster-fallback.html" (dict "title" $item.title "accent" $item.accent) }}
     {{- end -}}

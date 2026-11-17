@@ -1,6 +1,26 @@
 {{ define "main" }}
 {{ $kind := .Params.catalog }}
 {{ $catalog := cond (eq $kind "movie") site.Data.catalog.movies site.Data.catalog.anime }}
+
+{{/* Structured data: the title itself, plus the breadcrumb trail. */}}
+{{ $schema := dict
+  "@context" "https://schema.org"
+  "@type" (cond (or (eq $kind "movie") (eq .Params.format "Film")) "Movie" "TVSeries")
+  "name" .Title
+  "url" .Permalink }}
+{{ with .Params.overview }}{{ $schema = merge $schema (dict "description" .) }}{{ end }}
+{{ with .Params.poster }}{{ $schema = merge $schema (dict "image" .) }}{{ end }}
+{{ with .Params.genres }}{{ $schema = merge $schema (dict "genre" .) }}{{ end }}
+{{ with .Params.year }}{{ $schema = merge $schema (dict "datePublished" (string .)) }}{{ end }}
+<script type="application/ld+json">{{ $schema | jsonify | safeJS }}</script>
+
+{{ $crumbs := slice }}
+{{ with site.GetPage .Section }}
+  {{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" 1 "name" .Title "item" .Permalink) }}
+{{ end }}
+{{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" (add (len $crumbs) 1) "name" $.Title "item" $.Permalink) }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs | jsonify | safeJS }}</script>
+
 <article class="catalog-detail">
   <header class="catalog-hero"{{ with .Params.backdrop }} style="--hero-backdrop: url('{{ . }}')"{{ end }}>
     <div class="container catalog-hero-inner">

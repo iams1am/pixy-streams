@@ -2,6 +2,13 @@
 {{ $homeData := site.Data.home }}
 {{ $hero := $homeData.hero }}
 
+<script type="application/ld+json">{{ dict
+  "@context" "https://schema.org"
+  "@type" "WebSite"
+  "name" site.Title
+  "url" site.Home.Permalink
+  "description" site.Params.description | jsonify | safeJS }}</script>
+
 {{/* The featured slot follows the live catalogue when there is one. */}}
 {{ $movies := site.Data.catalog.movies }}
 {{ $anime := site.Data.catalog.anime }}
@@ -62,17 +69,17 @@
 <!-- Catalog rails -->
 {{ $rails := slice }}
 {{ with $movies }}
-  {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 10) }}
+  {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "movies" "title" "Trending movies" "subtitle" "What everyone is watching this week" "href" "/movies/#trending" "items" .) }}
   {{ end }}
 {{ end }}
 {{ with $anime }}
-  {{ with partial "catalog-items.html" (dict "items" .items "list" "seasonal" "limit" 10) }}
+  {{ with partial "catalog-items.html" (dict "items" .items "list" "seasonal" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "anime" "title" "Anime this season" "subtitle" (printf "Airing now · %s" $anime.season) "href" "/anime/#seasonal" "items" .) }}
   {{ end }}
 {{ end }}
 {{ with $sports }}
-  {{ with partial "catalog-items.html" (dict "items" .items "list" "upcoming" "limit" 10) }}
+  {{ with partial "catalog-items.html" (dict "items" .items "list" "upcoming" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "sports" "title" "Sport this week" "subtitle" "Next fixtures across football, basketball and motorsport" "href" "/sports/" "items" .) }}
   {{ end }}
 {{ end }}
