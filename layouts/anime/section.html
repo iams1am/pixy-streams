@@ -8,6 +8,8 @@
 
 {{ $catalog := site.Data.catalog.anime }}
 {{ if $catalog }}
+  {{ partial "category-filter.html" . }}
+
   {{ partial "rail.html" (dict
     "id" "seasonal"
     "title" "Airing this season"
@@ -32,8 +34,6 @@
     "subtitle" "What the community is watching today"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "trending" "limit" 14))) }}
 {{ end }}
-
-{{ partial "genre-chips.html" . }}
 
 {{ with .Content }}
 <section class="mission-section">

@@ -1,6 +1,6 @@
 {{- $items := .items | default slice -}}
 {{- if $items -}}
-<section class="rail-section container"{{ with .id }} id="{{ . }}"{{ end }}>
+<section class="rail-section container" data-filterable{{ with .id }} id="{{ . }}"{{ end }}>
   <div class="rail-header">
     <div class="rail-heading">
       <h2>{{ .title }}</h2>

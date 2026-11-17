@@ -1,0 +1,25 @@
+{{- /* Multi-select category buttons. Cards carry data-genres; main.js filters them. */ -}}
+{{- $terms := slice -}}
+{{- range $name, $pages := site.Taxonomies.genres -}}
+  {{- $slug := $name | urlize -}}
+  {{- $label := $name -}}
+  {{- with site.GetPage (printf "/genres/%s" $slug) }}{{ $label = .Title }}{{ end -}}
+  {{- $terms = $terms | append (dict "name" $label "slug" $slug "count" (len $pages)) -}}
+{{- end -}}
+{{- with $terms }}
+<section class="category-bar container" id="genres" data-category-filter aria-label="Filter by category">
+  <div class="category-bar-head">
+    <h2>Categories</h2>
+    <button type="button" class="category-clear" data-clear hidden>Clear selection</button>
+  </div>
+  <div class="category-options">
+    {{- range sort . "count" "desc" }}
+    <button type="button" class="category-chip" data-genre="{{ .slug }}" data-label="{{ .name }}" aria-pressed="false">
+      {{ .name }}<span class="category-count">{{ .count }}</span>
+    </button>
+    {{- end }}
+  </div>
+  <p class="category-status" data-filter-status role="status" aria-live="polite"></p>
+  <p class="category-empty" data-filter-empty hidden>No titles match those categories. Clear the selection to see everything again.</p>
+</section>
+{{- end }}

@@ -123,6 +123,75 @@
   });
 
   // ===========================
+  // Category Filter
+  // ===========================
+  const categoryFilter = document.querySelector('[data-category-filter]');
+
+  if (categoryFilter) {
+    const categoryButtons = Array.from(categoryFilter.querySelectorAll('[data-genre]'));
+    const clearButton = categoryFilter.querySelector('[data-clear]');
+    const statusMessage = categoryFilter.querySelector('[data-filter-status]');
+    const emptyMessage = categoryFilter.querySelector('[data-filter-empty]');
+    const filterableSections = Array.from(document.querySelectorAll('.rail-section[data-filterable]'));
+
+    const selectedCategories = () => categoryButtons
+      .filter(button => button.getAttribute('aria-pressed') === 'true')
+      .map(button => ({ slug: button.dataset.genre, label: button.dataset.label }));
+
+    const applyCategoryFilter = () => {
+      const selected = selectedCategories();
+      const slugs = selected.map(category => category.slug);
+      const labels = selected.map(category => category.label);
+      let shown = 0;
+
+      filterableSections.forEach(section => {
+        let matchesInSection = 0;
+
+        section.querySelectorAll('.rail-card').forEach(card => {
+          const cardGenres = (card.dataset.genres || '').split(',').filter(Boolean);
+          const matches = slugs.length === 0 || slugs.some(slug => cardGenres.includes(slug));
+
+          card.classList.toggle('is-filtered-out', !matches);
+          if (matches) matchesInSection += 1;
+        });
+
+        section.classList.toggle('is-filtered-out', matchesInSection === 0);
+        shown += matchesInSection;
+      });
+
+      if (clearButton) clearButton.hidden = selected.length === 0;
+      if (emptyMessage) emptyMessage.hidden = shown !== 0;
+
+      if (statusMessage) {
+        if (!selected.length) {
+          statusMessage.textContent = '';
+        } else if (!shown) {
+          statusMessage.textContent = 'Nothing in ' + labels.join(' + ') + ' right now.';
+        } else {
+          statusMessage.textContent = shown + ' title' + (shown === 1 ? '' : 's') + ' in ' + labels.join(' + ') + '.';
+        }
+      }
+    };
+
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const pressed = this.getAttribute('aria-pressed') === 'true';
+        this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+        applyCategoryFilter();
+      });
+    });
+
+    if (clearButton) {
+      clearButton.addEventListener('click', function() {
+        categoryButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+        applyCategoryFilter();
+      });
+    }
+
+    applyCategoryFilter();
+  }
+
+  // ===========================
   // Active Nav Link Highlighting
   // ===========================
   function setActiveNavLink() {

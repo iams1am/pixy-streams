@@ -8,6 +8,8 @@
 
 {{ $catalog := site.Data.catalog.sports }}
 {{ if $catalog }}
+  {{ partial "category-filter.html" . }}
+
   {{ partial "rail.html" (dict
     "id" "results"
     "title" "Latest results"

@@ -8,6 +8,8 @@
 
 {{ $catalog := site.Data.catalog.movies }}
 {{ if $catalog }}
+  {{ partial "category-filter.html" . }}
+
   {{ partial "rail.html" (dict
     "id" "trending"
     "title" "Trending now"
@@ -26,8 +28,6 @@
     "subtitle" "Recently added, newest first"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "new_releases" "limit" 14))) }}
 {{ end }}
-
-{{ partial "genre-chips.html" . }}
 
 {{ with .Content }}
 <section class="mission-section">

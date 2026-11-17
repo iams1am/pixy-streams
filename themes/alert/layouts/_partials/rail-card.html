@@ -1,6 +1,9 @@
 {{- $item := . -}}
 {{- $href := partial "item-url.html" $item -}}
-<a class="rail-card{{ if eq $item.kind "event" }} is-event{{ end }}" href="{{ $href }}">
+{{- $genres := slice -}}
+{{- range (.genres | default slice) }}{{ $genres = $genres | append (. | urlize) }}{{ end -}}
+{{- if eq $item.kind "event" }}{{ $genres = $genres | append "sports" }}{{ end -}}
+<a class="rail-card{{ if eq $item.kind "event" }} is-event{{ end }}" href="{{ $href }}" data-genres="{{ delimit $genres "," }}">
   {{- if and (eq $item.kind "event") $item.home $item.away $item.home.logo $item.away.logo -}}
   <div class="rail-poster poster-match">
     <img class="crest" src="{{ $item.home.logo }}" alt="{{ $item.home.name }}" loading="lazy">

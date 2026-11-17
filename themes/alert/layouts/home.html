@@ -78,6 +78,7 @@
 {{ end }}
 
 {{ if $rails }}
+  {{ partial "category-filter.html" . }}
   {{ range $rails }}{{ partial "rail.html" . }}{{ end }}
 {{ else }}
   {{ range $homeData.rows }}{{ partial "rail.html" . }}{{ end }}
@@ -95,8 +96,6 @@
 </section>
 {{ end }}
 
-<!-- Genres -->
-{{ partial "genre-chips.html" . }}
 
 <!-- Stats -->
 {{ with $homeData.stats }}
