@@ -6,7 +6,21 @@
       <h2>{{ .title }}</h2>
       {{ with .subtitle }}<p class="rail-subtitle">{{ . }}</p>{{ end }}
     </div>
-    {{ with .href }}<a href="{{ partial "link.html" . }}" class="rail-link">View all &rarr;</a>{{ end }}
+    <div class="rail-actions">
+      {{ with .href }}<a href="{{ partial "link.html" . }}" class="rail-link">View all &rarr;</a>{{ end }}
+      <div class="rail-nav">
+        <button type="button" class="rail-nav-button" data-rail-scroll="-1" aria-label="Scroll {{ .title }} left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="rail-nav-button" data-rail-scroll="1" aria-label="Scroll {{ .title }} right">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
   <div class="rail">
     {{- range $items -}}

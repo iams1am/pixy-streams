@@ -192,6 +192,42 @@
   }
 
   // ===========================
+  // Rail Scrolling
+  // ===========================
+  document.querySelectorAll('.rail-section').forEach(section => {
+    const rail = section.querySelector('.rail');
+    const buttons = section.querySelectorAll('[data-rail-scroll]');
+
+    if (!rail || !buttons.length) return;
+
+    const updateRailControls = () => {
+      const overflowing = rail.scrollWidth > rail.clientWidth + 4;
+      const atStart = rail.scrollLeft <= 2;
+      const atEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+
+      buttons.forEach(button => {
+        const direction = Number(button.dataset.railScroll);
+        button.hidden = !overflowing;
+        button.disabled = !overflowing || (direction < 0 ? atStart : atEnd);
+      });
+    };
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function() {
+        const direction = Number(this.dataset.railScroll);
+        rail.scrollBy({
+          left: direction * Math.round(rail.clientWidth * 0.8),
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    rail.addEventListener('scroll', updateRailControls, { passive: true });
+    window.addEventListener('resize', updateRailControls);
+    updateRailControls();
+  });
+
+  // ===========================
   // Active Nav Link Highlighting
   // ===========================
   function setActiveNavLink() {

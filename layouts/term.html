@@ -18,7 +18,7 @@
           {{ if .Params.poster }}
           <img src="{{ .Params.poster }}" alt="{{ .Title }}" loading="lazy">
           {{ else }}
-          <span class="poster-fallback"{{ with .Params.accent }} style="--poster-accent: {{ . }}"{{ end }}>{{ .Title }}</span>
+          {{ partial "poster-fallback.html" (dict "title" .Title "accent" .Params.accent) }}
           {{ end }}
         </div>
         <h2 class="rail-title">{{ .Title }}</h2>

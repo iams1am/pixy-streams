@@ -1,0 +1,12 @@
+{{- /* Artwork placeholder: monogram plus title, tinted by the item accent. */ -}}
+{{- $title := .title | default "Untitled" -}}
+{{- $initials := "" -}}
+{{- range first 2 (split $title " ") -}}
+  {{- with substr . 0 1 -}}
+    {{- $initials = printf "%s%s" $initials (upper .) -}}
+  {{- end -}}
+{{- end -}}
+<span class="poster-fallback"{{ with .accent }} style="--poster-accent: {{ . }}"{{ end }}>
+  <span class="poster-monogram">{{ $initials }}</span>
+  <span class="poster-title">{{ $title }}</span>
+</span>
