@@ -1,0 +1,132 @@
+baseURL = "https://iams1am.github.io/pixy-streams/"
+languageCode = "en-us"
+title = "Pixy Streams"
+theme = "alert"
+
+# Set to false once real catalog data is wired up (P1)
+[params]
+  description = "Discover movies, anime and live sport in one place."
+  tagline = "Movies, anime and sport - all in one place"
+  keywords = "movies, anime, sport, streaming, watch online, trailers, where to watch"
+  author = "Pixy Streams"
+  logoText = "Pixy"
+  logoAccent = "Streams"
+
+  # Brand
+  themeColor = "#ff6b35"
+
+  # Social / contact
+  github = "https://github.com/iams1am/pixy-streams"
+  facebook = ""
+  linkedin = ""
+  email = ""
+
+  # Feature flags (used by templates)
+  showAttribution = true
+
+# Main navigation menu
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  identifier = "movies"
+  name = "Movies"
+  url = "/movies/"
+  weight = 2
+
+[[menu.main]]
+  parent = "movies"
+  name = "Trending Now"
+  url = "/movies/#trending"
+  weight = 1
+
+[[menu.main]]
+  parent = "movies"
+  name = "Top Rated"
+  url = "/movies/#top-rated"
+  weight = 2
+
+[[menu.main]]
+  parent = "movies"
+  name = "New Releases"
+  url = "/movies/#new-releases"
+  weight = 3
+
+[[menu.main]]
+  parent = "movies"
+  name = "Genres"
+  url = "/movies/#genres"
+  weight = 4
+
+[[menu.main]]
+  identifier = "anime"
+  name = "Anime"
+  url = "/anime/"
+  weight = 3
+
+[[menu.main]]
+  parent = "anime"
+  name = "Airing This Season"
+  url = "/anime/#seasonal"
+  weight = 1
+
+[[menu.main]]
+  parent = "anime"
+  name = "Top Anime"
+  url = "/anime/#top-anime"
+  weight = 2
+
+[[menu.main]]
+  parent = "anime"
+  name = "Anime Movies"
+  url = "/anime/#movies"
+  weight = 3
+
+[[menu.main]]
+  identifier = "sports"
+  name = "Sports"
+  url = "/sports/"
+  weight = 4
+
+[[menu.main]]
+  parent = "sports"
+  name = "Football"
+  url = "/sports/#football"
+  weight = 1
+
+[[menu.main]]
+  parent = "sports"
+  name = "Basketball"
+  url = "/sports/#basketball"
+  weight = 2
+
+[[menu.main]]
+  parent = "sports"
+  name = "Motorsport"
+  url = "/sports/#motorsport"
+  weight = 3
+
+[[menu.main]]
+  name = "My List"
+  url = "/my-list/"
+  weight = 5
+
+[[menu.main]]
+  name = "About"
+  url = "/about/"
+  weight = 6
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "monokai"
+
+[taxonomies]
+  genre = "genres"
+
+[outputs]
+  home = ["HTML", "RSS"]

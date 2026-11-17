@@ -1,0 +1,134 @@
+{{ define "main" }}
+{{ $homeData := site.Data.home }}
+{{ $hero := $homeData.hero }}
+
+<!-- Hero Section -->
+<section class="hero hero-featured"{{ with $hero.backdrop }} style="--hero-backdrop: url('{{ . }}')"{{ end }}>
+  <div class="hero-content">
+    <div class="hero-text">
+      {{ with $hero.eyebrow }}<p class="hero-eyebrow">{{ . }}</p>{{ end }}
+      <h1 class="hero-title">{{ $hero.title }}</h1>
+      {{ with $hero.meta }}<p class="hero-meta">{{ . }}</p>{{ end }}
+      <p class="hero-subtitle">{{ $hero.subtitle }}</p>
+      {{ with $hero.tagline }}<p class="hero-tagline">{{ . }}</p>{{ end }}
+      <div class="hero-actions">
+        {{ with $hero.cta_text }}<a href="{{ $hero.cta_link }}" class="btn btn-primary">{{ . }}</a>{{ end }}
+        {{ with $hero.secondary_text }}<a href="{{ $hero.secondary_link }}" class="btn btn-ghost">{{ . }}</a>{{ end }}
+      </div>
+    </div>
+  </div>
+  <div class="hero-overlay"></div>
+</section>
+
+<!-- Catalog rails -->
+{{ range $homeData.rows }}
+<section class="rail-section container">
+  <div class="rail-header">
+    <div class="rail-heading">
+      <h2>{{ .title }}</h2>
+      {{ with .subtitle }}<p class="rail-subtitle">{{ . }}</p>{{ end }}
+    </div>
+    {{ with .href }}<a href="{{ . }}" class="rail-link">View all &rarr;</a>{{ end }}
+  </div>
+  <div class="rail">
+    {{ range .items }}
+    <a class="rail-card" href="{{ .href }}">
+      <div class="rail-poster">
+        <img src="{{ .poster }}" alt="{{ .title }}" loading="lazy">
+        {{ with .badge }}<span class="badge">{{ . }}</span>{{ end }}
+      </div>
+      <h3 class="rail-title">{{ .title }}</h3>
+      {{ with .meta }}<p class="rail-meta">{{ . }}</p>{{ end }}
+    </a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+
+<!-- About the catalog -->
+{{ with .Content }}
+<section class="mission-section">
+  <div class="container">
+    <h2>What is Pixy Streams?</h2>
+    <div class="mission-content">
+      {{ . }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+<!-- Genres -->
+{{ with $homeData.genres }}
+<section class="specialties-section container" id="genres">
+  <h2>Browse by genre</h2>
+  <div class="specialties-grid">
+    {{ range . }}
+    <a class="specialty-item" href="/movies/#genres">
+      <svg class="specialty-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>{{ . }}</span>
+    </a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+
+<!-- Stats -->
+{{ with $homeData.stats }}
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      {{ range . }}
+      <div class="stat-item">
+        <div class="stat-number">{{ .number }}</div>
+        <div class="stat-label">{{ .label }}</div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+<!-- Quick Links -->
+{{ with $homeData.quick_links }}
+<section class="quick-links-section">
+  <div class="container">
+    <h2>Jump back in</h2>
+    <div class="quick-links-grid">
+      {{ range . }}
+      <a href="{{ .url }}" class="quick-link-card">
+        <div class="quick-link-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            {{ if eq .icon "film" }}
+            <rect x="2" y="3" width="20" height="18" rx="2"></rect>
+            <line x1="7" y1="3" x2="7" y2="21"></line>
+            <line x1="17" y1="3" x2="17" y2="21"></line>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            {{ else if eq .icon "sparkles" }}
+            <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"></path>
+            <path d="M18 15l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1L15 18l2.1-.9z"></path>
+            {{ else if eq .icon "trophy" }}
+            <path d="M8 21h8"></path>
+            <path d="M12 17v4"></path>
+            <path d="M7 4h10v5a5 5 0 0 1-10 0z"></path>
+            <path d="M17 5h3v2a3 3 0 0 1-3 3"></path>
+            <path d="M7 5H4v2a3 3 0 0 0 3 3"></path>
+            {{ else if eq .icon "bookmark" }}
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            {{ else }}
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            {{ end }}
+          </svg>
+        </div>
+        <h3>{{ .title }}</h3>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ end }}

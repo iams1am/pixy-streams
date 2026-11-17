@@ -1,0 +1,51 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h3>{{ site.Title }}</h3>
+        <p>{{ site.Params.description }}</p>
+        <p class="footer-tagline">{{ site.Params.tagline }}</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Browse</h3>
+        <ul class="footer-links">
+          {{ range site.Menus.main }}
+          <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+          {{ end }}
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Data &amp; credits</h3>
+        <ul class="footer-links">
+          <li><a href="https://www.themoviedb.org/" target="_blank" rel="noopener">Movie &amp; TV data: TMDB</a></li>
+          <li><a href="https://anilist.co/" target="_blank" rel="noopener">Anime data: AniList</a></li>
+          <li><a href="https://www.thesportsdb.com/" target="_blank" rel="noopener">Sports data: TheSportsDB</a></li>
+          <li><a href="https://www.football-data.org/" target="_blank" rel="noopener">Fixtures: football-data.org</a></li>
+          {{ with site.Params.github }}
+          <li><a href="{{ . }}" target="_blank" rel="noopener">Source on GitHub</a></li>
+          {{ end }}
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>How it works</h3>
+        <p>
+          Pixy Streams is a discovery layer. We link to official trailers and to the
+          services that hold the rights to each title, so nothing is hosted or streamed here.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ now.Year }} {{ site.Title }}. All rights reserved.</p>
+      {{ if site.Params.showAttribution }}
+      <p class="footer-attribution">
+        This product uses the TMDB API but is not endorsed or certified by TMDB.
+      </p>
+      {{ end }}
+      <p>Built with <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a></p>
+    </div>
+  </div>
+</footer>

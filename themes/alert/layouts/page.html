@@ -1,0 +1,38 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}
+    <p class="page-description">{{ . }}</p>
+    {{ end }}
+    {{ if .Date }}
+    <time class="page-date">{{ .Date.Format "January 2, 2006" }}</time>
+    {{ end }}
+  </div>
+</div>
+
+<article class="page-content container">
+  <div class="content-main">
+    {{ if .Params.featured_image }}
+    <div class="featured-image">
+      <img src="{{ .Params.featured_image }}" alt="{{ .Title }}">
+    </div>
+    {{ end }}
+    
+    {{ .Content }}
+  </div>
+  
+  {{ if .Params.gallery }}
+  <div class="image-gallery">
+    <h2>Gallery</h2>
+    <div class="gallery-grid">
+      {{ range .Params.gallery }}
+      <div class="gallery-item">
+        <img src="{{ . }}" alt="Gallery image" loading="lazy">
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ end }}
+</article>
+{{ end }}
