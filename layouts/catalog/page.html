@@ -1,5 +1,6 @@
 {{ define "main" }}
 {{ $kind := .Params.catalog }}
+{{ $catalog := cond (eq $kind "movie") site.Data.catalog.movies site.Data.catalog.anime }}
 <article class="catalog-detail">
   <header class="catalog-hero"{{ with .Params.backdrop }} style="--hero-backdrop: url('{{ . }}')"{{ end }}>
     <div class="container catalog-hero-inner">
@@ -11,6 +12,11 @@
         {{ end }}
       </div>
       <div class="catalog-hero-text">
+        <nav class="catalog-breadcrumb" aria-label="Breadcrumb">
+          <a href="{{ partial "link.html" (printf "/%s/" .Section) }}">{{ with site.GetPage .Section }}{{ .Title }}{{ else }}Catalogue{{ end }}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{{ .Title }}</span>
+        </nav>
         <p class="hero-eyebrow">
           {{ with $kind }}{{ . | upper }}{{ end }}{{ with .Params.source }} · {{ . }}{{ end }}
         </p>
@@ -57,10 +63,42 @@
       {{ .Content }}
 
       <p class="catalog-note">
+        {{ with .Params.source }}Source: {{ . }}{{ end }}{{ with $catalog }}{{ with .generated_at }} · catalogue updated {{ (time .).Format "2 Jan 2006" }}{{ end }}{{ end }}.
         Pixy Streams lists metadata and links to official sources only. Playback
         happens on the service that holds the rights.
       </p>
     </div>
   </div>
 </article>
+
+{{/* Related titles from the primary genre. */}}
+{{ $primary := "" }}
+{{ $primarySlug := "" }}
+{{ with .Params.genres }}
+  {{ $primary = index . 0 }}
+  {{ $primarySlug = $primary | urlize }}
+{{ end }}
+
+{{ if $primary }}
+  {{ $related := first 11 (where (where site.RegularPages "Type" "catalog") "Params.genres" "intersect" (slice $primary)) }}
+  {{ $related = where $related "Permalink" "ne" $.Permalink }}
+  {{ $cards := slice }}
+  {{ range $related }}
+    {{ $cards = $cards | append (dict
+      "title" .Title
+      "meta" .Params.meta
+      "poster" .Params.poster
+      "accent" .Params.accent
+      "badge" .Params.badge
+      "kind" .Params.catalog
+      "href" .RelPermalink) }}
+  {{ end }}
+  {{ with $cards }}
+    {{ partial "rail.html" (dict
+      "title" "More like this"
+      "subtitle" (printf "More %s in the catalogue" $primary)
+      "href" (printf "/genres/%s/" $primarySlug)
+      "items" .) }}
+  {{ end }}
+{{ end }}
 {{ end }}
