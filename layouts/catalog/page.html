@@ -51,6 +51,20 @@
           {{ with .Params.source_url }}
           <a class="btn btn-ghost" href="{{ . }}" target="_blank" rel="noopener">More details</a>
           {{ end }}
+          <button type="button" class="btn btn-ghost save-button" data-save aria-pressed="false">
+            <svg class="save-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path>
+            </svg>
+            <span data-save-label>Save to My List</span>
+          </button>
+          <script type="application/json" data-save-data>{{ dict
+            "title" .Title
+            "url" .RelPermalink
+            "poster" (.Params.poster | default "")
+            "accent" (.Params.accent | default "")
+            "meta" (.Params.meta | default "")
+            "kind" ($kind | default "title")
+            "genres" (.Params.genres | default slice) | jsonify | safeJS }}</script>
         </div>
       </div>
     </div>

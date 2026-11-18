@@ -228,6 +228,381 @@
   });
 
   // ===========================
+  // Header Search
+  // ===========================
+  const searchRoot = document.querySelector('[data-search]');
+
+  if (searchRoot) {
+    const searchForm = searchRoot.querySelector('[data-search-form]');
+    const searchInput = searchRoot.querySelector('[data-search-input]');
+    const searchPanel = searchRoot.querySelector('[data-search-results]');
+    const indexUrl = searchRoot.dataset.index;
+
+    let searchIndex = null;
+    let indexLoading = false;
+    let indexFailed = false;
+    let results = [];
+    let activeResult = -1;
+    let searchTimer;
+
+    const loadIndex = async () => {
+      if (searchIndex || indexLoading) return searchIndex;
+      indexLoading = true;
+
+      try {
+        const response = await fetch(indexUrl, { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+        const data = await response.json();
+        searchIndex = Array.isArray(data) ? data : [];
+      } catch (error) {
+        indexFailed = true;
+        searchIndex = [];
+      }
+
+      indexLoading = false;
+      return searchIndex;
+    };
+
+    const closeResults = () => {
+      searchPanel.hidden = true;
+      searchPanel.textContent = '';
+      searchInput.setAttribute('aria-expanded', 'false');
+      searchInput.removeAttribute('aria-activedescendant');
+      activeResult = -1;
+    };
+
+    const scoreEntry = (entry, terms) => {
+      const title = (entry.title || '').toLowerCase();
+      const haystack = [title, entry.meta || '', (entry.genres || []).join(' ')].join(' ').toLowerCase();
+
+      if (!terms.every(term => haystack.includes(term))) return -1;
+      if (title.startsWith(terms[0])) return 0;
+      if (title.includes(terms[0])) return 1;
+      return 2;
+    };
+
+    const renderResults = () => {
+      searchPanel.textContent = '';
+
+      if (!results.length) {
+        const empty = document.createElement('p');
+        empty.className = 'search-empty';
+        empty.textContent = indexFailed
+          ? 'Search is unavailable right now.'
+          : 'No titles match that search.';
+        searchPanel.append(empty);
+      } else {
+        results.forEach((entry, position) => {
+          const link = document.createElement('a');
+          link.className = 'search-result';
+          link.href = entry.url;
+          link.id = 'search-result-' + position;
+          link.setAttribute('role', 'option');
+          link.setAttribute('aria-selected', String(position === activeResult));
+
+          const title = document.createElement('span');
+          title.className = 'search-result-title';
+          title.textContent = entry.title;
+
+          const kindLabel = entry.kind === 'movie' ? 'Movie' : entry.kind === 'anime' ? 'Anime' : '';
+          const meta = document.createElement('span');
+          meta.className = 'search-result-meta';
+          meta.textContent = [kindLabel, entry.meta].filter(Boolean).join(' · ');
+
+          link.append(title, meta);
+          searchPanel.append(link);
+        });
+      }
+
+      searchPanel.hidden = false;
+      searchInput.setAttribute('aria-expanded', 'true');
+
+      if (activeResult >= 0) {
+        searchInput.setAttribute('aria-activedescendant', 'search-result-' + activeResult);
+      } else {
+        searchInput.removeAttribute('aria-activedescendant');
+      }
+    };
+
+    const runSearch = async () => {
+      const value = searchInput.value.trim().toLowerCase();
+
+      if (value.length < 2) {
+        results = [];
+        closeResults();
+        return;
+      }
+
+      const data = await loadIndex();
+      const terms = value.split(/\s+/).filter(Boolean);
+
+      results = (data || [])
+        .map(entry => ({ entry, score: scoreEntry(entry, terms) }))
+        .filter(result => result.score >= 0)
+        .sort((a, b) => a.score - b.score || a.entry.title.localeCompare(b.entry.title))
+        .slice(0, 8)
+        .map(result => result.entry);
+
+      activeResult = -1;
+      renderResults();
+    };
+
+    const openResult = (position) => {
+      const entry = results[position] || results[0];
+      if (entry) window.location.href = entry.url;
+    };
+
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 120);
+    });
+
+    searchInput.addEventListener('focus', function() {
+      loadIndex();
+      if (searchInput.value.trim().length >= 2) runSearch();
+    });
+
+    searchInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeResults();
+        return;
+      }
+
+      if (searchPanel.hidden || !results.length) return;
+
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        activeResult = event.key === 'ArrowDown'
+          ? (activeResult + 1) % results.length
+          : (activeResult <= 0 ? results.length - 1 : activeResult - 1);
+        renderResults();
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        openResult(activeResult >= 0 ? activeResult : 0);
+      }
+    });
+
+    if (searchForm) {
+      searchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (results.length) openResult(activeResult >= 0 ? activeResult : 0);
+      });
+    }
+
+    document.addEventListener('click', function(event) {
+      if (!searchRoot.contains(event.target)) closeResults();
+    });
+  }
+
+  // ===========================
+  // My List (saved titles, browser-local)
+  // ===========================
+  const LIST_KEY = 'pixy-my-list';
+  const listGrid = document.querySelector('[data-my-list]');
+  const listEmpty = document.querySelector('[data-my-list-empty]');
+  const listToolbar = document.querySelector('[data-my-list-toolbar]');
+  const listCount = document.querySelector('[data-my-list-count]');
+  const listClear = document.querySelector('[data-my-list-clear]');
+
+  const readList = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(item => item && typeof item.url === 'string' && typeof item.title === 'string');
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const writeList = (items) => {
+    try {
+      localStorage.setItem(LIST_KEY, JSON.stringify(items));
+    } catch (error) {
+      // Storage may be blocked or full; the list simply will not persist.
+    }
+  };
+
+  const safeAccent = (value) => /^#[0-9a-f]{3,8}$/i.test(value || '') ? value : '';
+  const safePoster = (value) => /^https?:\/\//i.test(value || '') ? value : '';
+
+  const readSavePayload = () => {
+    const script = document.querySelector('[data-save-data]');
+    if (!script) return null;
+
+    try {
+      const payload = JSON.parse(script.textContent || '{}');
+      return payload && typeof payload.url === 'string' ? payload : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const buildListCard = (item) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'my-list-item';
+
+    const link = document.createElement('a');
+    link.className = 'rail-card';
+    link.href = item.url;
+
+    const poster = document.createElement('div');
+    poster.className = 'rail-poster';
+    const posterUrl = safePoster(item.poster);
+
+    if (posterUrl) {
+      const img = document.createElement('img');
+      img.src = posterUrl;
+      img.alt = item.title;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      poster.append(img);
+    } else {
+      const fallback = document.createElement('span');
+      fallback.className = 'poster-fallback';
+      const accent = safeAccent(item.accent);
+      if (accent) fallback.style.setProperty('--poster-accent', accent);
+
+      const monogram = document.createElement('span');
+      monogram.className = 'poster-monogram';
+      monogram.textContent = item.title
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase();
+
+      const label = document.createElement('span');
+      label.className = 'poster-title';
+      label.textContent = item.title;
+
+      fallback.append(monogram, label);
+      poster.append(fallback);
+    }
+
+    const title = document.createElement('h3');
+    title.className = 'rail-title';
+    title.textContent = item.title;
+    link.append(poster, title);
+
+    if (item.meta) {
+      const meta = document.createElement('p');
+      meta.className = 'rail-meta';
+      meta.textContent = item.meta;
+      link.append(meta);
+    }
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'my-list-remove';
+    remove.dataset.remove = item.url;
+    remove.setAttribute('aria-label', 'Remove ' + item.title + ' from My List');
+    remove.innerHTML = '&times;';
+
+    wrapper.append(link, remove);
+    return wrapper;
+  };
+
+  const renderList = () => {
+    if (!listGrid) return;
+
+    const items = readList();
+    listGrid.textContent = '';
+    items.forEach(item => listGrid.append(buildListCard(item)));
+
+    if (listEmpty) listEmpty.hidden = items.length > 0;
+    if (listToolbar) listToolbar.hidden = items.length === 0;
+    if (listCount) {
+      listCount.textContent = items.length === 1 ? '1 title saved' : items.length + ' titles saved';
+    }
+  };
+
+  let navCountBadge = null;
+
+  const getNavCountBadge = () => {
+    if (navCountBadge) return navCountBadge;
+
+    const myListLink = Array.from(document.querySelectorAll('.nav-link')).find(link => {
+      const href = link.getAttribute('href') || '';
+      return href.replace(/\/$/, '').endsWith('/my-list');
+    });
+
+    if (!myListLink) return null;
+
+    navCountBadge = document.createElement('span');
+    navCountBadge.className = 'nav-count';
+    navCountBadge.hidden = true;
+    myListLink.append(navCountBadge);
+    return navCountBadge;
+  };
+
+  const syncSaveButtons = () => {
+    const saved = new Set(readList().map(item => item.url));
+    const payload = readSavePayload();
+    const isSaved = Boolean(payload && saved.has(payload.url));
+
+    document.querySelectorAll('[data-save]').forEach(button => {
+      button.setAttribute('aria-pressed', String(isSaved));
+
+      const label = button.querySelector('[data-save-label]');
+      if (label) label.textContent = isSaved ? 'In My List' : 'Save to My List';
+    });
+
+    const badge = getNavCountBadge();
+    if (badge) {
+      const total = saved.size;
+      badge.textContent = String(total);
+      badge.hidden = total === 0;
+    }
+  };
+
+  document.querySelectorAll('[data-save]').forEach(button => {
+    button.addEventListener('click', function() {
+      const payload = readSavePayload();
+      if (!payload) return;
+
+      const items = readList();
+      const position = items.findIndex(item => item.url === payload.url);
+      if (position >= 0) items.splice(position, 1);
+      else items.push(payload);
+
+      writeList(items);
+      syncSaveButtons();
+      renderList();
+    });
+  });
+
+  if (listGrid) {
+    listGrid.addEventListener('click', function(event) {
+      const remove = event.target.closest('[data-remove]');
+      if (!remove) return;
+
+      event.preventDefault();
+      writeList(readList().filter(item => item.url !== remove.dataset.remove));
+      renderList();
+      syncSaveButtons();
+    });
+  }
+
+  if (listClear) {
+    listClear.addEventListener('click', function() {
+      writeList([]);
+      renderList();
+      syncSaveButtons();
+    });
+  }
+
+  window.addEventListener('storage', function(event) {
+    if (event.key !== LIST_KEY) return;
+    renderList();
+    syncSaveButtons();
+  });
+
+  syncSaveButtons();
+  renderList();
+
+  // ===========================
   // Active Nav Link Highlighting
   // ===========================
   function setActiveNavLink() {

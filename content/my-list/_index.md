@@ -1,11 +1,11 @@
 ---
 title: "My List"
-description: "Your shortlist, kept in this browser once saving lands."
+description: "Titles you save, kept in this browser only."
 ---
 
-A personal shortlist is the next piece of this site: no account, no email, no
-tracking - just a list stored in your own browser.
+Save anything with **Save to My List** on a title page and it appears here. The
+list lives in this browser's local storage: no account, no email, no tracking,
+and nothing is sent to a server.
 
-Until that ships, everything worth watching is a click away: the
-[Movies](/movies/), [Anime](/anime/) and [Sports](/sports/) sections are rebuilt
-on every deploy, and each title page already lists the services carrying it.
+Clearing the list empties it for this browser. Open the site somewhere else, or
+in a private window, and you start with an empty list.

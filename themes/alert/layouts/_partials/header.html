@@ -39,6 +39,16 @@
       </ul>
       
       <div class="navbar-actions">
+        <div class="site-search" role="search" data-search data-index="{{ partial "link.html" "/search.json" }}">
+          <form class="search-form" data-search-form>
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+            </svg>
+            <input type="search" class="search-input" data-search-input placeholder="Search titles" aria-label="Search titles" role="combobox" aria-autocomplete="list" autocomplete="off" spellcheck="false" aria-expanded="false" aria-controls="search-results">
+          </form>
+          <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Search results" hidden></div>
+        </div>
         <button class="theme-toggle" aria-label="Toggle theme">
           <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"></circle>

@@ -128,4 +128,14 @@ theme = "alert"
   genre = "genres"
 
 [outputs]
-  home = ["HTML", "RSS"]
+  home = ["HTML", "RSS", "search"]
+
+# Build-time search index consumed by the header search box.
+[mediaTypes."application/json"]
+  suffixes = ["json"]
+
+[outputFormats.search]
+  mediaType = "application/json"
+  baseName = "search"
+  isPlainText = true
+  notAlternative = true

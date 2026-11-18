@@ -63,14 +63,19 @@ then generates the rails, section pages and one page per title.
 ```bash
 node scripts/fetch-catalog.mjs                  # everything
 node scripts/fetch-catalog.mjs --only=anime     # one vertical
-TMDB_API_KEY=xxx node scripts/fetch-catalog.mjs --only=movies
+node scripts/fetch-catalog.mjs --only=movies    # films (needs a TMDB key)
 ```
 
 Environment variables: `TMDB_API_KEY` (or `TMDB_READ_TOKEN`), `SPORTSDB_KEY`.
+Put them in a `.env` file at the repo root - copy `.env.example`, which is the
+committed template while `.env` itself is git-ignored. Shell values win over the
+file.
+
 Without a TMDB key the movies vertical keeps the curated seed in
 `data/catalog/movies.json` and the script reports `kept … cached items` instead of
-failing. A source that errors also leaves its previous JSON untouched, so a flaky
-API never breaks a build.
+failing. With a key it replaces the seed with live trending, top-rated and
+now-playing films, complete with posters and backdrops. A source that errors also
+leaves its previous JSON untouched, so a flaky API never breaks a build.
 
 Keys are read at build time only. Nothing secret is shipped to the browser, which
 is why this is a build step rather than client-side `fetch()`.
@@ -133,8 +138,9 @@ the file.
 
 - **Done** - rebrand, streaming homepage, rails, genres, nav dropdowns
 - **Done** - build-time catalogue fetch, generated title pages, live posters
-- **Next** - client-side search index, watchlist in `localStorage`, trailer modal
-- **Then** - scheduled catalogue refresh and a TMDB key for live movie artwork
+- **Done** - client-side search over a build-time index, My List in `localStorage`
+- **Next** - TMDB key for live movie artwork, trailer modal
+- **Then** - scheduled catalogue refresh through the Actions workflow
 - **Later** - per-title playback slot for public-domain / licensed media
 
 ## Attribution

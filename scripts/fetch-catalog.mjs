@@ -15,15 +15,36 @@
  *   TMDB_READ_TOKEN  TMDB v4 read token     (alternative to the key)
  *   SPORTSDB_KEY     TheSportsDB key        (defaults to the public test key)
  *
+ * Variables may live in a .env file at the repo root (see .env.example) or in
+ * the shell; the shell wins.
+ *
  * A source that fails leaves its previous JSON file untouched, so a flaky API
  * or a missing key never breaks the build.
  */
 
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+/** Read `KEY=value` pairs from .env at the repo root, without overriding the real environment. */
+function loadEnvFile() {
+  const file = path.join(ROOT, ".env");
+  if (!existsSync(file)) return;
+
+  for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (!match) continue;
+
+    const [, key, raw] = match;
+    const value = raw.replace(/^['"]|['"]$/g, "");
+    if (!(key in process.env)) process.env[key] = value;
+  }
+}
+
+loadEnvFile();
 const OUT_DIR = path.join(ROOT, "data", "catalog");
 const UA = "PixyStreams/1.0 (+https://github.com/iams1am/pixy-streams)";
 const TIMEOUT_MS = 25_000;
@@ -664,12 +685,15 @@ async function main() {
       console.log(`${data.count} items from ${data.source}`);
       live++;
     } catch (error) {
+      const hint = /TMDB credentials/.test(error.message)
+        ? "\n  \u2192 copy .env.example to .env and set TMDB_API_KEY for live movie artwork"
+        : "";
       const previous = await existing(job.name);
       if (previous) {
-        console.log(`kept ${previous.count} cached items (${error.message})`);
+        console.log(`kept ${previous.count} cached items (${error.message})${hint}`);
         kept++;
       } else {
-        console.log(`no data (${error.message})`);
+        console.log(`no data (${error.message})${hint}`);
         failed++;
       }
     }

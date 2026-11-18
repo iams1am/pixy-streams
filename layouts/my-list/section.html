@@ -1,0 +1,36 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}
+    <p class="page-description">{{ . }}</p>
+    {{ end }}
+  </div>
+</div>
+
+<div class="page-content container">
+  <div class="content-main">
+    {{ .Content }}
+
+    <div class="my-list-toolbar" data-my-list-toolbar hidden>
+      <p class="my-list-count" data-my-list-count aria-live="polite"></p>
+      <button type="button" class="btn btn-ghost" data-my-list-clear>Clear list</button>
+    </div>
+
+    <div class="my-list-grid" data-my-list></div>
+
+    <p class="my-list-empty" data-my-list-empty>
+      Nothing saved yet. Open any title and choose <strong>Save to My List</strong>.
+    </p>
+
+    <noscript>
+      <p class="my-list-empty">
+        My List is kept in this browser, so it needs JavaScript. The
+        <a href="{{ partial "link.html" "/movies/" }}">Movies</a>,
+        <a href="{{ partial "link.html" "/anime/" }}">Anime</a> and
+        <a href="{{ partial "link.html" "/sports/" }}">Sports</a> sections work without it.
+      </p>
+    </noscript>
+  </div>
+</div>
+{{ end }}

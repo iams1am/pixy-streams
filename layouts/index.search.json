@@ -1,0 +1,14 @@
+{{- /* Flat index for the header search box: title, link, meta line, genres. */ -}}
+[
+{{- $pages := where site.RegularPages "Type" "catalog" -}}
+{{- range $i, $page := $pages -}}
+{{- if $i }},{{ end -}}
+{{- dict
+  "title" $page.Title
+  "url" $page.RelPermalink
+  "meta" ($page.Params.meta | default "")
+  "kind" ($page.Params.catalog | default "")
+  "genres" ($page.Params.genres | default slice)
+  | jsonify -}}
+{{- end -}}
+]
