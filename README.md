@@ -116,29 +116,20 @@ site base path so the site works from the `/pixy-streams/` subpath.
 
 ## Deployment
 
-Live at <https://iams1am.github.io/pixy-streams/>, served from the `gh-pages`
-branch.
+Live at <https://iams1am.github.io/pixy-streams/>, deployed by
+`.github/workflows/deploy.yml`. Every push to `main` refreshes the catalogue,
+builds with Hugo and publishes through GitHub Pages; a daily `cron` run at 05:00
+UTC does the same so fixtures and seasonal anime do not go stale, and
+`workflow_dispatch` covers manual runs.
 
-`.github/workflows/deploy.yml` builds on every push to `main` and on a daily
-`cron` schedule, refreshing the catalogue first so fixtures and seasonal anime do
-not go stale. It reads `TMDB_API_KEY`, `TMDB_READ_TOKEN` and `SPORTSDB_KEY` from
-repository secrets; a missing secret just leaves that source on its committed
-JSON. Schedules only run once the workflow exists on the default branch.
+The workflow reads `TMDB_API_KEY`, `TMDB_READ_TOKEN` and `SPORTSDB_KEY` from
+repository secrets. A missing secret just leaves that source on its committed
+JSON, so the site still builds.
 
-The push token behind `gh` does not carry the `workflow` scope, so that file
-cannot be pushed from this machine yet. Until it can, publish with:
-
-```bash
-node scripts/fetch-catalog.mjs
-hugo --gc --minify --cleanDestinationDir
-cd public && git init -q -b gh-pages && git add -A \
-  && git commit -q -m "Deploy" \
-  && git push -f https://github.com/iams1am/pixy-streams.git gh-pages && cd ..
-```
-
-To switch to the Actions pipeline later: run `gh auth refresh -s workflow`, then
-remove the `.github/workflows/deploy.yml` line from `.git/info/exclude` and commit
-the file.
+Pages is configured with `build_type: workflow`, which is what allows
+`actions/deploy-pages` to publish. To go back to branch publishing, run
+`gh api -X PUT repos/iams1am/pixy-streams/pages -f build_type=legacy` and point
+Pages at the `gh-pages` branch, which the older manual flow force-pushed.
 
 ## Roadmap
 
