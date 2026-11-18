@@ -1,14 +1,27 @@
-{{- /* Flat index for the header search box: title, link, meta line, genres. */ -}}
-[
-{{- $pages := where site.RegularPages "Type" "catalog" -}}
-{{- range $i, $page := $pages -}}
-{{- if $i }},{{ end -}}
-{{- dict
-  "title" $page.Title
-  "url" $page.RelPermalink
-  "meta" ($page.Params.meta | default "")
-  "kind" ($page.Params.catalog | default "")
-  "genres" ($page.Params.genres | default slice)
-  | jsonify -}}
+{{- /* Flat index for the header search box: titles, fixtures, meta lines, genres. */ -}}
+{{- $entries := slice -}}
+
+{{- range where site.RegularPages "Type" "catalog" -}}
+  {{- $entries = $entries | append (dict
+    "title" .Title
+    "url" .RelPermalink
+    "meta" (.Params.meta | default "")
+    "kind" (.Params.catalog | default "")
+    "genres" (.Params.genres | default slice)) -}}
 {{- end -}}
-]
+
+{{- with site.Data.catalog.sports -}}
+  {{- range $event := .items -}}
+    {{- with $event.href -}}
+      {{- $entries = $entries | append (dict
+        "title" $event.title
+        "url" .
+        "meta" ($event.meta | default "")
+        "kind" "event"
+        "external" true
+        "genres" ($event.genres | default slice)) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $entries | jsonify -}}

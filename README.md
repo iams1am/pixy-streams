@@ -119,8 +119,14 @@ site base path so the site works from the `/pixy-streams/` subpath.
 Live at <https://iams1am.github.io/pixy-streams/>, served from the `gh-pages`
 branch.
 
-The push token behind `gh` does not carry the `workflow` scope, so
-`.github/workflows/deploy.yml` cannot be pushed yet. Until it can, publish with:
+`.github/workflows/deploy.yml` builds on every push to `main` and on a daily
+`cron` schedule, refreshing the catalogue first so fixtures and seasonal anime do
+not go stale. It reads `TMDB_API_KEY`, `TMDB_READ_TOKEN` and `SPORTSDB_KEY` from
+repository secrets; a missing secret just leaves that source on its committed
+JSON. Schedules only run once the workflow exists on the default branch.
+
+The push token behind `gh` does not carry the `workflow` scope, so that file
+cannot be pushed from this machine yet. Until it can, publish with:
 
 ```bash
 node scripts/fetch-catalog.mjs
@@ -139,8 +145,8 @@ the file.
 - **Done** - rebrand, streaming homepage, rails, genres, nav dropdowns
 - **Done** - build-time catalogue fetch, generated title pages, live posters
 - **Done** - client-side search over a build-time index, My List in `localStorage`
-- **Next** - TMDB key for live movie artwork, trailer modal
-- **Then** - scheduled catalogue refresh through the Actions workflow
+- **Done** - trailer modal on title pages, scheduled catalogue refresh workflow
+- **Next** - TMDB key for live movie artwork and film trailers
 - **Later** - per-title playback slot for public-domain / licensed media
 
 ## Attribution

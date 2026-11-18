@@ -46,7 +46,10 @@
         {{ with .Params.score }}<p class="catalog-score">{{ . }}<span>/10</span></p>{{ end }}
         <div class="hero-actions">
           {{ with .Params.trailer }}
-          <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener">Watch trailer</a>
+          {{ $embed := . }}
+          {{ $embed = replaceRE `^https?://(?:www\.)?youtube\.com/watch\?(?:.*&)?v=([A-Za-z0-9_-]+).*$` "https://www.youtube.com/embed/${1}?autoplay=1&rel=0" $embed }}
+          {{ $embed = replaceRE `^https?://youtu\.be/([A-Za-z0-9_-]+).*$` "https://www.youtube.com/embed/${1}?autoplay=1&rel=0" $embed }}
+          <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener" data-trailer="{{ $embed }}">Watch trailer</a>
           {{ end }}
           {{ with .Params.source_url }}
           <a class="btn btn-ghost" href="{{ . }}" target="_blank" rel="noopener">More details</a>
@@ -104,6 +107,21 @@
     </div>
   </div>
 </article>
+
+{{ with .Params.trailer }}
+<dialog class="trailer-dialog" data-trailer-dialog aria-label="{{ $.Title }} trailer">
+  <div class="trailer-dialog-head">
+    <p class="trailer-dialog-title">{{ $.Title }}</p>
+    <button type="button" class="trailer-close" data-trailer-close aria-label="Close trailer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="trailer-frame" data-trailer-frame></div>
+</dialog>
+{{ end }}
 
 {{/* Related titles from the primary genre. */}}
 {{ $primary := "" }}

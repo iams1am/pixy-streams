@@ -2213,6 +2213,75 @@ button:focus-visible,
 }
 
 /* ===========================
+   Trailer Modal
+   =========================== */
+.trailer-dialog {
+  width: min(920px, 92vw);
+  max-width: none;
+  max-height: 90vh;
+  padding: 0;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: #0b1020;
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.trailer-dialog::backdrop {
+  background-color: rgba(5, 7, 14, 0.72);
+}
+
+.trailer-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: 0.65rem 0.85rem;
+}
+
+.trailer-dialog-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.trailer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.trailer-close:hover,
+.trailer-close:focus-visible {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+.trailer-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+}
+
+.trailer-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ===========================
    Print Styles
    =========================== */
 @media print {

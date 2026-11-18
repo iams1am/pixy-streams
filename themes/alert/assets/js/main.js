@@ -300,11 +300,17 @@
           link.setAttribute('role', 'option');
           link.setAttribute('aria-selected', String(position === activeResult));
 
+          if (entry.external) {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+          }
+
           const title = document.createElement('span');
           title.className = 'search-result-title';
           title.textContent = entry.title;
 
-          const kindLabel = entry.kind === 'movie' ? 'Movie' : entry.kind === 'anime' ? 'Anime' : '';
+          const kindLabels = { movie: 'Movie', anime: 'Anime', event: 'Sport' };
+          const kindLabel = kindLabels[entry.kind] || '';
           const meta = document.createElement('span');
           meta.className = 'search-result-meta';
           meta.textContent = [kindLabel, entry.meta].filter(Boolean).join(' · ');
@@ -349,7 +355,10 @@
 
     const openResult = (position) => {
       const entry = results[position] || results[0];
-      if (entry) window.location.href = entry.url;
+      if (!entry) return;
+
+      if (entry.external) window.open(entry.url, '_blank', 'noopener');
+      else window.location.href = entry.url;
     };
 
     searchInput.addEventListener('input', function() {
@@ -393,6 +402,56 @@
 
     document.addEventListener('click', function(event) {
       if (!searchRoot.contains(event.target)) closeResults();
+    });
+  }
+
+  // ===========================
+  // Trailer Modal
+  // ===========================
+  const trailerDialog = document.querySelector('[data-trailer-dialog]');
+  const trailerFrame = document.querySelector('[data-trailer-frame]');
+
+  if (trailerDialog && trailerFrame) {
+    const closeTrailer = () => {
+      if (trailerDialog.open && typeof trailerDialog.close === 'function') {
+        trailerDialog.close();
+      } else {
+        trailerDialog.removeAttribute('open');
+      }
+
+      trailerFrame.replaceChildren();
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll('[data-trailer]').forEach(link => {
+      link.addEventListener('click', function(event) {
+        const embed = link.dataset.trailer || '';
+        if (!embed.includes('/embed/')) return;
+
+        event.preventDefault();
+
+        const frame = document.createElement('iframe');
+        frame.src = embed;
+        frame.title = link.closest('.catalog-hero')?.querySelector('h1')?.textContent.trim() + ' trailer' || 'Trailer';
+        frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        frame.allowFullscreen = true;
+        frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+
+        trailerFrame.replaceChildren(frame);
+
+        if (typeof trailerDialog.showModal === 'function') trailerDialog.showModal();
+        else trailerDialog.setAttribute('open', '');
+
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    document.querySelector('[data-trailer-close]')?.addEventListener('click', closeTrailer);
+
+    trailerDialog.addEventListener('close', closeTrailer);
+
+    trailerDialog.addEventListener('click', function(event) {
+      if (event.target === trailerDialog) closeTrailer();
     });
   }
 
