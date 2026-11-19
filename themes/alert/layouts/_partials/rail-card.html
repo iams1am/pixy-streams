@@ -3,7 +3,7 @@
 {{- $genres := slice -}}
 {{- range (.genres | default slice) }}{{ $genres = $genres | append (. | urlize) }}{{ end -}}
 {{- if eq $item.kind "event" }}{{ $genres = $genres | append "sports" }}{{ end -}}
-<a class="rail-card{{ if eq $item.kind "event" }} is-event{{ end }}" href="{{ $href }}" data-genres="{{ delimit $genres "," }}">
+<a class="rail-card{{ if eq $item.kind "event" }} is-event{{ end }}" href="{{ $href }}" data-genres="{{ delimit $genres "," }}" data-sort-title="{{ $item.title }}"{{ with $item.score }} data-sort-score="{{ . }}"{{ end }}{{ with $item.year }} data-sort-year="{{ . }}"{{ end }}{{ with $item.kickoff }} data-sort-time="{{ . }}"{{ end }}>
   {{- if and (eq $item.kind "event") $item.home $item.away $item.home.logo $item.away.logo -}}
   <div class="rail-poster poster-match">
     <img class="crest" src="{{ $item.home.logo }}" alt="{{ $item.home.name }}" loading="lazy">

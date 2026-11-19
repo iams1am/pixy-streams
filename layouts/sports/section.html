@@ -33,6 +33,16 @@
     "title" "Motorsport"
     "subtitle" "Grand Prix weekends and sessions"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "motorsport" "limit" 14))) }}
+
+  {{ partial "catalog-grid.html" (dict
+    "id" "all-fixtures"
+    "items" $catalog.items
+    "title" "All fixtures"
+    "subtitle" "Every fixture and result from the latest scoreboard refresh"
+    "sorts" (slice
+      (dict "value" "default" "label" "Catalogue order")
+      (dict "value" "time" "label" "Soonest first")
+      (dict "value" "title" "label" "A to Z"))) }}
 {{ end }}
 
 {{ with .Content }}

@@ -27,6 +27,17 @@
     "title" "New releases"
     "subtitle" "Recently added, newest first"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "new_releases" "limit" 14))) }}
+
+  {{ partial "catalog-grid.html" (dict
+    "id" "all-movies"
+    "items" $catalog.items
+    "title" "All movies"
+    "subtitle" "Every film in the catalogue, including the ones outside the rails"
+    "sorts" (slice
+      (dict "value" "default" "label" "Catalogue order")
+      (dict "value" "score" "label" "Highest rated")
+      (dict "value" "year" "label" "Newest first")
+      (dict "value" "title" "label" "A to Z"))) }}
 {{ end }}
 
 {{ with .Content }}

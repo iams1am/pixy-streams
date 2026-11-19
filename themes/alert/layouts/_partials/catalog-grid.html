@@ -1,0 +1,32 @@
+{{- /* Every title in a section, not just the rail picks. Shares the rail card
+       markup so filtering (data-genres) and artwork fallbacks work unchanged.
+       `sorts` is a list of dicts with `value` and `label`; main.js reorders. */ -}}
+{{- $items := .items | default slice -}}
+{{- $id := .id | default "all-titles" -}}
+{{- $sorts := .sorts | default slice -}}
+{{- with $items }}
+<section class="catalog-browse container" id="{{ $id }}" data-filterable aria-labelledby="{{ $id }}-heading">
+  <div class="browse-header">
+    <div class="rail-heading">
+      <h2 id="{{ $id }}-heading">{{ $.title }}</h2>
+      {{ with $.subtitle }}<p class="rail-subtitle">{{ . }}</p>{{ end }}
+    </div>
+    {{ with $sorts }}
+    <label class="browse-sort">
+      <span>Sort by</span>
+      <select data-grid-sort="{{ $id }}">
+        {{- range . }}
+        <option value="{{ .value }}">{{ .label }}</option>
+        {{- end }}
+      </select>
+    </label>
+    {{ end }}
+  </div>
+  <div class="catalog-grid" data-catalog-grid>
+    {{- range $items }}
+    {{ partial "rail-card.html" . }}
+    {{- end }}
+  </div>
+  <p class="browse-status" role="status" aria-live="polite" data-grid-status></p>
+</section>
+{{- end }}

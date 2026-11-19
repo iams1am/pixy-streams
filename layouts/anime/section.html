@@ -33,6 +33,17 @@
     "title" "Trending right now"
     "subtitle" "What the community is watching today"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "trending" "limit" 14))) }}
+
+  {{ partial "catalog-grid.html" (dict
+    "id" "all-anime"
+    "items" $catalog.items
+    "title" "All anime"
+    "subtitle" "Every series and film pulled from AniList this build"
+    "sorts" (slice
+      (dict "value" "default" "label" "Catalogue order")
+      (dict "value" "score" "label" "Highest rated")
+      (dict "value" "year" "label" "Newest first")
+      (dict "value" "title" "label" "A to Z"))) }}
 {{ end }}
 
 {{ with .Content }}

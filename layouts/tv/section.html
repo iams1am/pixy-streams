@@ -27,6 +27,17 @@
     "title" "On the air"
     "subtitle" "Currently airing, according to TMDB"
     "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "on_the_air" "limit" 14))) }}
+
+  {{ partial "catalog-grid.html" (dict
+    "id" "all-series"
+    "items" $catalog.items
+    "title" "All series"
+    "subtitle" "Every show in the catalogue, on the air or not"
+    "sorts" (slice
+      (dict "value" "default" "label" "Catalogue order")
+      (dict "value" "score" "label" "Highest rated")
+      (dict "value" "year" "label" "Newest first")
+      (dict "value" "title" "label" "A to Z"))) }}
 {{ else }}
   <div class="container">
     <p class="catalog-note">The TV catalogue is unavailable right now. The rest of the site is unaffected.</p>

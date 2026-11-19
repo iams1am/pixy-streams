@@ -43,10 +43,15 @@ themes/alert/               design system: CSS, JS, shared partials
 node scripts/fetch-catalog.mjs    # refresh data/catalog/*.json
 hugo server -D                    # http://localhost:1313
 hugo --gc --minify                # production build into public/
+node scripts/check-site.mjs       # verify the build before shipping
 ```
 
 Node 20+ is only needed to refresh the catalogue. The generated JSON is committed,
 so a plain `hugo` build works without Node or network access.
+
+`check-site.mjs` fails on dead or un-prefixed internal links, missing metadata or
+`alt` text, duplicate ids, a malformed search index and leaked credentials. The
+deploy workflow runs it before uploading, so a broken build never publishes.
 
 ## Catalogue pipeline
 
@@ -150,7 +155,8 @@ Pages at the `gh-pages` branch, which the older manual flow force-pushed.
 - **Done** - build-time catalogue fetch, generated title pages, live posters
 - **Done** - client-side search over a build-time index, My List in `localStorage`
 - **Done** - trailer modal on title pages, scheduled catalogue refresh workflow
-- **Next** - TMDB key for live movie artwork and film trailers
+- **Done** - TV catalogue, browse-all grids with sorting, post-build checks in CI
+- **Next** - TMDB key for live movie artwork, film trailers and episode guides
 - **Later** - per-title playback slot for public-domain / licensed media
 
 ## Attribution

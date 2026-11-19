@@ -227,8 +227,8 @@
     const clearButton = categoryFilter.querySelector('[data-clear]');
     const statusMessage = categoryFilter.querySelector('[data-filter-status]');
     const emptyMessage = categoryFilter.querySelector('[data-filter-empty]');
-    const filterableSections = Array.from(document.querySelectorAll('.rail-section[data-filterable]'));
-    const railCards = Array.from(document.querySelectorAll('.rail-section[data-filterable] .rail-card'));
+    const filterableSections = Array.from(document.querySelectorAll('[data-filterable]'));
+    const railCards = Array.from(document.querySelectorAll('[data-filterable] .rail-card'));
 
     // The same title can appear in several rails. Count each genre once per title
     // so the chip numbers match what selecting that genre will actually reveal.
@@ -350,6 +350,45 @@
     window.addEventListener('resize', updateRailControls);
     railUpdateCallbacks.push(updateRailControls);
     updateRailControls();
+  });
+
+  // ===========================
+  // Browse-all sorting
+  // ===========================
+  document.querySelectorAll('[data-grid-sort]').forEach(select => {
+    const section = document.getElementById(select.dataset.gridSort);
+    const grid = section?.querySelector('[data-catalog-grid]');
+    const status = section?.querySelector('[data-grid-status]');
+
+    if (!grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.rail-card'));
+    cards.forEach((card, index) => { card.dataset.defaultIndex = String(index); });
+
+    const text = (card, key, fallback = '') => card.dataset[key] ?? fallback;
+    const number = (card, key) => Number.parseFloat(card.dataset[key] || '0') || 0;
+    const byTitle = (a, b) => text(a, 'sortTitle').localeCompare(text(b, 'sortTitle'));
+
+    const comparators = {
+      score: (a, b) => number(b, 'sortScore') - number(a, 'sortScore') || byTitle(a, b),
+      year: (a, b) => number(b, 'sortYear') - number(a, 'sortYear') || byTitle(a, b),
+      time: (a, b) => text(a, 'sortTime', '9999').localeCompare(text(b, 'sortTime', '9999')),
+      title: byTitle,
+      default: (a, b) => Number(a.dataset.defaultIndex) - Number(b.dataset.defaultIndex)
+    };
+
+    select.addEventListener('change', function() {
+      const comparator = comparators[select.value] || comparators.default;
+      const fragment = document.createDocumentFragment();
+
+      cards.slice().sort(comparator).forEach(card => fragment.append(card));
+      grid.append(fragment);
+
+      if (status) {
+        const label = select.options[select.selectedIndex].text;
+        status.textContent = select.value === 'default' ? '' : 'Sorted by ' + label.toLowerCase() + '.';
+      }
+    });
   });
 
   // ===========================
