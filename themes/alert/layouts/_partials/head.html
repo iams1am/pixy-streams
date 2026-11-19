@@ -12,6 +12,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+<script>
+  // Apply the saved theme before first paint so dark-mode users get no light flash.
+  (function () {
+    try {
+      var theme = window.localStorage.getItem('theme');
+      if (theme === 'dark' || theme === 'light') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (error) {
+      // Storage can be unavailable in private or restricted contexts.
+    }
+  })();
+</script>
+
 <meta name="description" content="{{ $description }}">
 {{ with site.Params.keywords }}
 <meta name="keywords" content="{{ . }}">

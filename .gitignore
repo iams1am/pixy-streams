@@ -8,6 +8,10 @@ resources/_gen/
 Thumbs.db
 desktop.ini
 
+#extra
+agents.md
+plan.md
+
 # Editor Files
 .vscode/
 .idea/

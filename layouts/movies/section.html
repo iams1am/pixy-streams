@@ -8,7 +8,7 @@
 
 {{ $catalog := site.Data.catalog.movies }}
 {{ if $catalog }}
-  {{ partial "category-filter.html" . }}
+  {{ partial "category-filter.html" (dict "items" $catalog.items) }}
 
   {{ partial "rail.html" (dict
     "id" "trending"

@@ -1,10 +1,27 @@
-{{- /* Multi-select category buttons. Cards carry data-genres; main.js filters them. */ -}}
+{{- /* Multi-select category buttons. Chips are derived from this section's own
+       catalogue, so a section never offers a genre it has no titles for. Cards
+       carry data-genres; main.js filters them and refines the counts so they
+       match the titles actually on the page. */ -}}
+{{- $items := .items | default slice -}}
+{{- $counts := dict -}}
+{{- $labels := dict -}}
+{{- range $items -}}
+  {{- $names := .genres | default slice -}}
+  {{- if eq .kind "event" -}}{{- $names = $names | append "Sports" -}}{{- end -}}
+  {{- range $names -}}
+    {{- $slug := . | urlize -}}
+    {{- $counts = merge $counts (dict $slug (add (index $counts $slug | default 0) 1)) -}}
+    {{- $labels = merge $labels (dict $slug .) -}}
+  {{- end -}}
+{{- end -}}
 {{- $terms := slice -}}
-{{- range $name, $pages := site.Taxonomies.genres -}}
-  {{- $slug := $name | urlize -}}
-  {{- $label := $name -}}
-  {{- with site.GetPage (printf "/genres/%s" $slug) }}{{ $label = .Title }}{{ end -}}
-  {{- $terms = $terms | append (dict "name" $label "slug" $slug "count" (len $pages)) -}}
+{{- range $slug, $count := $counts -}}
+  {{- $label := index $labels $slug -}}
+  {{- $terms = $terms | append (dict
+    "name" $label
+    "slug" $slug
+    "count" $count
+    "order" (printf "%05d-%s" (sub 10000 $count) (lower $label))) -}}
 {{- end -}}
 {{- with $terms }}
 <section class="category-bar container" id="genres" data-category-filter aria-label="Filter by category">
@@ -13,7 +30,7 @@
     <button type="button" class="category-clear" data-clear hidden>Clear selection</button>
   </div>
   <div class="category-options">
-    {{- range sort . "count" "desc" }}
+    {{- range sort . "order" }}
     <button type="button" class="category-chip" data-genre="{{ .slug }}" data-label="{{ .name }}" aria-pressed="false">
       {{ .name }}<span class="category-count">{{ .count }}</span>
     </button>

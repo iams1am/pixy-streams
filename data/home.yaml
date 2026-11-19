@@ -133,7 +133,7 @@ rows:
 # Genre chips are generated from the `genres` taxonomy, so this file no longer
 # carries a genre list.
 stats:
-  - number: "3"
+  - number: "4"
     label: "Verticals"
   - number: "1"
     label: "Search Bar, Everything"

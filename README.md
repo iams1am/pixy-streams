@@ -22,16 +22,17 @@ where-to-watch links. It does not host or stream copyrighted video.
 ```
 hugo.toml                   site config, navigation, taxonomies
 scripts/fetch-catalog.mjs   build-time catalogue fetch and normalisation
-data/catalog/               generated: anime.json, movies.json, sports.json
+data/catalog/               generated: anime.json, movies.json, series.json, sports.json
 data/home.yaml              hero fallback, stats, quick links
 content/
   _index.md                 homepage copy
   movies/_content.gotmpl    generates one page per movie
+  tv/_content.gotmpl        generates one page per TV series
   anime/_content.gotmpl     generates one page per anime title
-  movies/ anime/ sports/ my-list/ about/
+  movies/ tv/ anime/ sports/ my-list/ about/
 layouts/
   catalog/page.html         title page for a generated catalogue entry
-  movies|anime|sports/section.html   rails for each vertical
+  movies|tv|anime|sports/section.html   rails for each vertical
   term.html taxonomy.html   genre browsing
 themes/alert/               design system: CSS, JS, shared partials
 ```
@@ -57,25 +58,37 @@ then generates the rails, section pages and one page per title.
 |---|---|---|
 | AniList GraphQL | no | seasonal, trending and top anime, films, trailers, official streaming links |
 | ESPN scoreboards | no | football, NBA and F1 fixtures, results, team crests |
-| TMDB | yes | trending, top-rated and now-playing films with artwork |
+| TMDB | yes | trending, top-rated and now-playing films, plus trending, top-rated and on-air TV series with artwork, runtime, trailers, season guides and regional watch availability |
 | TheSportsDB | optional | fallback fixtures source when ESPN is unavailable |
 
 ```bash
 node scripts/fetch-catalog.mjs                  # everything
 node scripts/fetch-catalog.mjs --only=anime     # one vertical
 node scripts/fetch-catalog.mjs --only=movies    # films (needs a TMDB key)
+node scripts/fetch-catalog.mjs --only=series    # TV series (needs a TMDB key)
 ```
 
-Environment variables: `TMDB_API_KEY` (or `TMDB_READ_TOKEN`), `SPORTSDB_KEY`.
+Environment variables: `TMDB_API_KEY` (or `TMDB_READ_TOKEN`), `TMDB_REGION`
+(optional ISO 3166-1 watch region, default `US`), `SPORTSDB_KEY`.
 Put them in a `.env` file at the repo root - copy `.env.example`, which is the
 committed template while `.env` itself is git-ignored. Shell values win over the
-file.
+file. The deploy workflow reads `TMDB_REGION` from a repository variable with the
+same name; leave it unset to use `US`.
 
 Without a TMDB key the movies vertical keeps the curated seed in
 `data/catalog/movies.json` and the script reports `kept … cached items` instead of
 failing. With a key it replaces the seed with live trending, top-rated and
-now-playing films, complete with posters and backdrops. A source that errors also
-leaves its previous JSON untouched, so a flaky API never breaks a build.
+now-playing films, complete with posters, backdrops, runtime, official trailers
+and regional watch availability. A source that errors also leaves its previous
+JSON untouched, so a flaky API never breaks a build. If only a per-movie detail
+request fails, the previous trailer, provider and runtime values for that title
+are kept where available.
+
+The TV vertical follows the same pattern with `series.json`. Episode guides are
+deliberately bounded: the first six series in catalogue order, their two latest
+regular seasons, and at most 20 episodes per season. Cached guides are reused on
+later runs, and a failed season request never removes an existing guide. Season
+summaries for every series come from the single detail request.
 
 Keys are read at build time only. Nothing secret is shipped to the browser, which
 is why this is a build step rather than client-side `fetch()`.

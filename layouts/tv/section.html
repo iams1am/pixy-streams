@@ -1,0 +1,44 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </div>
+</div>
+
+{{ $catalog := site.Data.catalog.series }}
+{{ if $catalog }}
+  {{ partial "category-filter.html" (dict "items" $catalog.items) }}
+
+  {{ partial "rail.html" (dict
+    "id" "trending"
+    "title" "Trending series"
+    "subtitle" "What everyone is watching this week"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "trending" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "top-rated"
+    "title" "Top rated"
+    "subtitle" "The highest-scoring series in the catalogue"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "top_rated" "limit" 14))) }}
+
+  {{ partial "rail.html" (dict
+    "id" "on-the-air"
+    "title" "On the air"
+    "subtitle" "Currently airing, according to TMDB"
+    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "on_the_air" "limit" 14))) }}
+{{ else }}
+  <div class="container">
+    <p class="catalog-note">The TV catalogue is unavailable right now. The rest of the site is unaffected.</p>
+  </div>
+{{ end }}
+
+{{ with .Content }}
+<section class="mission-section">
+  <div class="container">
+    <h2>About the TV catalogue</h2>
+    <div class="mission-content">{{ . }}</div>
+  </div>
+</section>
+{{ end }}
+{{ end }}

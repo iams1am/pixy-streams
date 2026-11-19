@@ -11,11 +11,15 @@
 
 {{/* The featured slot follows the live catalogue when there is one. */}}
 {{ $movies := site.Data.catalog.movies }}
+{{ $series := site.Data.catalog.series }}
 {{ $anime := site.Data.catalog.anime }}
 {{ $sports := site.Data.catalog.sports }}
 
 {{ $candidates := slice }}
 {{ with $movies }}
+  {{ range partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 5) }}{{ $candidates = $candidates | append . }}{{ end }}
+{{ end }}
+{{ with $series }}
   {{ range partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 5) }}{{ $candidates = $candidates | append . }}{{ end }}
 {{ end }}
 {{ with $anime }}
@@ -73,6 +77,11 @@
     {{ $rails = $rails | append (dict "id" "movies" "title" "Trending movies" "subtitle" "What everyone is watching this week" "href" "/movies/#trending" "items" .) }}
   {{ end }}
 {{ end }}
+{{ with $series }}
+  {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
+    {{ $rails = $rails | append (dict "id" "series" "title" "Trending TV" "subtitle" "Series worth starting this week" "href" "/tv/#trending" "items" .) }}
+  {{ end }}
+{{ end }}
 {{ with $anime }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "seasonal" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "anime" "title" "Anime this season" "subtitle" (printf "Airing now · %s" $anime.season) "href" "/anime/#seasonal" "items" .) }}
@@ -85,7 +94,9 @@
 {{ end }}
 
 {{ if $rails }}
-  {{ partial "category-filter.html" . }}
+  {{ $railItems := slice }}
+  {{ range $rails }}{{ range .items }}{{ $railItems = $railItems | append . }}{{ end }}{{ end }}
+  {{ partial "category-filter.html" (dict "items" $railItems) }}
   {{ range $rails }}{{ partial "rail.html" . }}{{ end }}
 {{ else }}
   {{ range $homeData.rows }}{{ partial "rail.html" . }}{{ end }}

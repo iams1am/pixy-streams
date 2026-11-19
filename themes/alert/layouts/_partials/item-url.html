@@ -2,7 +2,9 @@
 {{- $item := . -}}
 {{- $href := $item.href | default "" -}}
 {{- if not $href -}}
-  {{- $section := cond (eq $item.kind "movie") "movies" "anime" -}}
+  {{- $section := "anime" -}}
+  {{- if eq $item.kind "movie" }}{{ $section = "movies" }}{{ end -}}
+  {{- if eq $item.kind "series" }}{{ $section = "tv" }}{{ end -}}
   {{- $href = printf "/%s/%s/" $section $item.slug -}}
 {{- end -}}
 {{- return partial "link.html" $href -}}

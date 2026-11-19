@@ -1,6 +1,6 @@
 ---
 title: "Pixy Streams"
-description: "Discover movies, anime and live sport in one place."
+description: "Discover movies, TV series, anime and live sport in one place."
 ---
 
 Pixy Streams is a single place to find something to watch. Browse what is trending

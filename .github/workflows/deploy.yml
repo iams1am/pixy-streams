@@ -46,6 +46,7 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           TMDB_READ_TOKEN: ${{ secrets.TMDB_READ_TOKEN }}
+          TMDB_REGION: ${{ vars.TMDB_REGION }}
           SPORTSDB_KEY: ${{ secrets.SPORTSDB_KEY }}
         run: node scripts/fetch-catalog.mjs
 

@@ -9,10 +9,12 @@
  *
  *   node scripts/fetch-catalog.mjs            # all sources
  *   node scripts/fetch-catalog.mjs --only=anime
+ *   node scripts/fetch-catalog.mjs --only=series
  *
  * Environment:
- *   TMDB_API_KEY     TMDB v3 key            (movies; skipped when absent)
+ *   TMDB_API_KEY     TMDB v3 key            (movies and TV; skipped when absent)
  *   TMDB_READ_TOKEN  TMDB v4 read token     (alternative to the key)
+ *   TMDB_REGION      ISO 3166-1 watch region (movies and TV; default US)
  *   SPORTSDB_KEY     TheSportsDB key        (defaults to the public test key)
  *
  * Variables may live in a .env file at the repo root (see .env.example) or in
@@ -341,6 +343,19 @@ async function animeCatalog() {
 /* ---------------------------------------------------------------- movies */
 
 const TMDB_IMAGE = "https://image.tmdb.org/t/p";
+const TMDB_LANGUAGE = "en-US";
+const TMDB_REGION = /^[a-z]{2}$/i.test(process.env.TMDB_REGION || "")
+  ? process.env.TMDB_REGION.toUpperCase()
+  : "US";
+const TMDB_DETAIL_CONCURRENCY = 4;
+
+const TMDB_WATCH_GROUPS = [
+  { key: "flatrate", label: "Stream" },
+  { key: "free", label: "Free" },
+  { key: "ads", label: "Free with ads" },
+  { key: "rent", label: "Rent" },
+  { key: "buy", label: "Buy" },
+];
 
 async function tmdb(pathname, params = {}) {
   const url = new URL(`https://api.themoviedb.org/3${pathname}`);
@@ -352,16 +367,208 @@ async function tmdb(pathname, params = {}) {
   });
 }
 
+function movieMeta(item) {
+  return [item.year || "", (item.genres || [])[0] || "", formatRuntime(item.runtime)]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** Pick the best YouTube trailer or teaser, preferring official English results. */
+function tmdbTrailer(videos) {
+  const candidates = (videos?.results || []).filter(
+    (video) =>
+      video &&
+      video.site === "YouTube" &&
+      video.key &&
+      (video.type === "Trailer" || video.type === "Teaser"),
+  );
+
+  const score = (video) =>
+    (video.type === "Trailer" ? 4 : 0) +
+    (video.official ? 2 : 0) +
+    (video.iso_639_1 === "en" ? 1 : 0);
+
+  const best = candidates
+    .slice()
+    .sort(
+      (a, b) =>
+        score(b) - score(a) ||
+        String(b.published_at || "").localeCompare(String(a.published_at || "")),
+    )[0];
+
+  return best ? `https://www.youtube.com/watch?v=${best.key}` : "";
+}
+
+/**
+ * Normalise TMDB watch data for one region. TMDB/JustWatch supplies one
+ * regional link, not per-provider deep links, so every provider points at that
+ * region page. Availability is informational, not a playback licence.
+ */
+function tmdbWatchProviders(payload, mediaType, mediaId) {
+  const region = payload?.results?.[TMDB_REGION];
+  if (!region) {
+    return { watch: [], link: "", region: "", attribution: "" };
+  }
+
+  const link =
+    region.link ||
+    `https://www.themoviedb.org/${mediaType}/${mediaId}/watch?locale=${TMDB_REGION}`;
+  const seen = new Set();
+  const watch = [];
+
+  for (const group of TMDB_WATCH_GROUPS) {
+    for (const provider of region[group.key] || []) {
+      const name = stripHtml(provider?.provider_name || "");
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      watch.push({ name, type: group.label, url: link });
+      if (watch.length >= 8) break;
+    }
+    if (watch.length >= 8) break;
+  }
+
+  return {
+    watch,
+    link: watch.length ? link : "",
+    region: watch.length ? TMDB_REGION : "",
+    attribution: watch.length
+      ? `Availability for ${TMDB_REGION} provided by JustWatch via TMDB.`
+      : "",
+  };
+}
+
+function applyMovieDetails(item, details) {
+  if (!details || typeof details !== "object") return;
+
+  const releaseDate = isoDate(details.release_date);
+  if (releaseDate) {
+    item.release_date = releaseDate;
+    item.year = Number(releaseDate.slice(0, 4)) || item.year;
+  }
+
+  if (Number.isFinite(details.runtime) && details.runtime > 0) {
+    item.runtime = details.runtime;
+  }
+
+  if (Array.isArray(details.genres) && details.genres.length) {
+    const names = details.genres.map((genre) => stripHtml(genre?.name || "")).filter(Boolean);
+    if (names.length) item.genres = names;
+  }
+
+  if (!item.poster && details.poster_path) {
+    item.poster = `${TMDB_IMAGE}/w500${details.poster_path}`;
+  }
+  if (!item.backdrop && details.backdrop_path) {
+    item.backdrop = `${TMDB_IMAGE}/w1280${details.backdrop_path}`;
+  }
+  if (!item.overview && details.overview) {
+    item.overview = shorten(stripHtml(details.overview), 460);
+  }
+  if (!item.score && details.vote_average) {
+    item.score = Number(details.vote_average.toFixed(1));
+  }
+  if (!item.votes && details.vote_count) {
+    item.votes = details.vote_count;
+  }
+
+  const trailer = tmdbTrailer(details.videos);
+  if (trailer) item.trailer = trailer;
+
+  const providers = tmdbWatchProviders(details["watch/providers"], "movie", item.tmdb_id);
+  item.watch = providers.watch;
+  item.watch_link = providers.link;
+  item.watch_region = providers.region;
+  item.watch_attribution = providers.attribution;
+  item.meta = movieMeta(item);
+}
+
+/**
+ * Detail requests are best-effort. If TMDB fails partway through, fill any
+ * missing enrichment fields from the previous JSON so a transient error does
+ * not erase valid trailers, runtime or provider data.
+ */
+function mergeCachedMovieDetails(item, cached) {
+  if (!cached) return;
+
+  for (const key of [
+    "genres",
+    "poster",
+    "backdrop",
+    "overview",
+    "score",
+    "votes",
+    "runtime",
+    "release_date",
+    "trailer",
+    "watch",
+    "watch_link",
+    "watch_region",
+    "watch_attribution",
+  ]) {
+    if (
+      ["watch", "watch_link", "watch_region", "watch_attribution"].includes(key) &&
+      cached.watch_region !== TMDB_REGION
+    ) {
+      continue;
+    }
+    const current = item[key];
+    const previous = cached[key];
+    if (previous === undefined || previous === null || previous === "") continue;
+    if (Array.isArray(previous) && previous.length === 0) continue;
+    if (Array.isArray(current) ? current.length === 0 : !current) item[key] = previous;
+  }
+
+  item.meta = movieMeta(item);
+}
+
+async function enrichMovies(items, previous) {
+  const cachedById = new Map();
+  for (const cached of previous?.items || []) {
+    if (cached?.id) cachedById.set(cached.id, cached);
+  }
+
+  let cursor = 0;
+  let failed = 0;
+
+  const worker = async () => {
+    while (cursor < items.length) {
+      const item = items[cursor++];
+      if (!item.tmdb_id) continue;
+
+      try {
+        const details = await tmdb(`/movie/${item.tmdb_id}`, {
+          language: TMDB_LANGUAGE,
+          append_to_response: "videos,watch/providers",
+        });
+        applyMovieDetails(item, details);
+      } catch (error) {
+        failed++;
+        mergeCachedMovieDetails(item, cachedById.get(item.id));
+        console.warn(`   details unavailable for ${item.title}: ${error.message}`);
+      }
+    }
+  };
+
+  const workers = Math.min(TMDB_DETAIL_CONCURRENCY, items.length);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+
+  if (failed) {
+    console.warn(
+      `   ${failed}/${items.length} movie detail requests failed; cached values kept where available`,
+    );
+  }
+}
+
 async function moviesCatalog() {
   if (!TMDB_KEY && !TMDB_TOKEN) {
     throw new Error("no TMDB credentials (set TMDB_API_KEY or TMDB_READ_TOKEN)");
   }
 
   const [genres, trending, topRated, newReleases] = await Promise.all([
-    tmdb("/genre/movie/list", { language: "en-US" }),
+    tmdb("/genre/movie/list", { language: TMDB_LANGUAGE }),
     tmdb("/trending/movie/week"),
-    tmdb("/movie/top_rated", { language: "en-US" }),
-    tmdb("/movie/now_playing", { language: "en-US", region: "US" }),
+    tmdb("/movie/top_rated", { language: TMDB_LANGUAGE }),
+    tmdb("/movie/now_playing", { language: TMDB_LANGUAGE, region: TMDB_REGION }),
   ]);
 
   const genreNames = new Map((genres.genres || []).map((g) => [g.id, g.name]));
@@ -381,10 +588,13 @@ async function moviesCatalog() {
         item = {
           slug: nextSlug(title),
           id: `tmdb-${movie.id}`,
+          tmdb_id: movie.id,
           title,
           original_title: stripHtml(movie.original_title || ""),
           kind: "movie",
           year,
+          release_date: isoDate(movie.release_date),
+          runtime: null,
           score: movie.vote_average ? Number(movie.vote_average.toFixed(1)) : null,
           votes: movie.vote_count || 0,
           overview: shorten(stripHtml(movie.overview), 460),
@@ -396,6 +606,9 @@ async function moviesCatalog() {
           badge: listName === "new_releases" ? "In cinemas" : "",
           trailer: "",
           watch: [],
+          watch_link: "",
+          watch_region: "",
+          watch_attribution: "",
           lists: [],
           source: "TMDB",
           source_url: `https://www.themoviedb.org/movie/${movie.id}`,
@@ -413,6 +626,345 @@ async function moviesCatalog() {
 
   const items = [...byId.values()];
   if (!items.length) throw new Error("TMDB returned no movies");
+
+  const previous = await existing("movies");
+  await enrichMovies(items, previous);
+
+  return {
+    source: "TMDB",
+    source_url: "https://www.themoviedb.org",
+    attribution: "This product uses the TMDB API but is not endorsed or certified by TMDB.",
+    generated_at: new Date().toISOString(),
+    count: items.length,
+    items,
+  };
+}
+
+/* ------------------------------------------------------------------- tv */
+
+/**
+ * Episode guides are the expensive part of the TV catalogue, so only a small,
+ * stable slice is fetched: the first few series in catalogue order, their two
+ * latest regular seasons, and at most 20 episodes per season. Season summaries
+ * for every series come from the single detail request. Previous episodes are
+ * reused, so daily runs do not repeat work.
+ */
+const TMDB_EPISODE_SERIES_LIMIT = 6;
+const TMDB_EPISODE_SEASON_LIMIT = 2;
+const TMDB_EPISODE_LIMIT = 20;
+
+function seriesMeta(item) {
+  const seasons = Number(item.number_of_seasons) > 0 ? item.number_of_seasons : 0;
+  const seasonLabel = seasons ? `${seasons} season${seasons === 1 ? "" : "s"}` : "";
+  return [item.year || "", (item.genres || [])[0] || "", seasonLabel]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** Build season summaries, keeping any episode guides already cached. */
+function seriesSeasonSummaries(details, cached) {
+  const source =
+    Array.isArray(details?.seasons) && details.seasons.length
+      ? details.seasons
+      : cached?.seasons || [];
+  const cachedByNumber = new Map(
+    (cached?.seasons || []).map((season) => [season?.season_number, season]),
+  );
+
+  return source
+    .filter((season) => season && season.season_number > 0)
+    .map((season) => {
+      const previous = cachedByNumber.get(season.season_number);
+      const episodes = Array.isArray(previous?.episodes) ? previous.episodes : [];
+      return {
+        season_number: season.season_number,
+        name: stripHtml(season.name || `Season ${season.season_number}`),
+        episode_count: Number.isFinite(season.episode_count)
+          ? season.episode_count
+          : episodes.length,
+        air_date: isoDate(season.air_date),
+        episodes,
+      };
+    });
+}
+
+function applySeriesDetails(item, details, cached) {
+  if (!details || typeof details !== "object") return;
+
+  const firstAir = isoDate(details.first_air_date);
+  if (firstAir) {
+    item.first_air_date = firstAir;
+    item.year = Number(firstAir.slice(0, 4)) || item.year;
+  }
+
+  const lastAir = isoDate(details.last_air_date);
+  if (lastAir) item.last_air_date = lastAir;
+
+  if (Number.isFinite(details.number_of_seasons) && details.number_of_seasons > 0) {
+    item.number_of_seasons = details.number_of_seasons;
+  }
+  if (Number.isFinite(details.number_of_episodes) && details.number_of_episodes > 0) {
+    item.number_of_episodes = details.number_of_episodes;
+  }
+  if (details.status) item.status = stripHtml(details.status);
+
+  const runtime = (details.episode_run_time || []).find((value) => value > 0);
+  if (runtime) item.runtime = runtime;
+
+  if (Array.isArray(details.genres) && details.genres.length) {
+    const names = details.genres.map((genre) => stripHtml(genre?.name || "")).filter(Boolean);
+    if (names.length) item.genres = names;
+  }
+
+  if (!item.poster && details.poster_path) {
+    item.poster = `${TMDB_IMAGE}/w500${details.poster_path}`;
+  }
+  if (!item.backdrop && details.backdrop_path) {
+    item.backdrop = `${TMDB_IMAGE}/w1280${details.backdrop_path}`;
+  }
+  if (!item.overview && details.overview) {
+    item.overview = shorten(stripHtml(details.overview), 460);
+  }
+  if (!item.score && details.vote_average) {
+    item.score = Number(details.vote_average.toFixed(1));
+  }
+  if (!item.votes && details.vote_count) {
+    item.votes = details.vote_count;
+  }
+
+  const trailer = tmdbTrailer(details.videos);
+  if (trailer) item.trailer = trailer;
+
+  const providers = tmdbWatchProviders(details["watch/providers"], "tv", item.tmdb_id);
+  item.watch = providers.watch;
+  item.watch_link = providers.link;
+  item.watch_region = providers.region;
+  item.watch_attribution = providers.attribution;
+
+  item.seasons = seriesSeasonSummaries(details, cached);
+  item.meta = seriesMeta(item);
+}
+
+function mergeCachedSeriesDetails(item, cached) {
+  if (!cached) return;
+
+  for (const key of [
+    "genres",
+    "poster",
+    "backdrop",
+    "overview",
+    "score",
+    "votes",
+    "runtime",
+    "first_air_date",
+    "last_air_date",
+    "number_of_seasons",
+    "number_of_episodes",
+    "status",
+    "trailer",
+    "watch",
+    "watch_link",
+    "watch_region",
+    "watch_attribution",
+    "seasons",
+  ]) {
+    if (
+      ["watch", "watch_link", "watch_region", "watch_attribution"].includes(key) &&
+      cached.watch_region !== TMDB_REGION
+    ) {
+      continue;
+    }
+    const current = item[key];
+    const previous = cached[key];
+    if (previous === undefined || previous === null || previous === "") continue;
+    if (Array.isArray(previous) && previous.length === 0) continue;
+    if (Array.isArray(current) ? current.length === 0 : !current) item[key] = previous;
+  }
+
+  item.meta = seriesMeta(item);
+}
+
+async function enrichSeriesEpisodes(items) {
+  const targets = items
+    .filter(
+      (item) =>
+        item.tmdb_id && (item.seasons || []).some((season) => season.episode_count > 0),
+    )
+    .slice(0, TMDB_EPISODE_SERIES_LIMIT);
+
+  let cursor = 0;
+  let failed = 0;
+
+  const worker = async () => {
+    while (cursor < targets.length) {
+      const item = targets[cursor++];
+      const seasons = item.seasons
+        .filter((season) => season.season_number > 0 && season.episode_count > 0)
+        .slice(-TMDB_EPISODE_SEASON_LIMIT);
+
+      for (const season of seasons) {
+        if (Array.isArray(season.episodes) && season.episodes.length) continue;
+
+        try {
+          const payload = await tmdb(
+            `/tv/${item.tmdb_id}/season/${season.season_number}`,
+            { language: TMDB_LANGUAGE },
+          );
+          const episodes = (payload.episodes || [])
+            .filter((episode) => episode && Number.isFinite(episode.episode_number))
+            .sort((a, b) => a.episode_number - b.episode_number)
+            .slice(0, TMDB_EPISODE_LIMIT)
+            .map((episode) => ({
+              episode_number: episode.episode_number,
+              name: stripHtml(episode.name || `Episode ${episode.episode_number}`),
+              overview: shorten(stripHtml(episode.overview), 320),
+              air_date: isoDate(episode.air_date),
+              runtime:
+                Number.isFinite(episode.runtime) && episode.runtime > 0
+                  ? episode.runtime
+                  : null,
+            }));
+          season.episodes = episodes;
+        } catch (error) {
+          failed++;
+          console.warn(
+            `   episodes unavailable for ${item.title} S${season.season_number}: ${error.message}`,
+          );
+        }
+      }
+    }
+  };
+
+  const workers = Math.min(TMDB_DETAIL_CONCURRENCY, targets.length);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+
+  if (failed) {
+    console.warn(
+      `   ${failed} season episode request${failed === 1 ? "" : "s"} failed; cached or empty guides kept`,
+    );
+  }
+}
+
+async function enrichSeries(items, previous) {
+  const cachedById = new Map();
+  for (const cached of previous?.items || []) {
+    if (cached?.id) cachedById.set(cached.id, cached);
+  }
+
+  let cursor = 0;
+  let failed = 0;
+
+  const worker = async () => {
+    while (cursor < items.length) {
+      const item = items[cursor++];
+      if (!item.tmdb_id) continue;
+      const cached = cachedById.get(item.id);
+
+      try {
+        const details = await tmdb(`/tv/${item.tmdb_id}`, {
+          language: TMDB_LANGUAGE,
+          append_to_response: "videos,watch/providers",
+        });
+        applySeriesDetails(item, details, cached);
+      } catch (error) {
+        failed++;
+        mergeCachedSeriesDetails(item, cached);
+        console.warn(`   details unavailable for ${item.title}: ${error.message}`);
+      }
+    }
+  };
+
+  const workers = Math.min(TMDB_DETAIL_CONCURRENCY, items.length);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+
+  if (failed) {
+    console.warn(
+      `   ${failed}/${items.length} TV detail requests failed; cached values kept where available`,
+    );
+  }
+
+  await enrichSeriesEpisodes(items);
+}
+
+async function seriesCatalog() {
+  if (!TMDB_KEY && !TMDB_TOKEN) {
+    throw new Error("no TMDB credentials (set TMDB_API_KEY or TMDB_READ_TOKEN)");
+  }
+
+  const [genres, trending, topRated, onTheAir] = await Promise.all([
+    tmdb("/genre/tv/list", { language: TMDB_LANGUAGE }),
+    tmdb("/trending/tv/week"),
+    tmdb("/tv/top_rated", { language: TMDB_LANGUAGE }),
+    tmdb("/tv/on_the_air", { language: TMDB_LANGUAGE }),
+  ]);
+
+  const genreNames = new Map((genres.genres || []).map((genre) => [genre.id, genre.name]));
+  const nextSlug = uniqueSlugFactory();
+  const byId = new Map();
+
+  const ingest = (results, listName, limit = 18) => {
+    for (const show of (results || []).slice(0, limit)) {
+      if (!show || !show.id) continue;
+
+      let item = byId.get(show.id);
+      if (!item) {
+        const title = stripHtml(show.name || show.original_name || "Untitled");
+        const firstAir = isoDate(show.first_air_date);
+        const year = firstAir ? Number(firstAir.slice(0, 4)) : null;
+        const genresForShow = (show.genre_ids || [])
+          .map((id) => genreNames.get(id))
+          .filter(Boolean);
+
+        item = {
+          slug: nextSlug(title),
+          id: `tmdb-tv-${show.id}`,
+          tmdb_id: show.id,
+          title,
+          original_title: stripHtml(show.original_name || ""),
+          kind: "series",
+          year,
+          first_air_date: firstAir,
+          last_air_date: "",
+          score: show.vote_average ? Number(show.vote_average.toFixed(1)) : null,
+          votes: show.vote_count || 0,
+          overview: shorten(stripHtml(show.overview), 460),
+          poster: show.poster_path ? `${TMDB_IMAGE}/w500${show.poster_path}` : "",
+          backdrop: show.backdrop_path ? `${TMDB_IMAGE}/w1280${show.backdrop_path}` : "",
+          accent: "",
+          genres: genresForShow,
+          meta: [year || "", genresForShow[0] || ""].filter(Boolean).join(" · "),
+          badge: "",
+          trailer: "",
+          watch: [],
+          watch_link: "",
+          watch_region: "",
+          watch_attribution: "",
+          status: "",
+          number_of_seasons: null,
+          number_of_episodes: null,
+          runtime: null,
+          seasons: [],
+          lists: [],
+          source: "TMDB",
+          source_url: `https://www.themoviedb.org/tv/${show.id}`,
+        };
+        byId.set(show.id, item);
+      }
+
+      if (!item.lists.includes(listName)) item.lists.push(listName);
+      if (listName === "on_the_air") item.badge = "On air";
+    }
+  };
+
+  ingest(trending.results, "trending");
+  ingest(topRated.results, "top_rated");
+  ingest(onTheAir.results, "on_the_air");
+
+  const items = [...byId.values()];
+  if (!items.length) throw new Error("TMDB returned no TV series");
+
+  const previous = await existing("series");
+  await enrichSeries(items, previous);
 
   return {
     source: "TMDB",
@@ -670,6 +1222,7 @@ async function main() {
   const jobs = [
     { name: "anime", run: animeCatalog },
     { name: "movies", run: moviesCatalog },
+    { name: "series", run: seriesCatalog },
     { name: "sports", run: sportsCatalog },
   ].filter((job) => wants(job.name));
 
@@ -686,7 +1239,7 @@ async function main() {
       live++;
     } catch (error) {
       const hint = /TMDB credentials/.test(error.message)
-        ? "\n  \u2192 copy .env.example to .env and set TMDB_API_KEY for live movie artwork"
+        ? "\n  \u2192 copy .env.example to .env and set TMDB_API_KEY for live movie and TV data"
         : "";
       const previous = await existing(job.name);
       if (previous) {

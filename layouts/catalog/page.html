@@ -1,6 +1,8 @@
 {{ define "main" }}
 {{ $kind := .Params.catalog }}
-{{ $catalog := cond (eq $kind "movie") site.Data.catalog.movies site.Data.catalog.anime }}
+{{ $catalog := site.Data.catalog.anime }}
+{{ if eq $kind "movie" }}{{ $catalog = site.Data.catalog.movies }}{{ end }}
+{{ if eq $kind "series" }}{{ $catalog = site.Data.catalog.series }}{{ end }}
 
 {{/* Structured data: the title itself, plus the breadcrumb trail. */}}
 {{ $schema := dict
@@ -11,7 +13,15 @@
 {{ with .Params.overview }}{{ $schema = merge $schema (dict "description" .) }}{{ end }}
 {{ with .Params.poster }}{{ $schema = merge $schema (dict "image" .) }}{{ end }}
 {{ with .Params.genres }}{{ $schema = merge $schema (dict "genre" .) }}{{ end }}
-{{ with .Params.year }}{{ $schema = merge $schema (dict "datePublished" (string .)) }}{{ end }}
+{{ $published := .Params.release_date | default .Params.first_air_date }}
+{{ with $published }}
+  {{ $schema = merge $schema (dict "datePublished" .) }}
+{{ else }}
+  {{ with .Params.year }}{{ $schema = merge $schema (dict "datePublished" (string .)) }}{{ end }}
+{{ end }}
+{{ with .Params.number_of_seasons }}{{ $schema = merge $schema (dict "numberOfSeasons" (int .)) }}{{ end }}
+{{ with .Params.number_of_episodes }}{{ $schema = merge $schema (dict "numberOfEpisodes" (int .)) }}{{ end }}
+{{ if eq $kind "movie" }}{{ with .Params.runtime }}{{ $schema = merge $schema (dict "duration" (printf "PT%dM" (int .))) }}{{ end }}{{ end }}
 <script type="application/ld+json">{{ $schema | jsonify | safeJS }}</script>
 
 {{ $crumbs := slice }}
@@ -92,17 +102,48 @@
       <h2>Where to watch</h2>
       <ul class="watch-list">
         {{ range . }}
-        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a></li>
+        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}{{ with .type }}<span class="watch-type">{{ . }}</span>{{ end }}</a></li>
         {{ end }}
       </ul>
+      {{ with $.Params.watch_attribution }}<p class="watch-attribution">{{ . }}</p>{{ end }}
+      {{ end }}
+
+      {{ with .Params.seasons }}
+      <h2>Seasons</h2>
+      <div class="season-list">
+        {{ range . }}
+        <section class="season">
+          <div class="season-head">
+            <h3>{{ .name }}</h3>
+            <p class="season-meta">{{ int .episode_count }} episode{{ if ne (int .episode_count) 1 }}s{{ end }}{{ with .air_date }} · first aired {{ (time .).Format "2 Jan 2006" }}{{ end }}</p>
+          </div>
+          {{ with .episodes }}
+          <ol class="episode-list">
+            {{ range . }}
+            <li class="episode">
+              <div class="episode-title">
+                <span class="episode-number">E{{ int .episode_number }}</span>
+                <h4>{{ .name }}</h4>
+                {{ with .runtime }}<span class="episode-runtime">{{ int . }} min</span>{{ end }}
+              </div>
+              {{ with .air_date }}<p class="episode-air">Aired {{ (time .).Format "2 Jan 2006" }}</p>{{ end }}
+              {{ with .overview }}<p class="episode-overview">{{ . }}</p>{{ end }}
+            </li>
+            {{ end }}
+          </ol>
+          {{ end }}
+        </section>
+        {{ end }}
+      </div>
       {{ end }}
 
       {{ .Content }}
 
       <p class="catalog-note">
         {{ with .Params.source }}Source: {{ . }}{{ end }}{{ with $catalog }}{{ with .generated_at }} · catalogue updated {{ (time .).Format "2 Jan 2006" }}{{ end }}{{ end }}.
-        Pixy Streams lists metadata and links to official sources only. Playback
-        happens on the service that holds the rights.
+        Pixy Streams lists metadata and links to official sources only. Availability
+        information is not a playback licence; playback happens on the service that
+        holds the rights.
       </p>
     </div>
   </div>

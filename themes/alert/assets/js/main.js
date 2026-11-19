@@ -10,19 +10,45 @@
   // ===========================
   const themeToggle = document.querySelector('.theme-toggle');
   const html = document.documentElement;
-  
-  // Check for saved theme preference or default to 'light' mode
-  const currentTheme = localStorage.getItem('theme') || 'light';
+
+  const readStoredTheme = () => {
+    try {
+      const stored = localStorage.getItem('theme');
+      return stored === 'dark' || stored === 'light' ? stored : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const writeStoredTheme = (theme) => {
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (error) {
+      // Persistence is best-effort; the theme still applies for this visit.
+    }
+  };
+
+  const syncThemeToggle = (theme) => {
+    if (!themeToggle) return;
+    themeToggle.setAttribute('aria-pressed', String(theme === 'dark'));
+    themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  };
+
+  // The inline head script restores the saved theme before paint; this keeps it
+  // correct when storage is unavailable or the script could not run.
+  const currentTheme = readStoredTheme() || (html.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
   html.setAttribute('data-theme', currentTheme);
-  
+  syncThemeToggle(currentTheme);
+
   if (themeToggle) {
     themeToggle.addEventListener('click', function() {
       const theme = html.getAttribute('data-theme');
       const newTheme = theme === 'light' ? 'dark' : 'light';
-      
+
       html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      
+      writeStoredTheme(newTheme);
+      syncThemeToggle(newTheme);
+
       // Add a transition class for smooth theme change
       html.style.transition = 'background-color 0.3s ease, color 0.3s ease';
       setTimeout(() => {
@@ -36,59 +62,121 @@
   // ===========================
   const navbarToggle = document.querySelector('.navbar-toggle');
   const navbarMenu = document.querySelector('.navbar-menu');
-  
+  const mobileNavQuery = window.matchMedia('(max-width: 1024px)');
+
+  // Keep body scroll locked only while a modal surface is actually open.
+  const syncBodyScrollLock = () => {
+    const navOpen = Boolean(navbarMenu && mobileNavQuery.matches && navbarMenu.classList.contains('active'));
+    const dialog = document.querySelector('[data-trailer-dialog]');
+    const dialogOpen = Boolean(dialog && dialog.open);
+    document.body.style.overflow = navOpen || dialogOpen ? 'hidden' : '';
+  };
+
+  const setDropdownState = (dropdown, expanded) => {
+    if (!dropdown) return;
+    dropdown.classList.toggle('active', expanded);
+    const trigger = dropdown.querySelector('.nav-link');
+    if (trigger) trigger.setAttribute('aria-expanded', String(expanded));
+  };
+
+  const closeDropdowns = () => {
+    document.querySelectorAll('.nav-item-dropdown').forEach(dropdown => setDropdownState(dropdown, false));
+  };
+
+  const closeMobileNav = () => {
+    if (!navbarMenu || !navbarToggle) return;
+    navbarMenu.classList.remove('active');
+    navbarToggle.classList.remove('active');
+    navbarToggle.setAttribute('aria-expanded', 'false');
+    closeDropdowns();
+    syncBodyScrollLock();
+  };
+
   if (navbarToggle && navbarMenu) {
     navbarToggle.addEventListener('click', function() {
-      navbarMenu.classList.toggle('active');
-      navbarToggle.classList.toggle('active');
-      
-      // Toggle aria-expanded for accessibility
-      const expanded = navbarToggle.getAttribute('aria-expanded') === 'true' || false;
-      navbarToggle.setAttribute('aria-expanded', !expanded);
-      
-      // Prevent body scroll when menu is open
-      if (navbarMenu.classList.contains('active')) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      const willOpen = !navbarMenu.classList.contains('active');
+
+      navbarMenu.classList.toggle('active', willOpen);
+      navbarToggle.classList.toggle('active', willOpen);
+      navbarToggle.setAttribute('aria-expanded', String(willOpen));
+
+      if (!willOpen) closeDropdowns();
+      syncBodyScrollLock();
     });
-    
+
     // Close menu when clicking outside
     document.addEventListener('click', function(e) {
       if (!navbarToggle.contains(e.target) && !navbarMenu.contains(e.target)) {
-        navbarMenu.classList.remove('active');
-        navbarToggle.classList.remove('active');
-        navbarToggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+        closeMobileNav();
       }
     });
-    
+
     // Close menu when pressing Escape
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && navbarMenu.classList.contains('active')) {
-        navbarMenu.classList.remove('active');
-        navbarToggle.classList.remove('active');
-        navbarToggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+      if (e.key !== 'Escape') return;
+      if (document.querySelector('[data-trailer-dialog][open]')) return;
+
+      const openDropdown = document.querySelector('.nav-item-dropdown.active');
+      if (openDropdown) {
+        setDropdownState(openDropdown, false);
+        openDropdown.querySelector('.nav-link')?.focus();
+        e.preventDefault();
+        return;
+      }
+
+      if (navbarMenu.classList.contains('active')) {
+        closeMobileNav();
+        navbarToggle.focus();
       }
     });
   }
 
   // ===========================
-  // Mobile Dropdown Toggles
+  // Dropdown Toggles
   // ===========================
-  const dropdownLinks = document.querySelectorAll('.nav-item-dropdown > .nav-link');
-  
-  if (window.innerWidth <= 768) {
-    dropdownLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const parent = this.closest('.nav-item-dropdown');
-        parent.classList.toggle('active');
-      });
+  const dropdownItems = document.querySelectorAll('.nav-item-dropdown');
+
+  dropdownItems.forEach(dropdown => {
+    const trigger = dropdown.querySelector('.nav-link');
+    if (!trigger) return;
+
+    // Mobile: the parent link becomes a disclosure button.
+    trigger.addEventListener('click', function(event) {
+      if (!mobileNavQuery.matches) return;
+
+      event.preventDefault();
+      const willExpand = !dropdown.classList.contains('active');
+      closeDropdowns();
+      setDropdownState(dropdown, willExpand);
     });
-  }
+
+    // Desktop: keep ARIA state in sync with the CSS hover/focus behaviour.
+    dropdown.addEventListener('mouseenter', function() {
+      if (!mobileNavQuery.matches) trigger.setAttribute('aria-expanded', 'true');
+    });
+
+    dropdown.addEventListener('mouseleave', function() {
+      if (!mobileNavQuery.matches && !dropdown.contains(document.activeElement)) {
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    dropdown.addEventListener('focusin', function() {
+      if (!mobileNavQuery.matches) trigger.setAttribute('aria-expanded', 'true');
+    });
+
+    dropdown.addEventListener('focusout', function(event) {
+      if (mobileNavQuery.matches) return;
+      if (event.relatedTarget && dropdown.contains(event.relatedTarget)) return;
+      if (!dropdown.matches(':hover')) trigger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Collapse the mobile menu and any open disclosure when crossing breakpoints.
+  mobileNavQuery.addEventListener('change', function() {
+    closeMobileNav();
+    closeDropdowns();
+  });
 
   // ===========================
   // Smooth Scrolling for Anchor Links
@@ -114,13 +202,20 @@
         
         // Close mobile menu if open
         if (navbarMenu && navbarMenu.classList.contains('active')) {
-          navbarMenu.classList.remove('active');
-          navbarToggle.classList.remove('active');
-          document.body.style.overflow = '';
+          closeMobileNav();
         }
       }
     });
   });
+
+  // ===========================
+  // Rail Controls Refresh
+  // ===========================
+  const railUpdateCallbacks = [];
+
+  const refreshRailControls = () => {
+    railUpdateCallbacks.forEach(callback => callback());
+  };
 
   // ===========================
   // Category Filter
@@ -133,6 +228,29 @@
     const statusMessage = categoryFilter.querySelector('[data-filter-status]');
     const emptyMessage = categoryFilter.querySelector('[data-filter-empty]');
     const filterableSections = Array.from(document.querySelectorAll('.rail-section[data-filterable]'));
+    const railCards = Array.from(document.querySelectorAll('.rail-section[data-filterable] .rail-card'));
+
+    // The same title can appear in several rails. Count each genre once per title
+    // so the chip numbers match what selecting that genre will actually reveal.
+    const genreCounts = new Map();
+    const countedTitles = new Set();
+
+    railCards.forEach(card => {
+      const title = card.getAttribute('href') || card.textContent.trim();
+      if (countedTitles.has(title)) return;
+      countedTitles.add(title);
+
+      (card.dataset.genres || '').split(',').filter(Boolean).forEach(slug => {
+        genreCounts.set(slug, (genreCounts.get(slug) || 0) + 1);
+      });
+    });
+
+    categoryButtons.forEach(button => {
+      const count = genreCounts.get(button.dataset.genre) || 0;
+      const badge = button.querySelector('.category-count');
+      if (badge) badge.textContent = String(count);
+      button.hidden = count === 0;
+    });
 
     const selectedCategories = () => categoryButtons
       .filter(button => button.getAttribute('aria-pressed') === 'true')
@@ -142,7 +260,7 @@
       const selected = selectedCategories();
       const slugs = selected.map(category => category.slug);
       const labels = selected.map(category => category.label);
-      let shown = 0;
+      const shownTitles = new Set();
 
       filterableSections.forEach(section => {
         let matchesInSection = 0;
@@ -152,12 +270,16 @@
           const matches = slugs.length === 0 || slugs.some(slug => cardGenres.includes(slug));
 
           card.classList.toggle('is-filtered-out', !matches);
-          if (matches) matchesInSection += 1;
+          if (matches) {
+            matchesInSection += 1;
+            shownTitles.add(card.getAttribute('href') || card.textContent.trim());
+          }
         });
 
         section.classList.toggle('is-filtered-out', matchesInSection === 0);
-        shown += matchesInSection;
       });
+
+      const shown = shownTitles.size;
 
       if (clearButton) clearButton.hidden = selected.length === 0;
       if (emptyMessage) emptyMessage.hidden = shown !== 0;
@@ -166,11 +288,13 @@
         if (!selected.length) {
           statusMessage.textContent = '';
         } else if (!shown) {
-          statusMessage.textContent = 'Nothing in ' + labels.join(' + ') + ' right now.';
+          statusMessage.textContent = 'Nothing matches ' + labels.join(' or ') + ' right now.';
         } else {
-          statusMessage.textContent = shown + ' title' + (shown === 1 ? '' : 's') + ' in ' + labels.join(' + ') + '.';
+          statusMessage.textContent = shown + ' title' + (shown === 1 ? '' : 's') + ' matching ' + labels.join(' or ') + '.';
         }
       }
+
+      refreshRailControls();
     };
 
     categoryButtons.forEach(button => {
@@ -224,6 +348,7 @@
 
     rail.addEventListener('scroll', updateRailControls, { passive: true });
     window.addEventListener('resize', updateRailControls);
+    railUpdateCallbacks.push(updateRailControls);
     updateRailControls();
   });
 
@@ -309,7 +434,7 @@
           title.className = 'search-result-title';
           title.textContent = entry.title;
 
-          const kindLabels = { movie: 'Movie', anime: 'Anime', event: 'Sport' };
+          const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport' };
           const kindLabel = kindLabels[entry.kind] || '';
           const meta = document.createElement('span');
           meta.className = 'search-result-meta';
@@ -403,6 +528,15 @@
     document.addEventListener('click', function(event) {
       if (!searchRoot.contains(event.target)) closeResults();
     });
+
+    searchRoot.addEventListener('focusout', function(event) {
+      if (event.relatedTarget && searchRoot.contains(event.relatedTarget)) return;
+
+      // Defer so a click on a result is processed before the panel is cleared.
+      setTimeout(function() {
+        if (!searchRoot.contains(document.activeElement)) closeResults();
+      }, 0);
+    });
   }
 
   // ===========================
@@ -420,7 +554,7 @@
       }
 
       trailerFrame.replaceChildren();
-      document.body.style.overflow = '';
+      syncBodyScrollLock();
     };
 
     document.querySelectorAll('[data-trailer]').forEach(link => {
@@ -442,7 +576,7 @@
         if (typeof trailerDialog.showModal === 'function') trailerDialog.showModal();
         else trailerDialog.setAttribute('open', '');
 
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
       });
     });
 
@@ -454,6 +588,36 @@
       if (event.target === trailerDialog) closeTrailer();
     });
   }
+
+  // ===========================
+  // Broken artwork fallback
+  // ===========================
+  document.addEventListener('error', function(event) {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement)) return;
+
+    const poster = image.closest('.rail-poster, .catalog-poster');
+    if (!poster || poster.classList.contains('poster-match') || poster.querySelector('.poster-fallback')) return;
+
+    const title = (image.alt || poster.closest('.rail-card')?.querySelector('.rail-title')?.textContent || 'Untitled').trim();
+    const monogram = title.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word.charAt(0)).join('').toUpperCase();
+
+    // Remote artwork can disappear from a CDN; keep the card readable instead of
+    // showing a broken image.
+    const fallback = document.createElement('span');
+    fallback.className = 'poster-fallback';
+
+    const initials = document.createElement('span');
+    initials.className = 'poster-monogram';
+    initials.textContent = monogram;
+
+    const label = document.createElement('span');
+    label.className = 'poster-title';
+    label.textContent = title;
+
+    fallback.append(initials, label);
+    image.replaceWith(fallback);
+  }, true);
 
   // ===========================
   // My List (saved titles, browser-local)
@@ -837,23 +1001,7 @@
   // Console Welcome Message
   // ===========================
   console.log('%cPixy Streams', 'font-size: 16px; font-weight: bold; color: #ff6b35;');
-  console.log('%cMovies, anime and sport in one place.', 'font-size: 12px; color: #6b6b6b;');
-
-  // ===========================
-  // Handle Window Resize
-  // ===========================
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      // Re-initialize mobile menu if needed
-      if (window.innerWidth > 768 && navbarMenu) {
-        navbarMenu.classList.remove('active');
-        navbarToggle?.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    }, 250);
-  });
+  console.log('%cMovies, TV, anime and sport in one place.', 'font-size: 12px; color: #6b6b6b;');
 
   // ===========================
   // Initialize

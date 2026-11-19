@@ -4,9 +4,9 @@ title = "Pixy Streams"
 theme = "alert"
 
 [params]
-  description = "Discover movies, anime and live sport in one place."
-  tagline = "Movies, anime and sport - all in one place"
-  keywords = "movies, anime, sport, streaming, watch online, trailers, where to watch"
+  description = "Discover movies, TV series, anime and live sport in one place."
+  tagline = "Movies, TV, anime and sport - all in one place"
+  keywords = "movies, TV, series, anime, sport, streaming, watch online, trailers, where to watch"
   author = "Pixy Streams"
   logoText = "Pixy"
   logoAccent = "Streams"
@@ -60,10 +60,16 @@ theme = "alert"
   weight = 4
 
 [[menu.main]]
+  identifier = "tv"
+  name = "TV"
+  url = "/tv/"
+  weight = 3
+
+[[menu.main]]
   identifier = "anime"
   name = "Anime"
   url = "/anime/"
-  weight = 3
+  weight = 4
 
 [[menu.main]]
   parent = "anime"
@@ -87,7 +93,7 @@ theme = "alert"
   identifier = "sports"
   name = "Sports"
   url = "/sports/"
-  weight = 4
+  weight = 5
 
 [[menu.main]]
   parent = "sports"
@@ -110,12 +116,12 @@ theme = "alert"
 [[menu.main]]
   name = "My List"
   url = "/my-list/"
-  weight = 5
+  weight = 6
 
 [[menu.main]]
   name = "About"
   url = "/about/"
-  weight = 6
+  weight = 7
 
 [markup]
   [markup.goldmark]
