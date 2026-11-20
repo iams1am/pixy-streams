@@ -20,8 +20,8 @@ Hugo extended 0.154.5 and headless Edge 157.
 
 ### Fixed (2026-11-19)
 
-- Header no longer overflows at 769–1024 px; navigation collapses at
-  `max-width: 1024px` while typography and grids still break at 768 px.
+- Header no longer overflows; navigation collapses at `max-width: 1279px`
+  while typography and grids still break at 768 px.
 - Mobile dropdowns work after a desktop-to-mobile resize; the handler checks the
   active breakpoint at click time.
 - Crossing the navigation breakpoint collapses the mobile menu and open
@@ -46,6 +46,20 @@ Hugo extended 0.154.5 and headless Edge 157.
   excluded so the scoreboard layout survives.
 - Category filtering counts distinct titles instead of the same card in several
   rails, and multi-select reads "matching A or B" rather than "in A + B".
+
+### Navigation alignment (2026-11-20)
+
+- `Watch Free` and `My List` wrapped onto two lines between 1025 and 1440 px,
+  dropping their text out of line with the single-line items. Labels are now
+  `white-space: nowrap`, and desktop nav items are anchored to the header height
+  so every label, the logo, the search field and the theme toggle share one
+  baseline.
+- The desktop bar now needs ~1170 px of content, so the drawer takes over below
+  1280 px instead of 1025 px; the three-word menu no longer squeezes the search
+  field to 63 px.
+- Verified at 1440, 1280, 1279, 1024, 768 and 360 px: one baseline on desktop,
+  drawer above 150 px search width, aligned single-column rows when open, and no
+  horizontal overflow at any width. Dropdowns open flush with the header edge.
 
 ### Verification
 

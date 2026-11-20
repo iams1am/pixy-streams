@@ -183,7 +183,7 @@ ul, ol {
   align-items: center;
   justify-content: space-between;
   height: var(--header-height);
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .navbar-brand .logo {
@@ -220,15 +220,16 @@ ul, ol {
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
   flex: 1;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .navbar-nav {
   display: flex;
   list-style: none;
-  gap: var(--spacing-sm);
+  gap: 4px;
   margin: 0;
   padding: 0;
 }
@@ -237,13 +238,30 @@ ul, ol {
   position: relative;
 }
 
+/* Desktop: keep single-line labels vertically centred with the logo, search
+   field and theme toggle, whichever of them is tallest. */
+@media (min-width: 1280px) {
+  .navbar-nav {
+    height: var(--header-height);
+    align-items: center;
+  }
+
+  .nav-item,
+  .nav-item-dropdown {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+}
+
 .nav-link {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-xs) 0.75rem;
   color: var(--color-text);
   font-weight: 500;
+  white-space: nowrap;
   transition: color var(--transition-fast);
 }
 
@@ -863,7 +881,9 @@ ul, ol {
    Responsive Design
    =========================== */
 /* Navigation collapses before the desktop bar begins to overflow. */
-@media (max-width: 1024px) {
+/* The drawer takes over once the seven desktop items, the search field and the
+   theme toggle no longer fit on one line. */
+@media (max-width: 1279px) {
   .navbar-toggle {
     display: flex;
   }
@@ -1829,7 +1849,8 @@ button:focus-visible,
    =========================== */
 .site-search {
   position: relative;
-  flex: 0 1 240px;
+  flex: 0 1 220px;
+  min-width: 10rem;
 }
 
 .search-form {
@@ -1925,11 +1946,6 @@ button:focus-visible,
   font-size: 0.875rem;
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .site-search {
-    flex-basis: 160px;
-  }
-}
 
 .search-results[hidden],
 .my-list-toolbar[hidden],

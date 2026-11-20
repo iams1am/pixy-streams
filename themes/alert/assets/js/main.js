@@ -62,7 +62,7 @@
   // ===========================
   const navbarToggle = document.querySelector('.navbar-toggle');
   const navbarMenu = document.querySelector('.navbar-menu');
-  const mobileNavQuery = window.matchMedia('(max-width: 1024px)');
+  const mobileNavQuery = window.matchMedia('(max-width: 1279px)');
 
   // Keep body scroll locked only while a modal surface is actually open.
   const syncBodyScrollLock = () => {
