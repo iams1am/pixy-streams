@@ -57,6 +57,58 @@ const TMDB_TOKEN = process.env.TMDB_READ_TOKEN || "";
 
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").split("=")[1] || "";
 const wants = (name) => !only || only.split(",").includes(name);
+const statusOnly = process.argv.includes("--status");
+
+/**
+ * TMDB guesses a credential type from its shape, because the two accepted
+ * credentials live in different variables and a swapped pair only shows up as a
+ * 401 halfway through a run.
+ */
+const V3_KEY = /^[a-f0-9]{32}$/i;
+const V4_TOKEN = /^eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+function tmdbCredentialState() {
+  if (!TMDB_KEY && !TMDB_TOKEN) {
+    return {
+      ok: false,
+      configured: false,
+      message: "no TMDB credentials — set TMDB_API_KEY (v3 key) or TMDB_READ_TOKEN (v4 token)",
+    };
+  }
+
+  if (TMDB_KEY && !V3_KEY.test(TMDB_KEY)) {
+    return {
+      ok: false,
+      configured: true,
+      message: V4_TOKEN.test(TMDB_KEY)
+        ? "TMDB_API_KEY looks like a v4 read token; put it in TMDB_READ_TOKEN instead"
+        : "TMDB_API_KEY is not a 32-character v3 key",
+    };
+  }
+
+  if (TMDB_TOKEN && !V4_TOKEN.test(TMDB_TOKEN)) {
+    return {
+      ok: false,
+      configured: true,
+      message: V3_KEY.test(TMDB_TOKEN)
+        ? "TMDB_READ_TOKEN looks like a v3 key; put it in TMDB_API_KEY instead"
+        : "TMDB_READ_TOKEN is not a v4 JWT read token",
+    };
+  }
+
+  return {
+    ok: true,
+    configured: true,
+    message: TMDB_KEY ? "v3 key" : "v4 read token",
+  };
+}
+
+const TMDB_CREDENTIAL = tmdbCredentialState();
+if (TMDB_CREDENTIAL.configured && !TMDB_CREDENTIAL.ok) {
+  console.error(`✗ ${TMDB_CREDENTIAL.message}`);
+  console.error("  → create or copy credentials at https://www.themoviedb.org/settings/api");
+  process.exit(1);
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -358,13 +410,25 @@ const TMDB_WATCH_GROUPS = [
 ];
 
 async function tmdb(pathname, params = {}) {
-  const url = new URL(`https://api.themoviedb.org/3${pathname}`);
+  // TMDB_API_BASE exists so the pipeline can be exercised against a mock. The
+  // default is the real API and nothing else in the script reads this variable.
+  const base = process.env.TMDB_API_BASE || "https://api.themoviedb.org/3";
+  const url = new URL(`${base.replace(/\/$/, "")}${pathname}`);
   if (TMDB_KEY) url.searchParams.set("api_key", TMDB_KEY);
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
 
-  return fetchJson(url, {
-    headers: TMDB_TOKEN ? { Authorization: `Bearer ${TMDB_TOKEN}` } : {},
-  });
+  try {
+    return await fetchJson(url, {
+      headers: TMDB_TOKEN ? { Authorization: `Bearer ${TMDB_TOKEN}` } : {},
+    });
+  } catch (error) {
+    if (/^401\b/.test(error.message)) {
+      throw new Error(
+        "TMDB rejected the credentials (401). Use the v3 API key in TMDB_API_KEY or the v4 read token in TMDB_READ_TOKEN from https://www.themoviedb.org/settings/api",
+      );
+    }
+    throw error;
+  }
 }
 
 function movieMeta(item) {
@@ -1216,7 +1280,70 @@ async function existing(name) {
   }
 }
 
+/**
+ * Report how the catalogue is configured and how complete the committed data
+ * is. This is the check to run after adding a key: it never calls an API.
+ */
+async function printStatus() {
+  console.log(
+    TMDB_CREDENTIAL.configured
+      ? `TMDB: configured (${TMDB_CREDENTIAL.message}) · region ${TMDB_REGION}`
+      : `TMDB: ${TMDB_CREDENTIAL.message}`,
+  );
+  console.log(
+    `TheSportsDB: ${SPORTSDB_KEY === "123" ? "public test key (rate limited)" : "custom key"}`,
+  );
+  console.log("");
+
+  for (const name of ["movies", "series", "anime", "sports"]) {
+    const data = await existing(name);
+    if (!data) {
+      console.log(`  ${name.padEnd(7)} no catalogue file`);
+      continue;
+    }
+
+    const items = Array.isArray(data.items) ? data.items : [];
+    const count = (predicate) => items.filter(predicate).length;
+    const poster = count((item) => item.poster);
+    const trailer = count((item) => item.trailer);
+    const watch = count((item) => Array.isArray(item.watch) && item.watch.length > 0);
+    const episodes = count(
+      (item) => Array.isArray(item.seasons) && item.seasons.some((season) => season.episodes?.length),
+    );
+
+    console.log(
+      `  ${name.padEnd(7)} ${String(items.length).padStart(3)} items · ${poster} posters · ` +
+        `${trailer} trailers · ${watch} with watch links` +
+        (name === "series" ? ` · ${episodes} with episode guides` : "") +
+        ` · ${data.source || "unknown source"}`,
+    );
+  }
+
+  const movies = await existing("movies");
+  const series = await existing("series");
+  const stale = [movies, series]
+    .filter((data) => data && (data.items || []).some((item) => !item.poster))
+    .map((data) => data.source);
+
+  console.log("");
+  if (!TMDB_CREDENTIAL.configured) {
+    console.log(
+      "Movies and series stay on the committed cache until a key is set: no film artwork, trailers, watch providers or episode guides.",
+    );
+    console.log("Add one with TMDB_API_KEY (v3) or TMDB_READ_TOKEN (v4), then run again without --status.");
+  } else if (stale.length) {
+    console.log(`Run the fetch to fill in missing artwork: ${stale.join(", ")}`);
+  } else {
+    console.log("Every movie and series has artwork.");
+  }
+}
+
 async function main() {
+  if (statusOnly) {
+    await printStatus();
+    return;
+  }
+
   await mkdir(OUT_DIR, { recursive: true });
 
   const jobs = [

@@ -1,0 +1,32 @@
+{{- /* Official embed adapter. Controls stay with the provider; native MP4 is
+       only used for an authorized self-hosted source. */ -}}
+{{- $source := .source -}}
+{{- $title := .title | default "Video player" -}}
+{{- $poster := .poster | default "" -}}
+{{- with $source -}}
+  {{- if eq .method "internet_archive_embed" -}}
+  <div class="watch-player">
+    <iframe src="https://archive.org/embed/{{ .identifier }}" title="{{ $title }}" allow="fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  {{- else if eq .method "youtube_iframe" -}}
+  <div class="watch-player">
+    <iframe src="https://www.youtube-nocookie.com/embed/{{ .identifier }}?rel=0" title="{{ $title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  {{- else if eq .method "vimeo_iframe" -}}
+  <div class="watch-player">
+    <iframe src="https://player.vimeo.com/video/{{ .identifier }}" title="{{ $title }}" allow="fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  {{- else if eq .method "html5_mp4" -}}
+  <div class="watch-player watch-player-native">
+    <video controls preload="metadata" playsinline{{ with $poster }} poster="{{ . }}"{{ end }} data-watch-video>
+      <source src="{{ .url }}" type="video/mp4">
+      <p>Your browser cannot play this video. <a href="{{ .url }}">Open the MP4 directly</a>.</p>
+    </video>
+  </div>
+  <p class="watch-player-error" data-watch-error hidden>This video failed to load. <a href="{{ .url }}">Open it directly</a>.</p>
+  {{- else -}}
+  <p class="watch-player-error">Unsupported playback method ({{ .method }}). <a href="{{ .url }}">Open the source directly</a>.</p>
+  {{- end -}}
+{{- else -}}
+  <p class="watch-player-error">No playback source is available for this title.</p>
+{{- end -}}

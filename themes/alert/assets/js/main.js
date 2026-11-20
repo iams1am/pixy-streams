@@ -473,7 +473,7 @@
           title.className = 'search-result-title';
           title.textContent = entry.title;
 
-          const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport' };
+          const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport', sample: 'Free film' };
           const kindLabel = kindLabels[entry.kind] || '';
           const meta = document.createElement('span');
           meta.className = 'search-result-meta';
@@ -577,6 +577,27 @@
       }, 0);
     });
   }
+
+  // ===========================
+  // Native Video Playback
+  // ===========================
+  // Only the dormant self-hosted branch renders <video data-watch-video>.
+  // Surface a failure instead of leaving a silent, broken player.
+  document.querySelectorAll('[data-watch-video]').forEach(video => {
+    const wrapper = video.closest('.watch-player');
+    const error = wrapper ? wrapper.parentElement.querySelector('[data-watch-error]') : null;
+    const source = video.querySelector('source');
+
+    const showError = () => {
+      video.hidden = true;
+      if (error) error.hidden = false;
+    };
+
+    video.addEventListener('error', showError);
+    if (source) source.addEventListener('error', showError);
+
+    if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) showError();
+  });
 
   // ===========================
   // Trailer Modal

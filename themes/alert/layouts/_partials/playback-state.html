@@ -1,0 +1,26 @@
+{{- /* Resolve the playback state for a page. Mirrors scripts/lib/playback-model.mjs:
+       a verified registry source wins, then an official provider link, then a
+       trailer, then unavailable. Metadata listings never count as playback. */ -}}
+{{- $page := . -}}
+{{- $region := upper (site.Params.playbackRegion | default "US") -}}
+{{- $id := $page.Params.sample_id | default $page.Params.catalog_id -}}
+{{- $source := false -}}
+{{- with site.Data.playback.registry.sources -}}
+  {{- range . -}}
+    {{- if and (eq .content_id $id) .rights.verified (ne .availability.status "unavailable") -}}
+      {{- $regions := .availability.regions | default slice -}}
+      {{- if or (in $regions "worldwide") (in $regions $region) -}}
+        {{- $source = . -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $state := "unavailable" -}}
+{{- if $source -}}
+  {{- $state = "play_here" -}}
+{{- else if $page.Params.watch -}}
+  {{- $state = "official_provider" -}}
+{{- else if $page.Params.trailer -}}
+  {{- $state = "trailer_only" -}}
+{{- end -}}
+{{- return dict "state" $state "source" $source "content_id" $id "region" $region -}}

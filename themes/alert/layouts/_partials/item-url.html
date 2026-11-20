@@ -5,6 +5,7 @@
   {{- $section := "anime" -}}
   {{- if eq $item.kind "movie" }}{{ $section = "movies" }}{{ end -}}
   {{- if eq $item.kind "series" }}{{ $section = "tv" }}{{ end -}}
+  {{- if eq $item.kind "sample" }}{{ $section = "watch" }}{{ end -}}
   {{- $href = printf "/%s/%s/" $section $item.slug -}}
 {{- end -}}
 {{- return partial "link.html" $href -}}

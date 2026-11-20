@@ -1,0 +1,95 @@
+{{ define "main" }}
+{{ $playback := partial "playback-state.html" . }}
+{{ $source := $playback.source }}
+{{ $watchURL := printf "%swatch/" site.Home.Permalink }}
+{{ $schema := dict
+  "@context" "https://schema.org"
+  "@type" "Movie"
+  "name" .Title
+  "url" .Permalink
+  "description" .Params.overview
+  "image" .Params.poster
+  "datePublished" (string .Params.year)
+  "genre" (.Params.genres | default slice)
+  "isAccessibleForFree" true }}
+{{ with .Params.runtime }}{{ $schema = merge $schema (dict "duration" (printf "PT%dM" (int .))) }}{{ end }}
+{{ with $source }}
+  {{ $embed := "" }}
+  {{ if eq .method "internet_archive_embed" }}{{ $embed = printf "https://archive.org/embed/%s" .identifier }}{{ end }}
+  {{ if eq .method "youtube_iframe" }}{{ $embed = printf "https://www.youtube-nocookie.com/embed/%s" .identifier }}{{ end }}
+  {{ if eq .method "vimeo_iframe" }}{{ $embed = printf "https://player.vimeo.com/video/%s" .identifier }}{{ end }}
+  {{ if $embed }}
+    {{ $schema = merge $schema (dict "video" (dict "@type" "VideoObject" "name" $.Title "description" $.Params.overview "thumbnailUrl" $.Params.poster "embedUrl" $embed)) }}
+  {{ end }}
+{{ end }}
+<script type="application/ld+json">{{ $schema | jsonify | safeJS }}</script>
+
+{{ $crumbs := slice (dict "@type" "ListItem" "position" 1 "name" "Watch free" "item" $watchURL) }}
+{{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" 2 "name" .Title "item" .Permalink) }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs | jsonify | safeJS }}</script>
+
+<article class="watch-detail" data-playback-state="{{ $playback.state }}">
+  <header class="watch-hero">
+    <div class="container watch-hero-inner">
+      <nav class="catalog-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ partial "link.html" "/watch/" }}">Watch free</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ .Title }}</span>
+      </nav>
+      <p class="hero-eyebrow">Free film · {{ .Params.license }}</p>
+      <h1>{{ .Title }}</h1>
+      <p class="hero-meta">{{ .Params.year }} · {{ .Params.runtime }} min{{ with .Params.director }} · {{ . }}{{ end }}{{ with .Params.genres }} · {{ delimit . ", " }}{{ end }}</p>
+      <p class="watch-license-line">{{ .Params.license }} · <a href="{{ .Params.license_url }}" target="_blank" rel="noopener">rights record</a></p>
+    </div>
+  </header>
+
+  <div class="container watch-stage">
+    {{ if $source }}
+      {{ partial "playback-embed.html" (dict "source" $source "title" .Title "poster" .Params.poster) }}
+      <p class="watch-player-note">Playing from the Internet Archive's official embed. Use the player controls for play, pause, seek, volume and fullscreen.</p>
+      <p class="watch-player-note">Rights verified for {{ delimit $source.availability.regions ", " }}. If you are outside that region, check local law. If the player does not load, <a href="{{ .Params.source_url }}" target="_blank" rel="noopener">open the film on Internet Archive</a>.</p>
+      {{ if not $source.captions }}<p class="watch-player-note">Captions are not available for this transfer.</p>{{ end }}
+    {{ else }}
+      <div class="watch-unavailable" role="status">
+        <h2>Playback is unavailable</h2>
+        <p>The rights record for this title is missing, incomplete or unverified, so the player is disabled.</p>
+        {{ with .Params.source_url }}<a class="btn btn-ghost" href="{{ . }}" target="_blank" rel="noopener">Open on Internet Archive</a>{{ end }}
+      </div>
+    {{ end }}
+  </div>
+
+  <div class="container watch-content">
+    <div class="watch-copy">
+      <h2>About the film</h2>
+      <p>{{ .Params.overview }}</p>
+      {{ with .Params.note }}<p class="watch-source-note">{{ . }}</p>{{ end }}
+      {{ .Content }}
+      <p><a class="btn btn-ghost" href="{{ partial "link.html" "/watch/" }}">Back to all free films</a></p>
+    </div>
+
+    <aside class="watch-rights" aria-labelledby="rights-heading">
+      <h2 id="rights-heading">Rights and source</h2>
+      {{ with $source }}
+      <dl class="watch-facts">
+        <dt>Source</dt><dd><a href="{{ $.Params.source_url }}" target="_blank" rel="noopener">{{ $.Params.source }}</a></dd>
+        <dt>Rights basis</dt><dd>{{ .rights.basis | humanize }}</dd>
+        <dt>Region</dt><dd>{{ delimit .availability.regions ", " }}</dd>
+        <dt>Language</dt><dd>{{ with .language }}{{ . | upper }}{{ else }}Unknown{{ end }}</dd>
+        <dt>Captions</dt><dd>{{ if .captions }}{{ delimit .captions ", " }}{{ else }}None available{{ end }}</dd>
+        <dt>Last verified</dt><dd>{{ (time .last_verified).Format "2 Jan 2006" }}</dd>
+        <dt>Reviewed by</dt><dd>{{ .rights.approved_by }}</dd>
+      </dl>
+      <h3>Evidence</h3>
+      <ul class="watch-evidence">
+        {{ range .rights.evidence }}
+        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .source }}</a><span>{{ (time .checked_at).Format "2 Jan 2006" }}</span></li>
+        {{ end }}
+      </ul>
+      <p class="watch-rights-note">{{ .rights.terms }}</p>
+      {{ else }}
+      <p>No verified playback source is registered for this title.</p>
+      {{ end }}
+    </aside>
+  </div>
+</article>
+{{ end }}

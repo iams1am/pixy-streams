@@ -10,6 +10,15 @@
     "genres" (.Params.genres | default slice)) -}}
 {{- end -}}
 
+{{- range where site.RegularPages "Type" "watch" -}}
+  {{- $entries = $entries | append (dict
+    "title" .Title
+    "url" .RelPermalink
+    "meta" (printf "%s · %s min · Free to watch" (string .Params.year) (string .Params.runtime))
+    "kind" "sample"
+    "genres" (.Params.genres | default slice)) -}}
+{{- end -}}
+
 {{- with site.Data.catalog.sports -}}
   {{- range $event := .items -}}
     {{- with $event.href -}}

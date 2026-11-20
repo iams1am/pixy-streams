@@ -139,6 +139,10 @@ check('accessible markup', () => {
       if (!text && !/aria-label=/.test(match[0])) fail(`${name}: unnamed button → ${match[0].slice(0, 80)}`);
     }
 
+    for (const match of html.matchAll(/<iframe\b[^>]*>/g)) {
+      if (!/\stitle=/.test(match[0])) fail(`${name}: iframe without title → ${match[0].slice(0, 80)}`);
+    }
+
     const seen = new Set();
     for (const match of html.matchAll(/\sid="([^"]+)"/g)) {
       if (seen.has(match[1])) fail(`${name}: duplicate id #${match[1]}`);
@@ -163,10 +167,99 @@ check('search index', () => {
     kinds.add(entry.kind);
   }
 
-  for (const kind of ['movie', 'series', 'anime', 'event']) {
+  for (const kind of ['movie', 'series', 'anime', 'event', 'sample']) {
     if (!kinds.has(kind)) fail(`search index has no ${kind} entries`);
   }
   checks.push({ name: 'search entries', failures: 0, note: String(index.length) });
+});
+
+check('watch pages', () => {
+  const samplesFile = path.join(ROOT, 'data', 'playback', 'samples.json');
+  const registryFile = path.join(ROOT, 'data', 'playback', 'registry.json');
+
+  if (!existsSync(samplesFile) || !existsSync(registryFile)) {
+    fail('missing data/playback samples.json or registry.json');
+    return;
+  }
+
+  const samples = JSON.parse(readFileSync(samplesFile, 'utf8'));
+  const registry = JSON.parse(readFileSync(registryFile, 'utf8'));
+  const sources = new Map((registry.sources || []).map((source) => [source.id, source]));
+  const items = Array.isArray(samples.items) ? samples.items : [];
+
+  if (!items.length) {
+    fail('samples.json has no items');
+    return;
+  }
+
+  for (const item of items) {
+    const file = path.join(OUT, 'watch', item.slug, 'index.html');
+    if (!existsSync(file)) {
+      fail(`missing watch page: /watch/${item.slug}/`);
+      continue;
+    }
+
+    const source = sources.get(item.source_id);
+    if (!source) {
+      fail(`${item.id}: no registry source ${item.source_id}`);
+      continue;
+    }
+
+    const html = readFileSync(file, 'utf8');
+    const embed = `https://archive.org/embed/${source.identifier}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    if (!new RegExp(`<iframe[^>]+src=["']?${embed}`).test(html)) {
+      fail(`${item.slug}: missing Internet Archive embed ${source.identifier}`);
+    }
+    if (!html.includes('Rights and source')) fail(`${item.slug}: missing rights panel`);
+    if (!html.includes('Last verified')) fail(`${item.slug}: missing verification date`);
+    if (!html.includes(`/watch/`)) fail(`${item.slug}: missing link back to the library`);
+  }
+
+  checks.push({ name: 'watch pages', failures: 0, note: String(items.length) });
+});
+
+check('playback states', () => {
+  const states = ['play_here', 'official_provider', 'trailer_only', 'unavailable'];
+  let declared = 0;
+
+  for (const file of pages) {
+    const html = readFileSync(file, 'utf8');
+    const isWatch = html.includes('class=watch-detail') || html.includes('class="watch-detail"');
+    const isCatalog = html.includes('class=catalog-detail') || html.includes('class="catalog-detail"');
+    if (!isWatch && !isCatalog) continue;
+
+    const match = html.match(/data-playback-state=(?:"([a-z_]+)"|([a-z_]+))/);
+    if (!match) {
+      fail(`${relative(file)}: no data-playback-state`);
+      continue;
+    }
+
+    const state = match[1] || match[2];
+    if (!states.includes(state)) {
+      fail(`${relative(file)}: unknown playback state "${state}"`);
+      continue;
+    }
+    declared += 1;
+
+    const hasEmbed = /<iframe\b/.test(html) || /<video\b/.test(html);
+    const hasProviders = html.includes('Where to watch');
+    const hasTrailer = /data-trailer=/.test(html);
+
+    if (state === 'play_here' && !hasEmbed) fail(`${relative(file)}: play_here without an embed`);
+    if (state === 'official_provider' && (!hasProviders || hasEmbed)) {
+      fail(`${relative(file)}: official_provider must show provider links and no player`);
+    }
+    if (state === 'trailer_only' && (!hasTrailer || hasEmbed)) {
+      fail(`${relative(file)}: trailer_only must offer a trailer and no player`);
+    }
+    if (state === 'unavailable' && (hasProviders || hasTrailer || hasEmbed)) {
+      fail(`${relative(file)}: unavailable page still offers playback, providers or a trailer`);
+    }
+  }
+
+  if (declared === 0) fail('no page declares a playback state');
+  checks.push({ name: 'playback states', failures: 0, note: String(declared) });
 });
 
 check('no leaked credentials', () => {
@@ -180,11 +273,13 @@ check('no leaked credentials', () => {
 
 const totalRefs = checks.find((item) => item.name === 'references scanned')?.note;
 const totalEntries = checks.find((item) => item.name === 'search entries')?.note;
+const totalWatch = checks.find((item) => item.name === 'watch pages')?.note;
+const totalStates = checks.find((item) => item.name === 'playback states')?.note;
 
 for (const item of checks) {
   if (!item.note) console.log(`${item.failures ? '✗' : '✓'} ${item.name}${item.failures ? ` (${item.failures} problem${item.failures === 1 ? '' : 's'})` : ''}`);
 }
-console.log(`\n${pages.length} pages · base path ${basePath}${totalRefs ? ` · ${totalRefs} references` : ''}${totalEntries ? ` · ${totalEntries} search entries` : ''}`);
+console.log(`\n${pages.length} pages · base path ${basePath}${totalRefs ? ` · ${totalRefs} references` : ''}${totalEntries ? ` · ${totalEntries} search entries` : ''}${totalWatch ? ` · ${totalWatch} watch pages` : ''}${totalStates ? ` · ${totalStates} playback states` : ''}`);
 
 if (failures.length) {
   console.error(`\n${failures.length} check${failures.length === 1 ? '' : 's'} failed:`);

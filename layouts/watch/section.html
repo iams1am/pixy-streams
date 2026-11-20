@@ -1,0 +1,47 @@
+{{ define "main" }}
+<div class="page-header">
+  <div class="container">
+    <p class="hero-eyebrow">Public domain · Verified rights</p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </div>
+</div>
+
+{{ $samples := site.Data.playback.samples }}
+<div class="container page-content">
+  <div class="content-main">
+    {{ .Content }}
+
+    {{ with $samples }}
+      {{ if .items }}
+      <section class="watch-library" aria-labelledby="watch-library-heading">
+        <h2 id="watch-library-heading">The sample library</h2>
+        <div class="watch-grid">
+          {{ range .items }}
+          <a class="watch-card" href="{{ partial "link.html" (printf "/watch/%s/" .slug) }}">
+            <div class="watch-card-poster">
+              {{ if .poster }}
+              <img src="{{ .poster }}" alt="{{ .title }} poster" loading="lazy" decoding="async">
+              {{ else }}
+              {{ partial "poster-fallback.html" (dict "title" .title "accent" "#1f6feb") }}
+              {{ end }}
+              <span class="badge">Free</span>
+            </div>
+            <h3>{{ .title }}</h3>
+            <p class="watch-card-meta">{{ .year }} · {{ .runtime }} min · {{ delimit .genres ", " }}</p>
+            <p class="watch-card-license">{{ .license }}</p>
+          </a>
+          {{ end }}
+        </div>
+      </section>
+      {{ end }}
+    {{ end }}
+
+    <section class="watch-policy" aria-labelledby="watch-policy-heading">
+      <h2 id="watch-policy-heading">Why these films?</h2>
+      <p>Each title is public domain in the United States and is streamed from the Internet Archive's official embed. The rights record, evidence links, reviewing editor and last verification date are shown on every watch page.</p>
+      <p>These are not commercial catalogue titles and they are not downloaded or re-hosted here. If you are outside the United States, check the law where you are.</p>
+    </section>
+  </div>
+</div>
+{{ end }}

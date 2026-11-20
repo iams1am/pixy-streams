@@ -41,6 +41,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Test playback model
+        run: node --test scripts/playback-model.test.mjs
+
       - name: Refresh catalogue
         # Missing keys are fine: each source falls back to its committed JSON.
         env:
@@ -57,8 +60,14 @@ jobs:
       - name: Build
         run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
 
+      - name: Report catalogue coverage
+        run: node scripts/fetch-catalog.mjs --status
+
       - name: Check the built site
         run: node scripts/check-site.mjs
+
+      - name: Check playback registry
+        run: node scripts/check-playback.mjs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

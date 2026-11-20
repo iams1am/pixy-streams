@@ -72,6 +72,9 @@
 
 <!-- Catalog rails -->
 {{ $rails := slice }}
+{{ with partial "sample-items.html" . }}
+  {{ $rails = $rails | append (dict "id" "free-films" "title" "Free to watch" "subtitle" "Public-domain films with a verified rights record" "href" "/watch/" "items" .) }}
+{{ end }}
 {{ with $movies }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "movies" "title" "Trending movies" "subtitle" "What everyone is watching this week" "href" "/movies/#trending" "items" .) }}

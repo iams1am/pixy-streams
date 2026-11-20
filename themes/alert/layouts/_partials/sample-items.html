@@ -1,0 +1,17 @@
+{{- /* Maps verified sample-library entries to the shared rail-card shape. */ -}}
+{{- $items := slice -}}
+{{- with site.Data.playback.samples -}}
+  {{- range .items -}}
+    {{- $items = $items | append (dict
+      "title" .title
+      "slug" .slug
+      "kind" "sample"
+      "poster" .poster
+      "year" .year
+      "meta" (printf "%s · %s min · Free" (string .year) (string .runtime))
+      "genres" (.genres | default slice)
+      "badge" "Free"
+      "accent" "#1f6feb") -}}
+  {{- end -}}
+{{- end -}}
+{{- return $items -}}

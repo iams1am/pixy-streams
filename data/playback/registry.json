@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-20T00:00:00.000Z",
+  "notes": "Only full-content playback sources with verified rights belong here. The three Internet Archive films are public domain in the United States; no other source is approved. See docs/PLAYBACK_MODEL.md before adding a source.",
+  "sources": [
+    {
+      "id": "ia-his-girl-friday",
+      "content_id": "sample-his-girl-friday",
+      "media_type": "movie",
+      "episode_id": null,
+      "provider": "internet_archive",
+      "method": "internet_archive_embed",
+      "identifier": "his_girl_friday",
+      "url": "https://archive.org/details/his_girl_friday",
+      "availability": {
+        "status": "region_restricted",
+        "regions": ["US"],
+        "checked_at": "2026-11-20T00:00:00.000Z"
+      },
+      "rights": {
+        "verified": true,
+        "basis": "public_domain",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "approved_by": "Pixy Streams editorial review",
+        "evidence": [
+          {
+            "source": "Internet Archive item metadata, including licenseurl",
+            "url": "https://archive.org/metadata/his_girl_friday",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Public-domain certification recorded for the item",
+            "url": "https://creativecommons.org/publicdomain/certification/1.0/us/",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Internet Archive item page and playable MP4 derivative",
+            "url": "https://archive.org/details/his_girl_friday",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          }
+        ]
+      },
+      "language": "en",
+      "captions": [],
+      "last_verified": "2026-11-20T00:00:00.000Z"
+    },
+    {
+      "id": "ia-the-general",
+      "content_id": "sample-the-general",
+      "media_type": "movie",
+      "episode_id": null,
+      "provider": "internet_archive",
+      "method": "internet_archive_embed",
+      "identifier": "TheGeneral1926",
+      "url": "https://archive.org/details/TheGeneral1926",
+      "availability": {
+        "status": "region_restricted",
+        "regions": ["US"],
+        "checked_at": "2026-11-20T00:00:00.000Z"
+      },
+      "rights": {
+        "verified": true,
+        "basis": "public_domain",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "approved_by": "Pixy Streams editorial review",
+        "evidence": [
+          {
+            "source": "Internet Archive item metadata, including licenseurl",
+            "url": "https://archive.org/metadata/TheGeneral1926",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Creative Commons public domain mark recorded for the item",
+            "url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Internet Archive item page and playable MP4 derivative",
+            "url": "https://archive.org/details/TheGeneral1926",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          }
+        ]
+      },
+      "language": "en",
+      "captions": [],
+      "last_verified": "2026-11-20T00:00:00.000Z"
+    },
+    {
+      "id": "ia-the-cabinet-of-dr-caligari",
+      "content_id": "sample-the-cabinet-of-dr-caligari",
+      "media_type": "movie",
+      "episode_id": null,
+      "provider": "internet_archive",
+      "method": "internet_archive_embed",
+      "identifier": "the-cabinet-of-dr.-caligari-1920.",
+      "url": "https://archive.org/details/the-cabinet-of-dr.-caligari-1920.",
+      "availability": {
+        "status": "region_restricted",
+        "regions": ["US"],
+        "checked_at": "2026-11-20T00:00:00.000Z"
+      },
+      "rights": {
+        "verified": true,
+        "basis": "public_domain",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "approved_by": "Pixy Streams editorial review",
+        "evidence": [
+          {
+            "source": "Internet Archive item metadata, including licenseurl",
+            "url": "https://archive.org/metadata/the-cabinet-of-dr.-caligari-1920.",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Creative Commons public domain mark recorded for the item",
+            "url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          },
+          {
+            "source": "Internet Archive item page and playable MP4 derivative",
+            "url": "https://archive.org/details/the-cabinet-of-dr.-caligari-1920.",
+            "checked_at": "2026-11-20T00:00:00.000Z"
+          }
+        ]
+      },
+      "language": "en",
+      "captions": [],
+      "last_verified": "2026-11-20T00:00:00.000Z"
+    }
+  ]
+}

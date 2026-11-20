@@ -1,5 +1,12 @@
 {{ define "main" }}
 {{ $kind := .Params.catalog }}
+{{ $playback := partial "playback-state.html" . }}
+{{ $playbackLabels := dict "play_here" "Play here" "official_provider" "Watch on official provider" "trailer_only" "Trailer only" "unavailable" "Unavailable" }}
+{{ $playbackNotes := dict
+  "play_here" "Streaming here from a source with a recorded rights basis."
+  "official_provider" "No full-length source is approved here; the official provider holds the rights."
+  "trailer_only" "Only the official trailer is available; no playback source is approved."
+  "unavailable" "No verified playback source, provider link or trailer is known." }}
 {{ $catalog := site.Data.catalog.anime }}
 {{ if eq $kind "movie" }}{{ $catalog = site.Data.catalog.movies }}{{ end }}
 {{ if eq $kind "series" }}{{ $catalog = site.Data.catalog.series }}{{ end }}
@@ -54,6 +61,10 @@
         {{ with .Params.original_title }}<p class="catalog-original">{{ . }}</p>{{ end }}
         {{ with .Params.meta }}<p class="hero-meta">{{ . }}</p>{{ end }}
         {{ with .Params.score }}<p class="catalog-score">{{ . }}<span>/10</span></p>{{ end }}
+        <p class="playback-state playback-state-{{ $playback.state }}" data-playback-state="{{ $playback.state }}">
+          <span class="playback-state-label">{{ index $playbackLabels $playback.state }}</span>
+          <span class="playback-state-note">{{ index $playbackNotes $playback.state }}</span>
+        </p>
         <div class="hero-actions">
           {{ with .Params.trailer }}
           {{ $embed := . }}
@@ -88,6 +99,12 @@
       {{ with .Params.overview }}
       <h2>Overview</h2>
       <p>{{ . }}</p>
+      {{ end }}
+
+      {{ if eq $playback.state "play_here" }}
+      <h2>Play here</h2>
+      {{ partial "playback-embed.html" (dict "source" $playback.source "title" .Title "poster" .Params.poster) }}
+      <p class="watch-player-note">{{ $playback.source.rights.terms }} Verified {{ (time $playback.source.last_verified).Format "2 Jan 2006" }}. <a href="{{ partial "link.html" "/watch/" }}">How rights are verified</a>.</p>
       {{ end }}
 
       {{ with .Params.genres }}

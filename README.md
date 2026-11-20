@@ -1,10 +1,11 @@
 # Pixy Streams
 
-A movie, anime and sport discovery site. Static, fast, and built to be hosted free
-on GitHub Pages.
+A movie, TV series, anime and sport discovery site. Static, fast, and built to be
+hosted free on GitHub Pages.
 
 Pixy Streams is a **discovery layer**: it shows metadata, artwork, trailers and
-where-to-watch links. It does not host or stream copyrighted video.
+where-to-watch links. It does not host or stream copyrighted video. Full-length
+playback is added only through the verified-rights registry described below.
 
 ## Stack
 
@@ -15,15 +16,21 @@ where-to-watch links. It does not host or stream copyrighted video.
 | Styling | Hand-written CSS with light/dark tokens, no framework |
 | Hosting | GitHub Pages, served from the `gh-pages` branch |
 | Catalogue build | `node scripts/fetch-catalog.mjs` (no dependencies) |
-| Data | TMDB (film), AniList (anime), ESPN + TheSportsDB (sport) |
+| Data | TMDB (film and TV), AniList (anime), ESPN + TheSportsDB (sport) |
 
 ## Structure
 
 ```
 hugo.toml                   site config, navigation, taxonomies
 scripts/fetch-catalog.mjs   build-time catalogue fetch and normalisation
+scripts/check-site.mjs      post-build link, metadata and security checks
+scripts/check-playback.mjs  validates the verified-rights playback registry
+scripts/lib/playback-model.mjs  shared playback states, resolver and validation
 data/catalog/               generated: anime.json, movies.json, series.json, sports.json
+data/playback/registry.json verified full-content sources (3 public-domain films)
+data/playback/samples.json  the curated free-film library those records cover
 data/home.yaml              hero fallback, stats, quick links
+docs/PLAYBACK_MODEL.md      playback schema, states and rights requirements
 content/
   _index.md                 homepage copy
   movies/_content.gotmpl    generates one page per movie
@@ -44,6 +51,8 @@ node scripts/fetch-catalog.mjs    # refresh data/catalog/*.json
 hugo server -D                    # http://localhost:1313
 hugo --gc --minify                # production build into public/
 node scripts/check-site.mjs       # verify the build before shipping
+node scripts/check-playback.mjs   # verify the playback registry
+node --test scripts/playback-model.test.mjs  # model and validator tests
 ```
 
 Node 20+ is only needed to refresh the catalogue. The generated JSON is committed,
@@ -98,6 +107,62 @@ summaries for every series come from the single detail request.
 Keys are read at build time only. Nothing secret is shipped to the browser, which
 is why this is a build step rather than client-side `fetch()`.
 
+## Getting a TMDB key
+
+TMDB is free for non-commercial use and needs an account:
+
+1. Sign in at <https://www.themoviedb.org>, open **Settings → API**, and request a
+   developer key.
+2. Copy **either** the *API Key (v3 auth)* — 32 hex characters — **or** the *API
+   Read Access Token (v4 auth)*, a JWT that starts with `eyJ`.
+3. Put it in `.env` (copy `.env.example` first). A v3 key goes in `TMDB_API_KEY`;
+   the v4 token goes in `TMDB_READ_TOKEN`. Set `TMDB_REGION` to your ISO 3166-1
+   country code if it is not `US`.
+4. Check the wiring before running anything expensive:
+
+   ```bash
+   node scripts/fetch-catalog.mjs --status
+   ```
+
+   The report shows whether TMDB is configured, which region is active, and how
+   many items in the committed catalogue have posters, trailers, watch links and
+   episode guides. A key in the wrong variable is rejected by name, so a swapped
+   pair never surfaces as a bare 401.
+5. Refresh one vertical and inspect the result:
+
+   ```bash
+   node scripts/fetch-catalog.mjs --only=movies
+   node scripts/fetch-catalog.mjs --only=series
+   ```
+
+For the deployed site, add `TMDB_API_KEY` or `TMDB_READ_TOKEN` under **Settings →
+Secrets and variables → Actions → Secrets**, and optionally `TMDB_REGION` under
+**Variables**. The workflow prints the same coverage report on every run, so a
+missing or malformed secret is visible in the log.
+
+Once a key is active, movie and series pages gain live artwork, official
+trailers, regional watch providers and episode guides. Until then the curated
+seed is served, which is why film cards currently show monograms instead of
+posters.
+
+## Playback sources
+
+Playback status is separate from catalogue metadata. Every title resolves to one
+of four states: `play_here`, `official_provider`, `trailer_only` or
+`unavailable`. Only a record in `data/playback/registry.json` can produce
+`play_here`; TMDB availability and AniList links never do.
+
+The committed registry holds three Internet Archive films that are public domain
+in the United States, and `/watch/` plays them through the archive's official
+embed. Everything else on the site is discovery only.
+
+Adding a source requires a recorded rights basis, HTTPS evidence, a named
+reviewer, an availability region and a provider/method pair that matches.
+`node scripts/check-playback.mjs` fails the build if any of that is missing, and
+`docs/PLAYBACK_MODEL.md` documents the full schema. The state line on every title
+page is generated by `themes/alert/layouts/_partials/playback-state.html`, which
+mirrors the model and reads the region from `playbackRegion` in `hugo.toml`.
+
 ## Editing the homepage
 
 `data/home.yaml` covers what is not in the catalogue:
@@ -135,10 +200,11 @@ site base path so the site works from the `/pixy-streams/` subpath.
 ## Deployment
 
 Live at <https://iams1am.github.io/pixy-streams/>, deployed by
-`.github/workflows/deploy.yml`. Every push to `main` refreshes the catalogue,
-builds with Hugo and publishes through GitHub Pages; a daily `cron` run at 05:00
-UTC does the same so fixtures and seasonal anime do not go stale, and
-`workflow_dispatch` covers manual runs.
+`.github/workflows/deploy.yml`. Every push to `main` tests the playback model,
+refreshes the catalogue, builds with Hugo, runs the site and playback checks, and
+publishes through GitHub Pages; a daily `cron` run at 05:00 UTC does the same so
+fixtures and seasonal anime do not go stale, and `workflow_dispatch` covers manual
+runs.
 
 The workflow reads `TMDB_API_KEY`, `TMDB_READ_TOKEN` and `SPORTSDB_KEY` from
 repository secrets. A missing secret just leaves that source on its committed
@@ -156,8 +222,9 @@ Pages at the `gh-pages` branch, which the older manual flow force-pushed.
 - **Done** - client-side search over a build-time index, My List in `localStorage`
 - **Done** - trailer modal on title pages, scheduled catalogue refresh workflow
 - **Done** - TV catalogue, browse-all grids with sorting, post-build checks in CI
+- **Done** - playback model, rights registry, three verified public-domain films on `/watch/`
 - **Next** - TMDB key for live movie artwork, film trailers and episode guides
-- **Later** - per-title playback slot for public-domain / licensed media
+- **Later** - Vimeo and self-hosted playback once authorized content needs them
 
 ## Attribution
 

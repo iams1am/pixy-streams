@@ -11,6 +11,9 @@ theme = "alert"
   logoText = "Pixy"
   logoAccent = "Streams"
 
+  # Playback: the region a verified playback source must cover (ISO 3166-1).
+  playbackRegion = "US"
+
   # Brand
   themeColor = "#ff6b35"
 
@@ -114,14 +117,19 @@ theme = "alert"
   weight = 3
 
 [[menu.main]]
+  name = "Watch Free"
+  url = "/watch/"
+  weight = 6
+
+[[menu.main]]
   name = "My List"
   url = "/my-list/"
-  weight = 6
+  weight = 7
 
 [[menu.main]]
   name = "About"
   url = "/about/"
-  weight = 7
+  weight = 8
 
 [markup]
   [markup.goldmark]

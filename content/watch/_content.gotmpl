@@ -1,0 +1,29 @@
+{{ $samples := site.Data.playback.samples }}
+{{ if and $samples $samples.items }}
+{{ range $index, $item := $samples.items }}
+{{ $.AddPage (dict
+  "path" $item.slug
+  "title" $item.title
+  "type" "watch"
+  "params" (dict
+    "sample_id" $item.id
+    "source_id" $item.source_id
+    "catalog" "sample"
+    "source" $item.source
+    "source_url" $item.source_url
+    "overview" $item.overview
+    "poster" $item.poster
+    "genres" $item.genres
+    "year" $item.year
+    "runtime" $item.runtime
+    "language" $item.language
+    "director" $item.director
+    "license" $item.license
+    "license_url" $item.license_url
+    "archive_id" $item.archive_id
+    "note" $item.note
+    "weight" $index
+  )
+) }}
+{{ end }}
+{{ end }}
