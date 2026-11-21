@@ -1418,6 +1418,20 @@ a.specialty-item:hover {
   background-position: center;
 }
 
+@media (max-width: 767px) {
+  /* The horizontal scrim is tuned for a side-by-side layout; stacked text needs
+     a full-width one so the backdrop never fights the title or metadata. */
+  .catalog-hero {
+    background-image:
+      linear-gradient(180deg, rgba(8, 10, 20, 0.94) 0%, rgba(8, 10, 20, 0.97) 100%),
+      var(--hero-backdrop, linear-gradient(160deg, #16203a 0%, #0b1020 100%));
+  }
+
+  .catalog-hero .hero-meta {
+    color: rgba(255, 255, 255, 0.88);
+  }
+}
+
 .catalog-hero-inner {
   display: flex;
   flex-wrap: wrap;
@@ -1542,6 +1556,17 @@ a.specialty-item:hover {
   color: var(--color-text-muted);
 }
 
+.watch-region {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+#play,
+#where-to-watch {
+  scroll-margin-top: calc(var(--header-height) + var(--spacing-md));
+}
+
 .season-list {
   display: grid;
   gap: var(--spacing-sm);
@@ -1569,6 +1594,12 @@ a.specialty-item:hover {
 
 .season-meta {
   margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.season-note {
+  margin: var(--spacing-sm) 0 0;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
 }

@@ -10,6 +10,7 @@
 {{ $catalog := site.Data.catalog.anime }}
 {{ if eq $kind "movie" }}{{ $catalog = site.Data.catalog.movies }}{{ end }}
 {{ if eq $kind "series" }}{{ $catalog = site.Data.catalog.series }}{{ end }}
+{{ $region := site.Params.playbackRegion | default "US" }}
 
 {{/* Structured data: the title itself, plus the breadcrumb trail. */}}
 {{ $schema := dict
@@ -65,15 +66,39 @@
           <span class="playback-state-label">{{ index $playbackLabels $playback.state }}</span>
           <span class="playback-state-note">{{ index $playbackNotes $playback.state }}</span>
         </p>
+        {{/* The primary action follows the playback state: a verified stream plays
+             here, an official provider is linked, and nothing pretends otherwise. */}}
+        {{ $watchHref := "" }}
+        {{ $watchLabel := "" }}
+        {{ if eq $playback.state "play_here" }}
+          {{ $watchHref = "#play" }}
+          {{ $watchLabel = "Play here" }}
+        {{ else if eq $playback.state "official_provider" }}
+          {{ if .Params.watch }}
+            {{ $watchHref = "#where-to-watch" }}
+            {{ $watchLabel = "Where to watch" }}
+          {{ else }}
+            {{ $watchHref = .Params.source_url | default "" }}
+            {{ $watchLabel = "Watch on official provider" }}
+          {{ end }}
+        {{ end }}
         <div class="hero-actions">
+          {{ with $watchHref }}
+            {{ if hasPrefix . "http" }}
+            <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener">{{ $watchLabel }}</a>
+            {{ else }}
+            <a class="btn btn-primary" href="{{ . }}">{{ $watchLabel }}</a>
+            {{ end }}
+          {{ end }}
           {{ with .Params.trailer }}
           {{ $embed := . }}
           {{ $embed = replaceRE `^https?://(?:www\.)?youtube\.com/watch\?(?:.*&)?v=([A-Za-z0-9_-]+).*$` "https://www.youtube.com/embed/${1}?autoplay=1&rel=0" $embed }}
           {{ $embed = replaceRE `^https?://youtu\.be/([A-Za-z0-9_-]+).*$` "https://www.youtube.com/embed/${1}?autoplay=1&rel=0" $embed }}
-          <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener" data-trailer="{{ $embed }}">Watch trailer</a>
+          <a class="btn {{ if $watchHref }}btn-ghost{{ else }}btn-primary{{ end }}" href="{{ . }}" target="_blank" rel="noopener" data-trailer="{{ $embed }}">Watch trailer</a>
           {{ end }}
-          {{ with .Params.source_url }}
-          <a class="btn btn-ghost" href="{{ . }}" target="_blank" rel="noopener">More details</a>
+          {{ $sourceUrl := .Params.source_url }}
+          {{ if and $sourceUrl (ne $sourceUrl $watchHref) }}
+          <a class="btn btn-ghost" href="{{ $sourceUrl }}" target="_blank" rel="noopener">More details</a>
           {{ end }}
           <button type="button" class="btn btn-ghost save-button" data-save aria-pressed="false">
             <svg class="save-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -102,7 +127,7 @@
       {{ end }}
 
       {{ if eq $playback.state "play_here" }}
-      <h2>Play here</h2>
+      <h2 id="play">Play here</h2>
       {{ partial "playback-embed.html" (dict "source" $playback.source "title" .Title "poster" .Params.poster) }}
       <p class="watch-player-note">{{ $playback.source.rights.terms }} Verified {{ (time $playback.source.last_verified).Format "2 Jan 2006" }}. <a href="{{ partial "link.html" "/watch/" }}">How rights are verified</a>.</p>
       {{ end }}
@@ -116,7 +141,8 @@
       {{ end }}
 
       {{ with .Params.watch }}
-      <h2>Where to watch</h2>
+      <h2 id="where-to-watch">Where to watch</h2>
+      <p class="watch-region">Availability shown for {{ $region }}. Links open the provider that holds the rights.</p>
       <ul class="watch-list">
         {{ range . }}
         <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}{{ with .type }}<span class="watch-type">{{ . }}</span>{{ end }}</a></li>
@@ -148,6 +174,8 @@
             </li>
             {{ end }}
           </ol>
+          {{ else }}
+          <p class="season-note">Episode guide not available for this season.</p>
           {{ end }}
         </section>
         {{ end }}
@@ -181,34 +209,47 @@
 </dialog>
 {{ end }}
 
-{{/* Related titles from the primary genre. */}}
+{{/* Related titles, ranked by how many genres they share with this one. */}}
+{{ $genres := .Params.genres | default slice }}
 {{ $primary := "" }}
 {{ $primarySlug := "" }}
-{{ with .Params.genres }}
+{{ with $genres }}
   {{ $primary = index . 0 }}
   {{ $primarySlug = $primary | urlize }}
 {{ end }}
 
-{{ if $primary }}
-  {{ $related := first 11 (where (where site.RegularPages "Type" "catalog") "Params.genres" "intersect" (slice $primary)) }}
-  {{ $related = where $related "Permalink" "ne" $.Permalink }}
-  {{ $cards := slice }}
-  {{ range $related }}
-    {{ $cards = $cards | append (dict
-      "title" .Title
-      "meta" .Params.meta
-      "poster" .Params.poster
-      "accent" .Params.accent
-      "badge" .Params.badge
-      "kind" .Params.catalog
-      "href" .RelPermalink) }}
+{{ $scored := slice }}
+{{ if $genres }}
+  {{ range where site.RegularPages "Type" "catalog" }}
+    {{ if ne .Permalink $.Permalink }}
+      {{ $shared := 0 }}
+      {{ range .Params.genres }}{{ if in $genres . }}{{ $shared = add $shared 1 }}{{ end }}{{ end }}
+      {{ if gt $shared 0 }}
+        {{ $scored = $scored | append (dict
+          "page" .
+          "order" (printf "%03d-%04d" $shared (int (.Params.score | default 0)))) }}
+      {{ end }}
+    {{ end }}
   {{ end }}
-  {{ with $cards }}
-    {{ partial "rail.html" (dict
-      "title" "More like this"
-      "subtitle" (printf "More %s in the catalogue" $primary)
-      "href" (printf "/genres/%s/" $primarySlug)
-      "items" .) }}
-  {{ end }}
+{{ end }}
+
+{{ $cards := slice }}
+{{ range first 11 (sort $scored "order" "desc") }}
+  {{ $p := .page }}
+  {{ $cards = $cards | append (dict
+    "title" $p.Title
+    "meta" $p.Params.meta
+    "poster" $p.Params.poster
+    "accent" $p.Params.accent
+    "badge" $p.Params.badge
+    "kind" $p.Params.catalog
+    "href" $p.RelPermalink) }}
+{{ end }}
+{{ with $cards }}
+  {{ partial "rail.html" (dict
+    "title" "More like this"
+    "subtitle" "Titles that share genres with this one"
+    "href" (printf "/genres/%s/" $primarySlug)
+    "items" .) }}
 {{ end }}
 {{ end }}

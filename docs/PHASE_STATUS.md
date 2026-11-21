@@ -372,6 +372,55 @@ Edge 157.
 - Personal rail URLs carry the deployment base path in production
   (`/pixy-streams/watch/the-general/`), verified in the built `index.html`.
 
+## Phase 4.2 — Title detail pages — Complete
+
+- **Primary action follows the playback state.** `play_here` titles lead with
+  "Play here" anchored to the inline player; `official_provider` titles lead with
+  "Where to watch" anchored to the provider list (or the source page when no
+  provider links exist); `trailer_only` titles keep the trailer as the primary
+  button; `unavailable` titles offer no watch or trailer call to action at all.
+  The trailer drops to a secondary button whenever a watch action exists, and
+  "More details" is suppressed when it would duplicate the primary link.
+- **Availability context.** The provider section now states the region the links
+  were checked for (`playbackRegion`, currently US) and that links open the
+  service holding the rights. The section still renders only when provider links
+  exist.
+- **Seasons.** A season with no episode guide now says "Episode guide not
+  available for this season." instead of ending silently after the header. The
+  committed seed has no episode guides, so every season shows the honest note
+  until TMDB credentials enrich it.
+- **Similar titles.** "More like this" now ranks catalogue titles by how many
+  genres they share with the current title, with score as the tie-break, instead
+  of matching only the first genre. The subtitle says what the ranking means.
+- **Poster and backdrop.** On screens narrower than 768 px the horizontal scrim
+  becomes a near-opaque vertical one, and the hero metadata is brightened, so the
+  backdrop cannot fight the title, score or state line when the layout stacks.
+  Desktop keeps the existing side-by-side scrim.
+- Metadata hierarchy, genre chips, overview layout, seasons, episode lists and
+  the bookmark button were already in place and were kept unchanged. Cast data
+  is not in any catalogue source, so no cast block was invented; the plan's
+  "where supported" condition is not met.
+
+### Verification
+
+- Rendered checks in headless Edge on the local build: `official_provider`
+  (ONE PIECE) shows "Where to watch" as the first action and the region line;
+  the anchor scrolls to the provider section, which lands exactly at the header's
+  bottom edge (scrollY 0 → 849, section top 71 px). `unavailable` (Dune, Severance)
+  shows no watch or trailer action. `trailer_only` (Made in Abyss) keeps the
+  trailer as the primary button. Season notes appear for both Severance seasons.
+  Related rails render 11 cards ranked by shared genres.
+- 768 px and 390 px: all hero actions stay inside the viewport, the provider CTA
+  is first, the region line fits, season notes stay inside their cards, and the
+  page has no horizontal overflow. Mobile screenshots confirm the darkened hero
+  keeps the title and metadata legible over a bright backdrop.
+- Production build 154 pages; `check-site.mjs` passes (120 pages, 5,427
+  references, 87 playback states, unavailable pages still free of provider
+  markup), `check-playback.mjs` passes, playback model tests 24/24.
+- Limitation: no catalogue title currently resolves to `play_here` (the three
+  verified films are watch-library pages with their own layout), so the
+  "Play here" hero branch is implemented but not exercised by a live page.
+
 ## Known limitations
 
 - Only three public-domain films are approved for playback. Everything else is
@@ -403,7 +452,8 @@ Edge 157.
 
 ## Next
 
-Phase 3 is closed for the verified library and Phase 4.1 is complete. Phase 4.2
-(title detail pages) is the next planned subphase and has not been started. More public-domain films can be added through the same
+Phase 3 is closed for the verified library, and Phases 4.1 and 4.2 are complete.
+Phase 4.3 (search and navigation) is the next planned subphase and has not been
+started. More public-domain films can be added through the same
 registry once their rights and exact playback file are verified. Live TMDB
 credentials remain the main catalogue limitation.
