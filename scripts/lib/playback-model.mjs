@@ -54,7 +54,7 @@ export const PROVIDERS = Object.freeze({
     identifier: /^[A-Za-z0-9_-]{11}$/,
   },
   internet_archive: {
-    method: "internet_archive_embed",
+    methods: ["internet_archive_embed", "internet_archive_mp4"],
     hosts: ["archive.org", "www.archive.org"],
     identifier: /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/,
   },
@@ -230,8 +230,12 @@ export function validateSamples(samples, registry) {
       errors.push(`${where}.source_id points at content_id ${source.content_id}, not ${item.id}`);
     }
 
-    if (source.provider !== "internet_archive" || source.method !== "internet_archive_embed") {
-      errors.push(`${where}.source_id must be an Internet Archive embed source`);
+    if (source.provider !== "internet_archive" || source.method !== "internet_archive_mp4") {
+      errors.push(`${where}.source_id must be an Internet Archive MP4 source`);
+    }
+
+    if (!isNonEmptyString(source.file)) {
+      errors.push(`${where}.source_id must name the verified MP4 file`);
     }
 
     if (source.identifier !== item.archive_id) {
@@ -322,12 +326,22 @@ function validateSource(source, index, catalogueById, seenIds, errors) {
   if (!provider) {
     errors.push(`${where}.provider must be one of ${Object.keys(PROVIDERS).join(", ")}`);
   } else {
-    if (source.method !== provider.method) {
-      errors.push(`${where}.method must be "${provider.method}" for ${source.provider}`);
+    const allowedMethods = provider.methods || [provider.method];
+    if (!allowedMethods.includes(source.method)) {
+      const expected = allowedMethods.map((method) => `"${method}"`).join(" or ");
+      errors.push(`${where}.method must be ${expected} for ${source.provider}`);
     }
 
     if (typeof source.identifier !== "string" || !provider.identifier.test(source.identifier)) {
       errors.push(`${where}.identifier is not valid for ${source.provider}`);
+    }
+
+    if (source.method === "internet_archive_mp4") {
+      if (!isNonEmptyString(source.file)) {
+        errors.push(`${where}.file is required for internet_archive_mp4`);
+      }
+    } else if (source.file !== null && source.file !== undefined) {
+      errors.push(`${where}.file is only allowed for internet_archive_mp4`);
     }
 
     validateProviderUrl(source, provider, where, errors);
@@ -403,15 +417,34 @@ function validateProviderUrl(source, provider, where, errors) {
       errors.push(`${where}.url does not point at identifier ${source.identifier}`);
     }
   } else if (source.provider === "internet_archive") {
-    const match = url.pathname.match(/^\/(?:details|embed)\/([^/]+)\/?$/);
-    let pathIdentifier = "";
-    try {
-      pathIdentifier = match ? decodeURIComponent(match[1]) : "";
-    } catch {
-      pathIdentifier = "";
-    }
-    if (pathIdentifier !== source.identifier) {
-      errors.push(`${where}.url does not point at identifier ${source.identifier}`);
+    if (source.method === "internet_archive_mp4") {
+      const match = url.pathname.match(/^\/download\/([^/]+)\/([^/]+)\/?$/);
+      let pathIdentifier = "";
+      let pathFile = "";
+      try {
+        pathIdentifier = match ? decodeURIComponent(match[1]) : "";
+        pathFile = match ? decodeURIComponent(match[2]) : "";
+      } catch {
+        pathIdentifier = "";
+        pathFile = "";
+      }
+      if (pathIdentifier !== source.identifier) {
+        errors.push(`${where}.url does not point at identifier ${source.identifier}`);
+      }
+      if (!pathFile || pathFile !== source.file) {
+        errors.push(`${where}.url does not point at file ${source.file}`);
+      }
+    } else {
+      const match = url.pathname.match(/^\/(?:details|embed)\/([^/]+)\/?$/);
+      let pathIdentifier = "";
+      try {
+        pathIdentifier = match ? decodeURIComponent(match[1]) : "";
+      } catch {
+        pathIdentifier = "";
+      }
+      if (pathIdentifier !== source.identifier) {
+        errors.push(`${where}.url does not point at identifier ${source.identifier}`);
+      }
     }
   } else if (source.provider === "vimeo") {
     if (url.pathname.replace(/\/+$/, "") !== `/${source.identifier}`) {

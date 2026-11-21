@@ -1,8 +1,9 @@
 # Pixy Streams — Phase Status
 
-Phases 1 and 2 are complete against `plan.md`, and Phase 3.1 is complete as a
-model. Verifications were run on 2026-11-20 against the production build with
-Hugo extended 0.154.5 and headless Edge 157.
+Phases 1 and 2 are complete against `plan.md`, and Phase 3 is complete for the
+verified Internet Archive library. Verifications were run on 2026-11-20 and
+2026-11-21 against the production build with Hugo extended 0.154.5 and headless
+Edge 157.
 
 ## Phase 1.1 — Baseline audit — Complete
 
@@ -199,19 +200,22 @@ Hugo extended 0.154.5 and headless Edge 157.
 ### 3.1 Playback source model — Complete
 
 - `data/playback/registry.json` holds full-content sources separately from the
-  catalogue: **3 verified sources**, all Internet Archive embeds of films that
-  are public domain in the United States (`his_girl_friday`,
-  `TheGeneral1926`, `the-cabinet-of-dr.-caligari-1920.`). `data/playback/samples.json`
-  is the curated library those records point at.
+  catalogue: **3 verified sources**, all Internet Archive MP4 derivatives of films
+  that are public domain in the United States (`his_girl_friday`,
+  `TheGeneral1926`, `the-cabinet-of-dr.-caligari-1920.`). Each record pins the
+  exact file, and `data/playback/samples.json` is the curated library those
+  records point at.
 - `docs/PLAYBACK_MODEL.md` defines the record schema: content id, media type,
-  episode id, provider, method, identifier, availability region and status,
-  rights basis, terms, reviewer, HTTPS evidence, language, captions and the last
-  verification date.
+  episode id, provider, method, identifier, exact file, availability region and
+  status, rights basis, terms, reviewer, HTTPS evidence, language, captions and
+  the last verification date.
 - `scripts/lib/playback-model.mjs` is the classifier and validator. Titles
   resolve to `play_here`, `official_provider`, `trailer_only` or `unavailable` in
   that priority order; a restricted source falls through, and an unverified
   source can never resolve to `play_here`. TMDB and AniList listings are never
-  treated as playback rights.
+  treated as playback rights. The validator accepts either the Internet Archive
+  embed method or the pinned `internet_archive_mp4` method, and rejects a record
+  whose download URL does not point at its declared identifier and file.
 - `themes/alert/layouts/_partials/playback-state.html` mirrors the classifier for
   Hugo, using `playbackRegion` (default `US`) from the site params. Every
   catalogue title page and every watch page now renders a labelled state line
@@ -219,75 +223,154 @@ Hugo extended 0.154.5 and headless Edge 157.
   official_provider, 4 trailer_only, 21 unavailable** across 87 pages.
 - `scripts/check-playback.mjs` fails closed on unverified rights, missing
   evidence, a missing reviewer, unknown catalogue ids, provider/method
-  mismatches, invalid regions or dates, duplicate ids, and URLs that do not point
-  at the declared identifier.
-- `scripts/playback-model.test.mjs`: **19/19 tests pass**, covering all four
-  states, region fallback, episode matching and every rejection path.
-- `scripts/check-site.mjs` now also checks the rendered states against their
-  payload: `play_here` needs a player, `official_provider` needs provider links
-  and no player, `trailer_only` needs a trailer, `unavailable` must offer none of
-  them. A state without a payload fails the build.
+  mismatches, a missing or mismatched MP4 file, invalid regions or dates,
+  duplicate ids, and URLs that do not point at the declared identifier.
+- `scripts/playback-model.test.mjs`: **24/24 tests pass**, covering all four
+  states, region fallback, episode matching, the native Internet Archive file
+  rules and every rejection path.
+- `scripts/check-site.mjs` checks the rendered states against their payload:
+  `play_here` needs a player, `official_provider` needs provider links and no
+  player, `trailer_only` needs a trailer, `unavailable` must offer none of them.
+  It also verifies that every watch page renders the pinned MP4 in a native
+  `<video>`, with no iframe player, plus the rights panel and resume control.
 
-### 3.2 Official embedded providers — Complete for YouTube and Internet Archive
+### 3.2 Provider adapters — Complete for Internet Archive and YouTube
 
 - `layouts/_partials/playback-embed.html` is the single adapter: Internet
-  Archive embed, YouTube privacy-enhanced iframe, Vimeo iframe and a native MP4
-  branch. Provider identifiers are validated against provider-specific patterns
-  before a record is accepted, and each embed keeps the provider's own controls.
-- Internet Archive is live for all three samples. YouTube is exercised by the
-  trailer modal and by a synthetic registry fixture (movie page rendered
-  `play_here` with the privacy-enhanced embed, then the fixture was removed).
+  Archive embed, pinned Internet Archive MP4 (native HTML5), YouTube
+  privacy-enhanced iframe, Vimeo iframe and a self-hosted MP4 branch. Provider
+  identifiers are validated against provider-specific patterns before a record
+  is accepted, and each iframe keeps the provider's own controls.
+- Internet Archive is live for all three samples through the pinned MP4 method.
+  The embed adapter is retained for records that need it. The switch was made
+  because the archive's embed sometimes selects a different derivative from the
+  one that was verified; the native player guarantees the checked file.
+- YouTube is exercised by the trailer modal and by a synthetic registry fixture
+  (movie page rendered `play_here` with the privacy-enhanced embed, then the
+  fixture was removed).
 - Vimeo and self-hosted MP4 are implemented but unused: no authorized content
   needs them yet.
 
-### 3.3 Dedicated watch page — Complete for what the provider exposes
+### 3.3 Dedicated watch page — Complete
 
 - `/watch/` library plus one page per verified film, with poster, licence line,
   rights panel (basis, region, language, captions, last verified, reviewer and
   the evidence list), and "back to all free films".
-- Play, pause, seek, volume and fullscreen come from the Internet Archive
-  player; custom controls are deliberately not faked.
+- Play, pause, seek, volume and fullscreen come from the browser's native video
+  controls. The page does not draw custom controls, so every control maps to the
+  real player.
 - Captions are reported honestly ("Captions are not available for this
   transfer"). A missing or unverified rights record replaces the player with a
   "Playback is unavailable" panel and offers the archive.org page instead.
-- Not implemented: Continue Watching. Progress inside a cross-origin provider
-  iframe is not readable, so it would be an invented state; episode navigation is
-  also unused because no serial source is registered.
+- Continue Watching is implemented for the native player: progress is written to
+  `localStorage` every few seconds and on pause, a resume prompt appears on the
+  watch page, and `/watch/` lists in-progress films with a `?resume=1` link. A
+  finished film or one within ten seconds of the end is cleared. Episode
+  navigation is unused because no serial source is registered.
 
-### 3.4 Native playback — Adapter ready, no authorized file
+### 3.4 Native playback — Complete for the Internet Archive sources
 
-- The `html5_mp4` branch renders `<video controls preload="metadata" playsinline>`
-  with the poster, a direct-file fallback link, and error handling that reveals a
-  message when the source fails. No self-hosted content is registered, so the
-  branch is dormant; no storage service was introduced.
+- `internet_archive_mp4` records render `<video controls preload="metadata"
+  playsinline>` with the poster, a direct-file fallback link, and error handling
+  that reveals a message when the source fails. The old `html5_mp4` branch stays
+  available for an authorized self-hosted file; no storage service was
+  introduced.
+- The player uses the archive's HTTP range support for seeking. Each watch page
+  keeps a link to the archive's official player as a fallback.
+- If no metadata arrives within 20 seconds, a slow-stream notice appears with
+  the official-player link and is cleared by `loadedmetadata`, `canplay` or
+  `playing`. A hard source error still takes precedence and replaces the player.
+- Verified on 2026-11-20 in headless Edge: all three direct MP4s played and
+  reported their full durations (His Girl Friday 5504.57 s, The General 4732.31 s,
+  The Cabinet of Dr. Caligari 4637.74 s). On 2026-11-21 the native player,
+  resume, continue-watching, error fallback and responsive layout were verified;
+  Internet Archive throughput was intermittent on that date, which is a provider
+  limitation rather than a rights or code failure.
 
 ### 3.5 Verified sample library — Complete (3 items)
 
-- Three films chosen and recorded with license evidence, provider, embedding
-  rights, region (US) and verification date: *His Girl Friday* (1940),
+- Three films chosen and recorded with license evidence, provider, playback
+  permission, region (US) and verification date: *His Girl Friday* (1940),
   *The General* (1926), *The Cabinet of Dr. Caligari* (1920).
-- Every registry identifier was re-checked today: the archive.org metadata
-  carries a public-domain licence URL and the official embed returns 200 for all
-  three.
-- Desktop and mobile rendering of the watch pages was verified in a headless
-  browser at 360–1440 px; see the browser section above for the method.
+- Every registry identifier was re-checked: the archive.org metadata carries a
+  public-domain licence URL, the item pages return 200, and the pinned MP4s
+  answer range requests with `206 Partial Content`.
+- Desktop and mobile rendering of the watch pages, the native player, resume and
+  Continue Watching were verified in headless Edge at 360 and 1440 px. The
+  2026-11-21 run used a local MP4 for player mechanics because Internet Archive
+  throughput was intermittent; direct archive playback had been verified the
+  previous day.
 
 ## Phase 3 acceptance gate
 
 - **Met for the three public-domain samples.** Three independently verified
-  authorized items play through the Internet Archive's official embed.
+  authorized items play from pinned Internet Archive MP4s, with the archive's
+  official player linked as a fallback.
 - Playback uses approved mechanisms only: registry record, provider validator,
-  official embed. No proxy, mirror, download or re-host exists.
+  exact-file check. No proxy, mirror, download or re-host exists.
 - Unsupported content shows an honest state instead of a dead player; the
-  unreachable/ unverified case was verified by removing a rights record and
-  confirming the page falls back to `unavailable` and the build check fails.
+  unverified case was verified by removing a rights record and confirming the
+  page falls back to `unavailable` and the build check fails.
 - Trailer buttons remain separate from full-content playback: the trailer modal
   is its own control and the state line says `Trailer only` when that is all
   there is.
-- Playback errors are surfaced for the native branch; provider iframe failures
-  fall back to a direct link.
-- Limitation: progress tracking and episode navigation are not offered, because
-  the provider iframe does not expose them.
+- Playback errors are surfaced for the native branch; iframe failures fall back
+  to a direct link. A deliberately missing MP4 was verified to hide the player
+  and show the error message.
+- Watch pages work on mobile and desktop. The 2026-11-21 browser pass checked
+  360 and 1440 px with no page-level overflow, play/pause/seek on a native clip,
+  the resume prompt, the Continue Watching rail, the error fallback and the
+  slow-stream notice. The slow notice was exercised on the real His Girl Friday
+  page against a stalled archive response: it appeared after 20 seconds with
+  `readyState` still 0, and no false error was shown.
+- Limitation: episode navigation is not offered because no serial source is
+  registered. Internet Archive throughput varies by data node; the provider can
+  be slow independently of this site.
+
+## Phase 4.1 — Homepage refinement — Complete
+
+- Rail order is now: Continue watching, Free to watch, Trending movies, Trending TV,
+  Anime this season, New additions, Sport this week, Picked for you.
+- **New additions** is built from the catalogue at build time: the TMDB
+  `new_releases` list first, then the newest series and anime, deduplicated and
+  capped at 14. It has no "view all" link because it spans four verticals.
+- **Continue watching** reads the same `pixy:watch:progress:<id>` records the
+  watch pages write, orders films by most recent activity, links each card with
+  `?resume=1` and shows the resume time and percentage. The partial already
+  shipped with the playback work but was never included in the home template;
+  it is now wired up, and the missing browser renderer was added to `main.js`.
+- **Picked for you** ranks the embedded catalogue against genres in My List
+  (weight 2) and genres of in-progress films (weight 3), excludes saved and
+  in-progress titles, and caps at 14. Its subtitle changes to match the signals
+  that exist ("Based on the genres in My List.", "Based on what you are
+  watching." or both).
+- Both personal rails ship `hidden` and are only revealed when real local data
+  exists, so a first-time visitor sees no empty sections. Corrupted or blocked
+  storage degrades to the catalogue rails instead of an error.
+- Personal rails sit outside `[data-filterable]`, so the category filter never
+  hides a visitor's own history; the catalogue rails, including New additions,
+  still filter and re-count as before.
+- Rail cards reuse the existing `rail-card` markup and monogram fallback; no new
+  fonts, colours, tokens or dependencies were introduced.
+
+### Verification
+
+- 23/25 headless-Edge checks passed on the first run; the two failures were test
+  mistakes (a saved URL built without the active base path, and an expectation
+  of rail overflow with only one card), corrected and re-run. Final pass:
+  fresh-visit hiding, rail order, resume link and "Resume at 20:00 · 25%" meta,
+  saved/in-progress exclusion, signal-specific subtitle, rail scroll controls
+  appearing at 360–390 px when the rail overflows, no overflow at 360, 390, 768
+  and 1440 px, clearing My List keeping watch-based picks, and corrupted storage
+  falling back to catalogue rails.
+- Smoke pass after the change: category filter narrows the homepage (Comedy →
+  "9 titles matching Comedy"), clearing restores every rail, header search still
+  returns `Severance — TV Series · 2022 · Drama · 2 seasons`, the watch page still
+  renders its `play_here` native player, and My List still lists saved titles.
+- Production build: 154 pages, `check-site.mjs` passes with 5,367 references,
+  `check-playback.mjs` passes, playback model tests 24/24.
+- Personal rail URLs carry the deployment base path in production
+  (`/pixy-streams/watch/the-general/`), verified in the built `index.html`.
 
 ## Known limitations
 
@@ -299,8 +382,13 @@ Hugo extended 0.154.5 and headless Edge 157.
   guides. `node scripts/fetch-catalog.mjs --status` reports exactly that, and the
   credentialed path was verified end to end against a local mock of the TMDB
   endpoints. Live data still needs a real key.
-- Continue Watching and episode navigation are not offered on watch pages: a
-  cross-origin provider iframe exposes no progress, so any bar would be invented.
+- Continue Watching works for the native player. Provider embeds still expose no
+  progress API, so the feature is not extended to them. Episode navigation is
+  not offered because no serial source is registered.
+- Internet Archive throughput varies by data node. A slow or stalled stream is a
+  provider-side condition; the watch page keeps the official-player link, shows
+  a slow-stream notice after 20 seconds, and shows a clear error if the source
+  fails. No alternative mirror or download is offered.
 - Sports fixtures come from ESPN/TheSportsDB at build time; schedules shift and
   the page says so. Scores are informational, never an implied live stream.
 
@@ -315,6 +403,7 @@ Hugo extended 0.154.5 and headless Edge 157.
 
 ## Next
 
-Phase 3.2 — official embedded providers. Not started; blocked until the registry
-contains at least one verified authorized source with recorded evidence, and the
-Phase 3 acceptance gate still needs three.
+Phase 3 is closed for the verified library and Phase 4.1 is complete. Phase 4.2
+(title detail pages) is the next planned subphase and has not been started. More public-domain films can be added through the same
+registry once their rights and exact playback file are verified. Live TMDB
+credentials remain the main catalogue limitation.

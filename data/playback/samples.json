@@ -22,7 +22,7 @@
       "archive_id": "his_girl_friday",
       "source_id": "ia-his-girl-friday",
       "added_at": "2026-11-20",
-      "note": "Streamed from the Internet Archive's official embed. No video is hosted by Pixy Streams."
+      "note": "Streamed from the Internet Archive's verified MP4 derivative. No video is hosted by Pixy Streams."
     },
     {
       "id": "sample-the-general",
@@ -42,7 +42,7 @@
       "archive_id": "TheGeneral1926",
       "source_id": "ia-the-general",
       "added_at": "2026-11-20",
-      "note": "Silent film with English intertitles, streamed from the Internet Archive's official embed."
+      "note": "Silent film with English intertitles, streamed from the Internet Archive's verified MP4 derivative."
     },
     {
       "id": "sample-the-cabinet-of-dr-caligari",
@@ -62,7 +62,7 @@
       "archive_id": "the-cabinet-of-dr.-caligari-1920.",
       "source_id": "ia-the-cabinet-of-dr-caligari",
       "added_at": "2026-11-20",
-      "note": "Silent film with English intertitles, streamed from the Internet Archive's official embed."
+      "note": "Silent film with English intertitles, streamed from the Internet Archive's verified MP4 derivative."
     }
   ]
 }

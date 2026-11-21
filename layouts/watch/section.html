@@ -18,7 +18,7 @@
         <h2 id="watch-library-heading">The sample library</h2>
         <div class="watch-grid">
           {{ range .items }}
-          <a class="watch-card" href="{{ partial "link.html" (printf "/watch/%s/" .slug) }}">
+          <a class="watch-card" href="{{ partial "link.html" (printf "/watch/%s/" .slug) }}" data-watch-id="{{ .id }}" data-watch-slug="{{ .slug }}">
             <div class="watch-card-poster">
               {{ if .poster }}
               <img src="{{ .poster }}" alt="{{ .title }} poster" loading="lazy" decoding="async">
@@ -37,9 +37,14 @@
       {{ end }}
     {{ end }}
 
+    <section class="watch-continue" aria-labelledby="watch-continue-heading" data-watch-continue hidden>
+      <h2 id="watch-continue-heading">Continue watching</h2>
+      <div class="watch-grid" data-watch-continue-grid></div>
+    </section>
+
     <section class="watch-policy" aria-labelledby="watch-policy-heading">
       <h2 id="watch-policy-heading">Why these films?</h2>
-      <p>Each title is public domain in the United States and is streamed from the Internet Archive's official embed. The rights record, evidence links, reviewing editor and last verification date are shown on every watch page.</p>
+      <p>Each title is public domain in the United States and is streamed from a verified Internet Archive MP4 source. The rights record, evidence links, reviewing editor and last verification date are shown on every watch page.</p>
       <p>These are not commercial catalogue titles and they are not downloaded or re-hosted here. If you are outside the United States, check the law where you are.</p>
     </section>
   </div>

@@ -70,6 +70,9 @@
 </section>
 {{ end }}
 
+{{/* Personal rails are hidden until the browser finds real local data. */}}
+{{ partial "home-continue.html" . }}
+
 <!-- Catalog rails -->
 {{ $rails := slice }}
 {{ with partial "sample-items.html" . }}
@@ -90,6 +93,37 @@
     {{ $rails = $rails | append (dict "id" "anime" "title" "Anime this season" "subtitle" (printf "Airing now · %s" $anime.season) "href" "/anime/#seasonal" "items" .) }}
   {{ end }}
 {{ end }}
+
+{{/* New additions: the newest titles each vertical actually carries. */}}
+{{ $fresh := slice }}
+{{ $freshUrls := slice }}
+{{ with $movies }}
+  {{ range partial "catalog-items.html" (dict "items" .items "list" "new_releases" "limit" 8) }}
+    {{ if not (in $freshUrls (partial "item-url.html" .)) }}
+      {{ $fresh = $fresh | append . }}
+      {{ $freshUrls = $freshUrls | append (partial "item-url.html" .) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ with $series }}
+  {{ range first 4 (sort .items "year" "desc") }}
+    {{ if not (in $freshUrls (partial "item-url.html" .)) }}
+      {{ $fresh = $fresh | append . }}
+      {{ $freshUrls = $freshUrls | append (partial "item-url.html" .) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ with $anime }}
+  {{ range first 4 (sort .items "year" "desc") }}
+    {{ if not (in $freshUrls (partial "item-url.html" .)) }}
+      {{ $fresh = $fresh | append . }}
+      {{ $freshUrls = $freshUrls | append (partial "item-url.html" .) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ with first 14 $fresh }}
+  {{ $rails = $rails | append (dict "id" "new-additions" "title" "New additions" "subtitle" "The latest films, series and anime in the catalogue" "items" .) }}
+{{ end }}
 {{ with $sports }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "upcoming" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "sports" "title" "Sport this week" "subtitle" "Next fixtures across football, basketball and motorsport" "href" "/sports/" "items" .) }}
@@ -104,6 +138,8 @@
 {{ else }}
   {{ range $homeData.rows }}{{ partial "rail.html" . }}{{ end }}
 {{ end }}
+
+{{ partial "home-recommend.html" . }}
 
 <!-- About the catalog -->
 {{ with .Content }}

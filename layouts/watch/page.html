@@ -14,13 +14,13 @@
   "isAccessibleForFree" true }}
 {{ with .Params.runtime }}{{ $schema = merge $schema (dict "duration" (printf "PT%dM" (int .))) }}{{ end }}
 {{ with $source }}
+  {{ $video := dict "@type" "VideoObject" "name" $.Title "description" $.Params.overview "thumbnailUrl" $.Params.poster "contentUrl" .url }}
   {{ $embed := "" }}
   {{ if eq .method "internet_archive_embed" }}{{ $embed = printf "https://archive.org/embed/%s" .identifier }}{{ end }}
   {{ if eq .method "youtube_iframe" }}{{ $embed = printf "https://www.youtube-nocookie.com/embed/%s" .identifier }}{{ end }}
   {{ if eq .method "vimeo_iframe" }}{{ $embed = printf "https://player.vimeo.com/video/%s" .identifier }}{{ end }}
-  {{ if $embed }}
-    {{ $schema = merge $schema (dict "video" (dict "@type" "VideoObject" "name" $.Title "description" $.Params.overview "thumbnailUrl" $.Params.poster "embedUrl" $embed)) }}
-  {{ end }}
+  {{ if $embed }}{{ $video = merge $video (dict "embedUrl" $embed) }}{{ end }}
+  {{ $schema = merge $schema (dict "video" $video) }}
 {{ end }}
 <script type="application/ld+json">{{ $schema | jsonify | safeJS }}</script>
 
@@ -28,7 +28,7 @@
 {{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" 2 "name" .Title "item" .Permalink) }}
 <script type="application/ld+json">{{ dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs | jsonify | safeJS }}</script>
 
-<article class="watch-detail" data-playback-state="{{ $playback.state }}">
+<article class="watch-detail" data-playback-state="{{ $playback.state }}"{{ with .Params.sample_id }} data-watch-id="{{ . }}"{{ end }}>
   <header class="watch-hero">
     <div class="container watch-hero-inner">
       <nav class="catalog-breadcrumb" aria-label="Breadcrumb">
@@ -46,8 +46,18 @@
   <div class="container watch-stage">
     {{ if $source }}
       {{ partial "playback-embed.html" (dict "source" $source "title" .Title "poster" .Params.poster) }}
-      <p class="watch-player-note">Playing from the Internet Archive's official embed. Use the player controls for play, pause, seek, volume and fullscreen.</p>
-      <p class="watch-player-note">Rights verified for {{ delimit $source.availability.regions ", " }}. If you are outside that region, check local law. If the player does not load, <a href="{{ .Params.source_url }}" target="_blank" rel="noopener">open the film on Internet Archive</a>.</p>
+      {{ if eq $source.method "internet_archive_mp4" }}
+      <div class="watch-resume" data-watch-resume hidden>
+        <p>You stopped at <strong data-watch-resume-time></strong>.</p>
+        <div class="watch-resume-actions">
+          <button type="button" class="btn btn-primary" data-watch-resume-start>Resume</button>
+          <button type="button" class="btn btn-ghost" data-watch-resume-reset>Start over</button>
+        </div>
+      </div>
+      {{ end }}
+      <p class="watch-player-note" data-watch-slow hidden>This stream is taking longer than usual. You can keep waiting, or <a href="{{ .Params.source_url }}" target="_blank" rel="noopener">open the film on Internet Archive</a>.</p>
+      <p class="watch-player-note">Playing the verified Internet Archive MP4 directly in your browser. Use the player controls for play, pause, seek, volume and fullscreen. The <a href="{{ .Params.source_url }}" target="_blank" rel="noopener">official Internet Archive player</a> is also available.</p>
+      <p class="watch-player-note">Rights verified for {{ delimit $source.availability.regions ", " }}. If you are outside that region, check local law. If the stream does not load, <a href="{{ .Params.source_url }}" target="_blank" rel="noopener">open the film on Internet Archive</a>.</p>
       {{ if not $source.captions }}<p class="watch-player-note">Captions are not available for this transfer.</p>{{ end }}
     {{ else }}
       <div class="watch-unavailable" role="status">

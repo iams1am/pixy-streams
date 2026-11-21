@@ -1,0 +1,42 @@
+{{- /* Client-rendered Continue Watching rail. Hidden until localStorage has a
+       real in-progress sample; the same record powers the watch pages. */ -}}
+{{- $cards := slice -}}
+{{- with site.Data.playback.samples -}}
+  {{- range .items -}}
+    {{- $cards = $cards | append (dict
+      "progressId" .id
+      "url" (partial "link.html" (printf "/watch/%s/" .slug))
+      "title" .title
+      "poster" (.poster | default "")
+      "accent" (.accent | default "")
+      "meta" (printf "%s · %s min · Free" (string .year) (string .runtime))
+      "genres" (.genres | default slice)) -}}
+  {{- end -}}
+{{- end -}}
+{{- with $cards }}
+<section class="rail-section container home-continue" data-home-continue hidden aria-labelledby="home-continue-heading">
+  <div class="rail-header">
+    <div class="rail-heading">
+      <h2 id="home-continue-heading">Continue watching</h2>
+      <p class="rail-subtitle">Pick up where you left off.</p>
+    </div>
+    <div class="rail-actions">
+      <a href="{{ partial "link.html" "/watch/" }}" class="rail-link">All free films &rarr;</a>
+      <div class="rail-nav">
+        <button type="button" class="rail-nav-button" data-rail-scroll="-1" aria-label="Scroll Continue watching left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="rail-nav-button" data-rail-scroll="1" aria-label="Scroll Continue watching right">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="rail" data-home-continue-rail></div>
+</section>
+<script type="application/json" data-home-watch>{{ $cards | jsonify | safeJS }}</script>
+{{- end }}

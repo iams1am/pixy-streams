@@ -1108,6 +1108,11 @@ ul, ol {
   padding: var(--spacing-xl) var(--spacing-md) 0;
 }
 
+.home-continue[hidden],
+.home-recommend[hidden] {
+  display: none;
+}
+
 .rail-header {
   display: flex;
   align-items: flex-end;
@@ -2198,6 +2203,48 @@ button:focus-visible,
 
 .watch-card-license {
   margin-top: 0.15rem;
+}
+
+.watch-card-progress {
+  margin: 0.15rem 0 0;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.watch-continue {
+  margin-top: var(--spacing-xl);
+}
+
+.watch-continue[hidden] {
+  display: none;
+}
+
+.watch-resume {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg-secondary);
+}
+
+.watch-resume[hidden] {
+  display: none;
+}
+
+.watch-resume p {
+  margin: 0;
+}
+
+.watch-resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .watch-policy {

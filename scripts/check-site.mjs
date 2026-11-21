@@ -192,6 +192,19 @@ check('watch pages', () => {
     return;
   }
 
+  const libraryFile = path.join(OUT, 'watch', 'index.html');
+  if (!existsSync(libraryFile)) {
+    fail('missing watch library: /watch/');
+  } else {
+    const library = readFileSync(libraryFile, 'utf8');
+    if (!library.includes('data-watch-continue') || !library.includes('data-watch-continue-grid')) {
+      fail('/watch/: missing Continue Watching container');
+    }
+    if (!library.includes('data-watch-id=')) {
+      fail('/watch/: library cards have no progress id');
+    }
+  }
+
   for (const item of items) {
     const file = path.join(OUT, 'watch', item.slug, 'index.html');
     if (!existsSync(file)) {
@@ -206,10 +219,35 @@ check('watch pages', () => {
     }
 
     const html = readFileSync(file, 'utf8');
-    const embed = `https://archive.org/embed/${source.identifier}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const videoSources = [...html.matchAll(/<source\b[^>]*\bsrc=(?:"([^"]+)"|'([^']+)'|([^\s>]+))/g)]
+      .map((match) => match[1] || match[2] || match[3]);
 
-    if (!new RegExp(`<iframe[^>]+src=["']?${embed}`).test(html)) {
-      fail(`${item.slug}: missing Internet Archive embed ${source.identifier}`);
+    if (!/<video\b[^>]*\bcontrols\b/.test(html) || !html.includes('data-watch-video')) {
+      fail(`${item.slug}: missing native video player`);
+    }
+    if (!html.includes('data-watch-resume')) {
+      fail(`${item.slug}: missing resume control`);
+    }
+    if (!html.includes('data-watch-slow')) {
+      fail(`${item.slug}: missing slow-stream notice`);
+    }
+    const playsVerified = videoSources.some((raw) => {
+      try {
+        const played = new URL(raw);
+        const verified = new URL(source.url);
+        return (
+          played.hostname === verified.hostname &&
+          decodeURIComponent(played.pathname) === decodeURIComponent(verified.pathname)
+        );
+      } catch {
+        return false;
+      }
+    });
+    if (!playsVerified) {
+      fail(`${item.slug}: player does not use the verified MP4 ${source.identifier}/${source.file}`);
+    }
+    if (/<iframe\b/.test(html)) {
+      fail(`${item.slug}: watch page still renders an iframe player`);
     }
     if (!html.includes('Rights and source')) fail(`${item.slug}: missing rights panel`);
     if (!html.includes('Last verified')) fail(`${item.slug}: missing verification date`);

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated_at": "2026-11-20T00:00:00.000Z",
-  "notes": "Only full-content playback sources with verified rights belong here. The three Internet Archive films are public domain in the United States; no other source is approved. See docs/PLAYBACK_MODEL.md before adding a source.",
+  "notes": "Only full-content playback sources with verified rights belong here. The three Internet Archive films are public domain in the United States and play from verified MP4 derivatives; no other source is approved. See docs/PLAYBACK_MODEL.md before adding a source.",
   "sources": [
     {
       "id": "ia-his-girl-friday",
@@ -9,9 +9,10 @@
       "media_type": "movie",
       "episode_id": null,
       "provider": "internet_archive",
-      "method": "internet_archive_embed",
+      "method": "internet_archive_mp4",
       "identifier": "his_girl_friday",
-      "url": "https://archive.org/details/his_girl_friday",
+      "file": "his_girl_friday.mp4",
+      "url": "https://archive.org/download/his_girl_friday/his_girl_friday.mp4",
       "availability": {
         "status": "region_restricted",
         "regions": ["US"],
@@ -20,7 +21,7 @@
       "rights": {
         "verified": true,
         "basis": "public_domain",
-        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and its verified MP4 derivative. Check local law outside the US.",
         "approved_by": "Pixy Streams editorial review",
         "evidence": [
           {
@@ -50,9 +51,10 @@
       "media_type": "movie",
       "episode_id": null,
       "provider": "internet_archive",
-      "method": "internet_archive_embed",
+      "method": "internet_archive_mp4",
       "identifier": "TheGeneral1926",
-      "url": "https://archive.org/details/TheGeneral1926",
+      "file": "The_General_1926_720p_512kb.mp4",
+      "url": "https://archive.org/download/TheGeneral1926/The_General_1926_720p_512kb.mp4",
       "availability": {
         "status": "region_restricted",
         "regions": ["US"],
@@ -61,7 +63,7 @@
       "rights": {
         "verified": true,
         "basis": "public_domain",
-        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and its verified MP4 derivative. Check local law outside the US.",
         "approved_by": "Pixy Streams editorial review",
         "evidence": [
           {
@@ -91,9 +93,10 @@
       "media_type": "movie",
       "episode_id": null,
       "provider": "internet_archive",
-      "method": "internet_archive_embed",
+      "method": "internet_archive_mp4",
       "identifier": "the-cabinet-of-dr.-caligari-1920.",
-      "url": "https://archive.org/details/the-cabinet-of-dr.-caligari-1920.",
+      "file": "The Cabinet Of Dr. Caligari (1920)..mp4",
+      "url": "https://archive.org/download/the-cabinet-of-dr.-caligari-1920./The%20Cabinet%20Of%20Dr.%20Caligari%20(1920)..mp4",
       "availability": {
         "status": "region_restricted",
         "regions": ["US"],
@@ -102,7 +105,7 @@
       "rights": {
         "verified": true,
         "basis": "public_domain",
-        "terms": "Public domain in the United States. Internet Archive hosts the film and provides the official embeddable player. Check local law outside the US.",
+        "terms": "Public domain in the United States. Internet Archive hosts the film and its verified MP4 derivative. Check local law outside the US.",
         "approved_by": "Pixy Streams editorial review",
         "evidence": [
           {

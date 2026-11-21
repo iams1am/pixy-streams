@@ -69,6 +69,42 @@ test("a fully evidenced play-here source is valid", () => {
   assert.deepEqual(errorsFor(makeSource()), []);
 });
 
+const makeArchiveSource = () => ({
+  ...makeSource(),
+  id: "ia-dune-part-two",
+  provider: "internet_archive",
+  method: "internet_archive_mp4",
+  identifier: "dune_part_two",
+  file: "dune_part_two.mp4",
+  url: "https://archive.org/download/dune_part_two/dune_part_two.mp4",
+});
+
+test("an Internet Archive MP4 source is valid", () => {
+  assert.deepEqual(errorsFor(makeArchiveSource()), []);
+});
+
+test("an Internet Archive MP4 source must name its file", () => {
+  const source = makeArchiveSource();
+  delete source.file;
+  assert.match(errorsFor(source).join("\n"), /file is required for internet_archive_mp4/);
+});
+
+test("the URL must point at the declared Internet Archive file", () => {
+  const source = makeArchiveSource();
+  source.url = "https://archive.org/download/dune_part_two/different.mp4";
+  assert.match(errorsFor(source).join("\n"), /does not point at file/);
+});
+
+test("an embed source cannot carry a file", () => {
+  const source = makeSource();
+  source.provider = "internet_archive";
+  source.method = "internet_archive_embed";
+  source.identifier = "dune_part_two";
+  source.url = "https://archive.org/details/dune_part_two";
+  source.file = "dune_part_two.mp4";
+  assert.match(errorsFor(source).join("\n"), /file is only allowed for internet_archive_mp4/);
+});
+
 test("rights evidence is mandatory", () => {
   const source = makeSource();
   source.rights.evidence = [];
@@ -179,6 +215,10 @@ test("the committed registry and sample library validate together", () => {
   assert.deepEqual(validateSamples(samples, registry).errors, []);
   assert.equal(registry.sources.length, 3);
   assert.equal(samples.items.length, 3);
+  assert.ok(
+    registry.sources.every((source) => source.method === "internet_archive_mp4" && source.file),
+    "every committed source must play a verified Internet Archive MP4",
+  );
 
   for (const item of samples.items) {
     assert.ok(catalogue.has(item.id), `missing catalogue id ${item.id}`);
@@ -201,6 +241,21 @@ test("a sample archive id must match the registry identifier", () => {
   broken.items[0].archive_id = "different_archive";
 
   assert.match(validateSamples(broken, registry).errors.join("\n"), /must match the registry identifier/);
+});
+
+test("a sample must point at an Internet Archive MP4 source", () => {
+  const registry = readJson("data/playback/registry.json");
+  const samples = readJson("data/playback/samples.json");
+  const brokenRegistry = JSON.parse(JSON.stringify(registry));
+  const source = brokenRegistry.sources.find((entry) => entry.id === samples.items[0].source_id);
+  source.method = "internet_archive_embed";
+  source.url = `https://archive.org/details/${source.identifier}`;
+  delete source.file;
+
+  assert.match(
+    validateSamples(samples, brokenRegistry).errors.join("\n"),
+    /must be an Internet Archive MP4 source/,
+  );
 });
 
 test("the resolver plays a sample only in the verified region", () => {

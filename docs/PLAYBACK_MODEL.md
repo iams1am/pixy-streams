@@ -56,9 +56,10 @@ line on catalogue title pages.
 | `media_type` | yes | `movie`, `series`, `episode`, `anime` or `event`; must match the catalogue kind. |
 | `episode_id` | for episodes | Non-empty id such as `S1E1`; `null` for title-level sources. |
 | `provider` | yes | `youtube`, `internet_archive`, `vimeo` or `self_hosted`. |
-| `method` | yes | Must match the provider: `youtube_iframe`, `internet_archive_embed`, `vimeo_iframe` or `html5_mp4`. |
+| `method` | yes | Must be allowed for the provider: `youtube_iframe`, `internet_archive_embed` or `internet_archive_mp4`, `vimeo_iframe`, `html5_mp4`. |
 | `identifier` | yes | Provider video id, archive identifier, Vimeo id or MP4 path. |
-| `url` | yes | HTTPS page that points at the same identifier. |
+| `file` | for `internet_archive_mp4` | Exact Internet Archive filename; forbidden on other methods. |
+| `url` | yes | HTTPS URL that points at the same identifier and, for a native MP4, the same file. |
 | `availability.status` | yes | `available` or `region_restricted`. `unavailable` records do not belong here. |
 | `availability.regions` | yes | Uppercase ISO 3166-1 codes, or `["worldwide"]`. A restricted source must name specific regions. |
 | `availability.checked_at` | yes | ISO 8601 date or timestamp. |
@@ -74,9 +75,15 @@ line on catalogue title pages.
 Provider URL rules:
 
 - `youtube` — `https://www.youtube.com/watch?v=<11-character-id>`
-- `internet_archive` — `https://archive.org/details/<identifier>`
+- `internet_archive` embed — `https://archive.org/details/<identifier>` or `https://archive.org/embed/<identifier>`
+- `internet_archive` native MP4 — `https://archive.org/download/<identifier>/<file>`; `file` is the exact, unencoded filename
 - `vimeo` — `https://vimeo.com/<numeric-id>`
 - `self_hosted` — HTTPS URL ending in `.mp4`; `identifier` is its path
+
+The native MP4 method exists because the archive's embed player does not always
+select the same derivative that was verified. A native record pins the exact
+file, and the watch page renders it in an HTML5 `<video>` element while keeping
+a link to the archive's official player.
 
 ### Illustrative record
 
@@ -122,7 +129,8 @@ copied into the registry without real evidence.
 1. Confirm the rights holder permits embedding or self-hosting this exact
    content in the intended regions.
 2. Save the evidence somewhere that can be cited with an HTTPS URL.
-3. Check the source plays the correct content and is still available.
+3. Check the source plays the correct content and is still available. For a
+   native Internet Archive source, play the exact MP4 that the record will name.
 4. Add the record and run `node scripts/check-playback.mjs`.
 5. Run `node --test scripts/playback-model.test.mjs`.
 6. Have a second person review the evidence before merging.
@@ -133,7 +141,19 @@ TMDB/JustWatch listing or an AniList `externalLinks` entry.
 
 ## Current status
 
-The committed registry contains **zero** sources. No full-length playback has
-been approved, so the site remains trailer-and-provider-links only. Phase 3.2
-must not add an adapter until at least one record passes this check, and the
-Phase 3 gate needs three independently verified items.
+The committed registry contains **3 verified sources**, all Internet Archive
+films that are public domain in the United States:
+
+| Title | Identifier | Verified file | Region |
+|---|---|---|---|
+| His Girl Friday (1940) | `his_girl_friday` | `his_girl_friday.mp4` | US |
+| The General (1926) | `TheGeneral1926` | `The_General_1926_720p_512kb.mp4` | US |
+| The Cabinet of Dr. Caligari (1920) | `the-cabinet-of-dr.-caligari-1920.` | `The Cabinet Of Dr. Caligari (1920)..mp4` | US |
+
+All three records use `internet_archive_mp4`, so `/watch/` streams the pinned
+file with native controls. The earlier embed adapter remains available for
+other Internet Archive records. Availability and playback were checked on
+2026-11-20; Internet Archive throughput varies by data node, so a slow stream is
+a provider limitation rather than a rights change. When no metadata arrives
+within 20 seconds the page says the stream is slow and links to the official
+player; a failed source replaces the player with an error message instead.

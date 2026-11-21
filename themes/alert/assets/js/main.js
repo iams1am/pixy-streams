@@ -579,16 +579,114 @@
   }
 
   // ===========================
-  // Native Video Playback
+  // Native Video Playback and Progress
   // ===========================
-  // Only the dormant self-hosted branch renders <video data-watch-video>.
-  // Surface a failure instead of leaving a silent, broken player.
+  const WATCH_PROGRESS_PREFIX = 'pixy:watch:progress:';
+
+  const formatWatchTime = (seconds) => {
+    const total = Math.max(0, Math.floor(seconds));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const remaining = total % 60;
+    return hours
+      ? hours + ':' + String(minutes).padStart(2, '0') + ':' + String(remaining).padStart(2, '0')
+      : minutes + ':' + String(remaining).padStart(2, '0');
+  };
+
+  const readWatchProgress = (id) => {
+    if (!id) return null;
+    try {
+      const value = JSON.parse(localStorage.getItem(WATCH_PROGRESS_PREFIX + id) || 'null');
+      if (!value || typeof value.t !== 'number' || typeof value.d !== 'number') return null;
+      if (!Number.isFinite(value.t) || !Number.isFinite(value.d) || value.d <= 0) return null;
+      if (value.t < 5 || value.d - value.t < 10) return null;
+      return value;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const writeWatchProgress = (id, currentTime, duration) => {
+    if (!id) return;
+    try {
+      localStorage.setItem(
+        WATCH_PROGRESS_PREFIX + id,
+        JSON.stringify({ t: currentTime, d: duration, at: Date.now() })
+      );
+    } catch (error) {
+      // Progress is a convenience; private browsing can reject storage.
+    }
+  };
+
+  const clearWatchProgress = (id) => {
+    if (!id) return;
+    try {
+      localStorage.removeItem(WATCH_PROGRESS_PREFIX + id);
+    } catch (error) {
+      // Ignore storage failures.
+    }
+  };
+
+  // The watch library lists every sample, so Continue Watching can reuse the
+  // existing cards instead of keeping a second copy of the metadata.
+  const continueSection = document.querySelector('[data-watch-continue]');
+  const continueGrid = continueSection ? continueSection.querySelector('[data-watch-continue-grid]') : null;
+
+  if (continueSection && continueGrid) {
+    const entries = [];
+    document.querySelectorAll('.watch-library .watch-card[data-watch-id]').forEach(card => {
+      const id = card.getAttribute('data-watch-id');
+      const progress = readWatchProgress(id);
+      if (progress) entries.push({ card, progress });
+    });
+
+    entries.sort((a, b) => (b.progress.at || 0) - (a.progress.at || 0));
+
+    entries.forEach(({ card, progress }) => {
+      const clone = card.cloneNode(true);
+      clone.removeAttribute('data-watch-id');
+      clone.removeAttribute('data-watch-slug');
+
+      const target = new URL(clone.getAttribute('href'), window.location.href);
+      target.searchParams.set('resume', '1');
+      clone.setAttribute('href', target.pathname + target.search + target.hash);
+
+      const meta = clone.querySelector('.watch-card-meta');
+      if (meta) {
+        const line = document.createElement('p');
+        line.className = 'watch-card-progress';
+        line.textContent = 'Resume at ' + formatWatchTime(progress.t) + ' · ' +
+          Math.round((progress.t / progress.d) * 100) + '%';
+        meta.insertAdjacentElement('afterend', line);
+      }
+
+      continueGrid.appendChild(clone);
+    });
+
+    continueSection.hidden = entries.length === 0;
+  }
+
+  // Internet Archive MP4s and the self-hosted branch render
+  // <video data-watch-video>. Surface a failure instead of leaving a silent,
+  // broken player, and remember progress for the native player only.
   document.querySelectorAll('[data-watch-video]').forEach(video => {
     const wrapper = video.closest('.watch-player');
     const error = wrapper ? wrapper.parentElement.querySelector('[data-watch-error]') : null;
     const source = video.querySelector('source');
+    const watchRoot = video.closest('[data-watch-id]');
+    const slowNotice = watchRoot ? watchRoot.querySelector('[data-watch-slow]') : null;
+    let slowTimer = 0;
+
+    const clearSlowNotice = () => {
+      if (slowTimer) {
+        clearTimeout(slowTimer);
+        slowTimer = 0;
+      }
+      if (slowNotice) slowNotice.hidden = true;
+    };
 
     const showError = () => {
+      clearSlowNotice();
       video.hidden = true;
       if (error) error.hidden = false;
     };
@@ -596,7 +694,97 @@
     video.addEventListener('error', showError);
     if (source) source.addEventListener('error', showError);
 
+    if (slowNotice) {
+      slowTimer = window.setTimeout(() => {
+        if (video.readyState < 1 && !video.hidden) slowNotice.hidden = false;
+      }, 20000);
+      ['loadedmetadata', 'canplay', 'playing'].forEach(eventName => {
+        video.addEventListener(eventName, clearSlowNotice);
+      });
+    }
+
     if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) showError();
+
+    const watchId = watchRoot ? watchRoot.getAttribute('data-watch-id') : '';
+    const resumePanel = watchRoot ? watchRoot.querySelector('[data-watch-resume]') : null;
+    const resumeTime = resumePanel ? resumePanel.querySelector('[data-watch-resume-time]') : null;
+    const resumeStart = resumePanel ? resumePanel.querySelector('[data-watch-resume-start]') : null;
+    const resumeReset = resumePanel ? resumePanel.querySelector('[data-watch-resume-reset]') : null;
+    let savedAt = 0;
+    let resumeTarget = readWatchProgress(watchId);
+
+    const hideResume = () => {
+      if (resumePanel) resumePanel.hidden = true;
+    };
+
+    const seekToResume = () => {
+      if (!resumeTarget) return;
+      try {
+        video.currentTime = resumeTarget.t;
+      } catch (error) {
+        return;
+      }
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {});
+      hideResume();
+    };
+
+    if (resumeStart) resumeStart.addEventListener('click', seekToResume);
+
+    if (resumeReset) {
+      resumeReset.addEventListener('click', () => {
+        resumeTarget = null;
+        clearWatchProgress(watchId);
+        hideResume();
+        try {
+          video.currentTime = 0;
+        } catch (error) {
+          // A player without seekable media still starts from the beginning.
+        }
+      });
+    }
+
+    const initResume = () => {
+      if (!watchId || !resumeTarget) return;
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      if (resumeTarget.t >= video.duration - 10) {
+        clearWatchProgress(watchId);
+        resumeTarget = null;
+        return;
+      }
+
+      if (new URLSearchParams(window.location.search).get('resume') === '1') {
+        seekToResume();
+        return;
+      }
+
+      if (resumePanel && resumeTime) {
+        resumeTime.textContent = formatWatchTime(resumeTarget.t);
+        resumePanel.hidden = false;
+      }
+    };
+
+    video.addEventListener('loadedmetadata', initResume);
+    if (video.readyState >= 1) initResume();
+
+    const saveProgress = () => {
+      if (!watchId || !Number.isFinite(video.duration) || video.duration <= 0) return;
+      const currentTime = video.currentTime;
+      if (currentTime < 5) return;
+      if (video.duration - currentTime < 10) {
+        clearWatchProgress(watchId);
+        return;
+      }
+      writeWatchProgress(watchId, currentTime, video.duration);
+      savedAt = Date.now();
+    };
+
+    video.addEventListener('timeupdate', () => {
+      if (Date.now() - savedAt >= 5000) saveProgress();
+    });
+    video.addEventListener('pause', saveProgress);
+    video.addEventListener('ended', () => clearWatchProgress(watchId));
+    window.addEventListener('pagehide', saveProgress);
   });
 
   // ===========================
@@ -884,6 +1072,174 @@
 
   syncSaveButtons();
   renderList();
+
+  // ===========================
+  // Home Personalisation
+  // ===========================
+  // Continue watching and genre recommendations are built in the browser from
+  // the same localStorage records the watch pages write. Both sections ship
+  // hidden, so a visitor with no history never sees an empty rail.
+  const readJsonScript = (selector) => {
+    const script = document.querySelector(selector);
+    if (!script) return [];
+
+    try {
+      const parsed = JSON.parse(script.textContent || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const buildHomeCard = (item) => {
+    const card = document.createElement('a');
+    card.className = 'rail-card';
+    card.href = item.url;
+
+    const poster = document.createElement('div');
+    poster.className = 'rail-poster';
+    const posterUrl = safePoster(item.poster);
+
+    if (posterUrl) {
+      const img = document.createElement('img');
+      img.src = posterUrl;
+      img.alt = item.title;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      poster.append(img);
+    } else {
+      const fallback = document.createElement('span');
+      fallback.className = 'poster-fallback';
+      const accent = safeAccent(item.accent);
+      if (accent) fallback.style.setProperty('--poster-accent', accent);
+
+      const monogram = document.createElement('span');
+      monogram.className = 'poster-monogram';
+      monogram.textContent = item.title
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase();
+
+      const label = document.createElement('span');
+      label.className = 'poster-title';
+      label.textContent = item.title;
+
+      fallback.append(monogram, label);
+      poster.append(fallback);
+    }
+
+    const title = document.createElement('h3');
+    title.className = 'rail-title';
+    title.textContent = item.title;
+    card.append(poster, title);
+
+    if (item.meta) {
+      const meta = document.createElement('p');
+      meta.className = 'rail-meta';
+      meta.textContent = item.meta;
+      card.append(meta);
+    }
+
+    return card;
+  };
+
+  const homeContinue = document.querySelector('[data-home-continue]');
+  const homeContinueRail = homeContinue ? homeContinue.querySelector('[data-home-continue-rail]') : null;
+  const homeRecommend = document.querySelector('[data-home-recommend]');
+  const homeRecommendRail = homeRecommend ? homeRecommend.querySelector('[data-home-recommend-rail]') : null;
+  const homeRecommendNote = homeRecommend ? homeRecommend.querySelector('[data-home-recommend-note]') : null;
+
+  const renderHomeContinue = () => {
+    if (!homeContinue || !homeContinueRail) return;
+
+    const entries = readJsonScript('[data-home-watch]')
+      .map(item => ({ item, progress: readWatchProgress(item.progressId) }))
+      .filter(entry => entry.progress)
+      .sort((a, b) => (b.progress.at || 0) - (a.progress.at || 0));
+
+    homeContinueRail.textContent = '';
+
+    entries.forEach(({ item, progress }) => {
+      const percent = Math.max(1, Math.min(99, Math.round((progress.t / progress.d) * 100)));
+      const card = buildHomeCard(Object.assign({}, item, {
+        meta: 'Resume at ' + formatWatchTime(progress.t) + ' · ' + percent + '%'
+      }));
+
+      const target = new URL(item.url, window.location.href);
+      target.searchParams.set('resume', '1');
+      card.href = target.pathname + target.search + target.hash;
+      homeContinueRail.append(card);
+    });
+
+    homeContinue.hidden = entries.length === 0;
+    if (entries.length) refreshRailControls();
+  };
+
+  const renderHomeRecommend = () => {
+    if (!homeRecommend || !homeRecommendRail) return;
+
+    const catalogue = readJsonScript('[data-home-recommend-data]');
+    const saved = readList();
+    const savedUrls = new Set(saved.map(item => item.url));
+    const weights = new Map();
+    const watching = new Set();
+
+    const addGenres = (genres, weight) => {
+      (genres || []).forEach(genre => {
+        const slug = String(genre || '').trim().toLowerCase();
+        if (!slug) return;
+        weights.set(slug, (weights.get(slug) || 0) + weight);
+      });
+    };
+
+    saved.forEach(item => addGenres(item.genres, 2));
+
+    catalogue.forEach(item => {
+      if (!item.progressId) return;
+      const progress = readWatchProgress(item.progressId);
+      if (!progress) return;
+      watching.add(item.progressId);
+      addGenres(item.genres, 3);
+    });
+
+    const picks = catalogue
+      .filter(item => !savedUrls.has(item.url) && !(item.progressId && watching.has(item.progressId)))
+      .map(item => ({
+        item,
+        weight: (item.genres || []).reduce((total, genre) => {
+          return total + (weights.get(String(genre || '').trim().toLowerCase()) || 0);
+        }, 0)
+      }))
+      .filter(entry => entry.weight > 0)
+      .sort((a, b) => b.weight - a.weight ||
+        (Number(b.item.score) || 0) - (Number(a.item.score) || 0) ||
+        a.item.title.localeCompare(b.item.title))
+      .slice(0, 14);
+
+    homeRecommendRail.textContent = '';
+    picks.forEach(entry => homeRecommendRail.append(buildHomeCard(entry.item)));
+
+    if (homeRecommendNote && picks.length) {
+      homeRecommendNote.textContent = saved.length && watching.size
+        ? 'Based on the genres in My List and what you are watching.'
+        : (saved.length
+          ? 'Based on the genres in My List.'
+          : 'Based on what you are watching.');
+    }
+
+    homeRecommend.hidden = picks.length === 0;
+    if (picks.length) refreshRailControls();
+  };
+
+  renderHomeContinue();
+  renderHomeRecommend();
+
+  window.addEventListener('storage', function(event) {
+    if (event.key !== LIST_KEY) return;
+    renderHomeRecommend();
+  });
 
   // ===========================
   // Active Nav Link Highlighting

@@ -1,5 +1,6 @@
-{{- /* Official embed adapter. Controls stay with the provider; native MP4 is
-       only used for an authorized self-hosted source. */ -}}
+{{- /* Provider adapters. Iframe players keep controls with the provider;
+       verified Internet Archive MP4s and authorized self-hosted files use
+       native HTML5 playback. */ -}}
 {{- $source := .source -}}
 {{- $title := .title | default "Video player" -}}
 {{- $poster := .poster | default "" -}}
@@ -16,9 +17,9 @@
   <div class="watch-player">
     <iframe src="https://player.vimeo.com/video/{{ .identifier }}" title="{{ $title }}" allow="fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
-  {{- else if eq .method "html5_mp4" -}}
+  {{- else if or (eq .method "internet_archive_mp4") (eq .method "html5_mp4") -}}
   <div class="watch-player watch-player-native">
-    <video controls preload="metadata" playsinline{{ with $poster }} poster="{{ . }}"{{ end }} data-watch-video>
+    <video controls preload="metadata" playsinline aria-label="{{ $title }}"{{ with $poster }} poster="{{ . }}"{{ end }} data-watch-video>
       <source src="{{ .url }}" type="video/mp4">
       <p>Your browser cannot play this video. <a href="{{ .url }}">Open the MP4 directly</a>.</p>
     </video>

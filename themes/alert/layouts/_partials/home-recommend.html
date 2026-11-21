@@ -1,0 +1,77 @@
+{{- /* Genre-affinity recommendations. The catalogue index is embedded as JSON
+       so the browser can rank it against My List and watch progress without a
+       backend. The section stays hidden until there is at least one match. */ -}}
+{{- $items := slice -}}
+{{- range site.Data.catalog.movies.items -}}
+  {{- $items = $items | append (dict
+    "title" .title
+    "url" (partial "item-url.html" .)
+    "meta" (.meta | default "")
+    "kind" (.kind | default "movie")
+    "genres" (.genres | default slice)
+    "poster" (.poster | default "")
+    "accent" (.accent | default "")
+    "score" (.score | default 0)) -}}
+{{- end -}}
+{{- range site.Data.catalog.series.items -}}
+  {{- $items = $items | append (dict
+    "title" .title
+    "url" (partial "item-url.html" .)
+    "meta" (.meta | default "")
+    "kind" (.kind | default "series")
+    "genres" (.genres | default slice)
+    "poster" (.poster | default "")
+    "accent" (.accent | default "")
+    "score" (.score | default 0)) -}}
+{{- end -}}
+{{- range site.Data.catalog.anime.items -}}
+  {{- $items = $items | append (dict
+    "title" .title
+    "url" (partial "item-url.html" .)
+    "meta" (.meta | default "")
+    "kind" (.kind | default "anime")
+    "genres" (.genres | default slice)
+    "poster" (.poster | default "")
+    "accent" (.accent | default "")
+    "score" (.score | default 0)) -}}
+{{- end -}}
+{{- with site.Data.playback.samples -}}
+  {{- range .items -}}
+    {{- $items = $items | append (dict
+      "title" .title
+      "url" (partial "link.html" (printf "/watch/%s/" .slug))
+      "meta" (printf "%s · %s min · Free" (string .year) (string .runtime))
+      "kind" "sample"
+      "genres" (.genres | default slice)
+      "poster" (.poster | default "")
+      "accent" (.accent | default "")
+      "score" 0
+      "progressId" .id) -}}
+  {{- end -}}
+{{- end -}}
+{{- with $items }}
+<section class="rail-section container home-recommend" data-home-recommend hidden aria-labelledby="home-recommend-heading">
+  <div class="rail-header">
+    <div class="rail-heading">
+      <h2 id="home-recommend-heading">Picked for you</h2>
+      <p class="rail-subtitle" data-home-recommend-note>Based on the genres in My List and what you are watching.</p>
+    </div>
+    <div class="rail-actions">
+      <div class="rail-nav">
+        <button type="button" class="rail-nav-button" data-rail-scroll="-1" aria-label="Scroll Picked for you left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="rail-nav-button" data-rail-scroll="1" aria-label="Scroll Picked for you right">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="rail" data-home-recommend-rail></div>
+</section>
+<script type="application/json" data-home-recommend-data>{{ $items | jsonify | safeJS }}</script>
+{{- end }}
