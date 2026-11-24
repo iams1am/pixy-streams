@@ -15,11 +15,16 @@
     <div class="navbar-menu" id="primary-navigation">
       <ul class="navbar-nav">
         {{ $currentPage := . }}
+        {{ $here := strings.TrimSuffix "/" $currentPage.RelPermalink }}
+        {{ $homeURL := strings.TrimSuffix "/" site.Home.RelPermalink }}
         {{ range site.Menus.main }}
-        <li class="nav-item {{ if $currentPage.IsMenuCurrent "main" . }}active{{ end }}">
+        {{ $url := strings.TrimSuffix "/" (.URL | relURL) }}
+        {{ $isCurrent := eq $here $url }}
+        {{ $isAncestor := and (ne $url $homeURL) (hasPrefix (printf "%s/" $here) (printf "%s/" $url)) }}
+        <li class="nav-item{{ if or $isCurrent $isAncestor }} active{{ end }}">
           {{ if .HasChildren }}
           <div class="nav-item-dropdown">
-            <a href="{{ .URL }}" class="nav-link" aria-expanded="false" aria-controls="menu-{{ .Identifier | default (.Name | urlize) }}">
+            <a href="{{ .URL }}" class="nav-link" aria-haspopup="true" aria-expanded="false" aria-controls="menu-{{ .Identifier | default (.Name | urlize) }}"{{ if $isCurrent }} aria-current="page"{{ else if $isAncestor }} aria-current="true"{{ end }}>
               {{ .Name }}
               <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -32,22 +37,25 @@
             </div>
           </div>
           {{ else }}
-          <a href="{{ .URL }}" class="nav-link">{{ .Name }}</a>
+          <a href="{{ .URL }}" class="nav-link"{{ if $isCurrent }} aria-current="page"{{ else if $isAncestor }} aria-current="true"{{ end }}>{{ .Name }}</a>
           {{ end }}
         </li>
         {{ end }}
       </ul>
       
       <div class="navbar-actions">
-        <div class="site-search" role="search" data-search data-index="{{ partial "link.html" "/search.json" }}">
+        <div class="site-search" role="search" data-search data-index="{{ partial "link.html" "/search.json" }}" data-genres-url="{{ partial "link.html" "/genres/" }}">
           <form class="search-form" data-search-form>
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
             </svg>
-            <input type="search" class="search-input" data-search-input placeholder="Search titles" aria-label="Search titles" role="combobox" aria-autocomplete="list" autocomplete="off" spellcheck="false" aria-expanded="false" aria-controls="search-results">
+            <input type="search" class="search-input" data-search-input placeholder="Search titles" aria-label="Search titles" aria-describedby="search-hint" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" autocomplete="off" autocapitalize="off" spellcheck="false" aria-expanded="false" aria-controls="search-results">
+            <span class="search-shortcut" aria-hidden="true">/</span>
+            <span class="visually-hidden" id="search-hint">Press slash to focus search. Results appear as you type.</span>
           </form>
           <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Search results" hidden></div>
+          <p class="visually-hidden" data-search-status role="status" aria-live="polite"></p>
         </div>
         <button class="theme-toggle" aria-label="Toggle theme">
           <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

@@ -329,8 +329,13 @@ Edge 157.
 
 ## Phase 4.1 — Homepage refinement — Complete
 
-- Rail order is now: Continue watching, Free to watch, Trending movies, Trending TV,
-  Anime this season, New additions, Sport this week, Picked for you.
+- Rail order is now: Continue watching (only when progress exists), Categories,
+  Free to watch, Trending now, Anime this season, New additions, Sports this week,
+  Picked for you (only when signals exist).
+- **Trending now** merges the separate film and TV trending rails into one mixed
+  rail, so the homepage has one clear "what people are watching" row instead of
+  two half-empty ones. It links to the film catalogue's Trending section; the TV
+  page keeps its own trending row.
 - **New additions** is built from the catalogue at build time: the TMDB
   `new_releases` list first, then the newest series and anime, deduplicated and
   capped at 14. It has no "view all" link because it spans four verticals.
@@ -352,6 +357,10 @@ Edge 157.
   still filter and re-count as before.
 - Rail cards reuse the existing `rail-card` markup and monogram fallback; no new
   fonts, colours, tokens or dependencies were introduced.
+- **Hero contrast.** The featured headline sets its own white colour, responsive
+  clamp size, text shadow and a rounded eyebrow; a bottom fade and a vertical
+  mobile scrim keep it legible over any backdrop. The global heading colour no
+  longer reaches this hero.
 
 ### Verification
 
@@ -367,7 +376,7 @@ Edge 157.
   "9 titles matching Comedy"), clearing restores every rail, header search still
   returns `Severance — TV Series · 2022 · Drama · 2 seasons`, the watch page still
   renders its `play_here` native player, and My List still lists saved titles.
-- Production build: 154 pages, `check-site.mjs` passes with 5,367 references,
+- Production build: 154 pages, `check-site.mjs` passes with 5,431 references,
   `check-playback.mjs` passes, playback model tests 24/24.
 - Personal rail URLs carry the deployment base path in production
   (`/pixy-streams/watch/the-general/`), verified in the built `index.html`.
@@ -421,6 +430,155 @@ Edge 157.
   verified films are watch-library pages with their own layout), so the
   "Play here" hero branch is implemented but not exercised by a live page.
 
+## Phase 4.3 — Search and navigation — Complete
+
+- **Search discovery.** Focusing the field opens a genre panel built from the
+  existing search index: the eight most common genres with counts plus an
+  "All genres" link to the `/genres/` hub. No search library or backend was
+  added; `/search.json` is still the only index.
+- **Genre hub.** `/genres/` lists every taxonomy term as a card with its title
+  count, replacing the leftover checkmark list from the robotics theme.
+- **Live results and feedback.** Queries need two characters and match title,
+  metadata and genres, with title prefixes ranked first. Eight results are
+  shown with a live count of the full match set. Loading, no-match and
+  index-unavailable states are explicit, and the empty states link to
+  `/genres/`. Results carry Movie, TV Series, Anime, Sport or Free film badges.
+- **Keyboard.** Arrow Up/Down wrap, Home/End jump to the ends, Enter opens and
+  Escape closes. The active result is exposed through `aria-activedescendant`
+  and scrolled into view. `/` focuses search from anywhere; on mobile it opens
+  the menu first, applies the open state, then focuses the field.
+- **Navigation clarity.** Dropdown triggers expose `aria-haspopup`. Hugo marks
+  the current link at build time: `aria-current="page"` on an exact match and
+  `aria-current="true"` on the section ancestor of a detail page, with the home
+  link compared against `site.Home.RelPermalink` so it only matches the root.
+  The mobile menu traps Tab/Shift+Tab; Escape closes an open dropdown, then the
+  results, then the menu.
+
+### Fixed during verification
+
+- The first implementation set `aria-current` from a client-side prefix match,
+  which marked the section link as `page` even on detail pages. It also required
+  JavaScript for a state that Hugo can render. The template now computes it once
+  (`page` for an exact match, `true` for an ancestor) and the duplicate script
+  was removed.
+- Opening search with `/` on mobile focused the field while the drawer was still
+  `visibility: hidden`, because that property was animated from the closed
+  state. The drawer is now visible immediately on open and only delays hiding
+  until the close animation ends, so focus lands in the same task.
+- Inside the drawer the results panel was absolutely positioned and clipped by
+  the menu's scroll box. It now sits in flow, so the menu grows and scrolls to
+  every result. The mobile `.site-search` width rule had been placed before its
+  base declaration and never applied; it now follows the base rule, which is
+  what lets the panel use the full drawer width.
+
+### Verification
+
+- 17/17 headless-Edge checks at 1440 px: discovery showed 8 genres (Drama 55,
+  Action 39, Adventure 31), "drama" returned 8 of 55 with an Anime badge,
+  Home/End/ArrowDown/ArrowUp selected 0/7/0/7, Enter opened Severance, Escape
+  closed the panel, an impossible query explained itself with a genres link,
+  `/` focused search, a genre suggestion ran a search, and navigation marked
+  exactly Home:page on `/`, Movies:page on `/movies/` and Movies:true on
+  `/movies/dune-part-two/`.
+- 14/14 mobile checks at 390 px: the closed menu starts hidden, `/` opens it and
+  focuses search with 8 suggestions, Tab wraps from the last stop to the first
+  and Shift+Tab back, the first Escape closes results while the menu stays open,
+  and the second closes the menu and restores focus to the toggle.
+- At 390 px the drawer gave the panel the full 290 px search width and scrolled
+  to all eight results. `/genres/` rendered 23 genre cards in three columns at
+  1440 px and one column at 390 px with no overflow.
+- A blocked `/search.json` request showed "Search is unavailable right now." in
+  the panel and the live region, with the genres link intact.
+- `/movies/#trending` still lands clear of the sticky header; the overflow
+  matrix covered 8 pages at 360, 390, 768 and 1440 px with no page-level
+  overflow.
+
+## Phase 4.4 — Personalization — Complete
+
+- **Versioned local records.** My List writes `{ version: 1, items }`, watch
+  progress writes `{ version: 1, t, d, at }`, and completed titles write
+  `{ version: 1, items }`. Readers still accept the earlier raw arrays and
+  objects. Malformed JSON, missing fields and blocked storage fall back to
+  empty data without an exception. No accounts or cloud sync were added.
+- **Watch library states.** In-progress cards show an "N% watched" badge and a
+  bottom progress track; completed cards show "Watched" and no track. Completed
+  titles are excluded from Continue watching. "Clear watch history" asks for
+  confirmation and removes both progress and completed records.
+- **Homepage personalization.** Continue watching shows a Resume badge, a
+  progress track, the resume time and a `?resume=1` link, and excludes
+  completed titles. Recommendations rank the embedded catalogue against My
+  List genres and in-progress genres, exclude saved/in-progress titles, cap at
+  14 and name the signals they used. Both rails refresh on cross-tab storage
+  changes, bfcache `pageshow` and tab visibility changes.
+- Progress remains native-player only; provider embeds still expose no progress
+  API and are not included.
+
+### Verification
+
+- 17/17 headless-Edge checks. With seeded My List data, one completed film and
+  one 20%-watched film, the homepage Continue rail showed only The General,
+  with a Resume badge, 20% track and `?resume=1`; recommendations rendered 14
+  cards, excluded the saved Dune entry and named both signals. The watch library
+  showed His Girl Friday as Watched with no track and The General at 22% watched
+  with a 22% track and "22% watched" badge.
+- "Clear watch history" removed both progress keys and the completed record,
+  hid Continue, reset the card badges/tracks and hid the clear control.
+- Saving from a title page wrote `{ version: 1, items: [...] }` with genres; a
+  paused player wrote `{ version: 1, t, d, at }`; finishing wrote
+  `{ version: 1, items: [{ id, at }] }`.
+- A legacy raw My List array, a raw completed string array and an unversioned
+  progress object were read correctly. Corrupted values on every key left both
+  personal rails hidden and produced no page exceptions.
+- A `storage` event for `pixy-my-list` revealed the recommendation rail without a
+  reload; `pageshow` and visibility changes run the same refresh.
+
+## Phase 4.5 — Polish and accessibility — Complete
+
+- **Reduced motion.** CSS collapses animation and transition durations, removes
+  hover lift and forces auto scroll behaviour. JavaScript uses the same media
+  query to choose `auto` instead of `smooth` for rail and anchor scrolling.
+- **Focus and structure.** Focus-visible rings cover links, buttons, rail cards
+  and watch cards; rails are labelled, grouped and focusable; headings balance;
+  in-page targets reserve the sticky header height; the category chip row
+  scrolls horizontally on small screens instead of growing into a tall block.
+- **Mobile details.** The slash hint is hidden where the menu provides search.
+  Opening search via `/` applies the menu's open state before focusing so the
+  field is never focused while still `visibility: hidden`.
+- **Cascade fixes found in review.** The mobile category and search-hint rules
+  were moved after their base declarations; previously the later base rules
+  silently overrode them. Search Escape now stops propagation so it closes the
+  results without also closing the mobile menu.
+
+### Verification
+
+- 14/14 headless-Edge checks. At 1440, 390 and 360 px there is no horizontal
+  overflow. The first Tab reaches the skip link with a 2 px focus ring, the next
+  reaches the logo, and a focused rail card matches `:focus-visible` with a 2 px
+  ring. Category chips scroll horizontally at 360 px (1,329 px of chips in 312
+  px) without widening the page; the slash hint is hidden below 1280 px and
+  visible at 1440 px.
+- Search announced "Loading genres…" with `aria-busy="true"` while the index
+  request was throttled. The empty My List explains how to save a title, the
+  watch library hides history controls when empty, and a fresh visitor sees no
+  personal rails.
+- Typography and structure: body computes to Inter, headings to Space Grotesk,
+  the hero headline uses balanced wrapping, rail artwork is lazy/async inside a
+  2:3 box, and each page has one header, nav, main, footer and h1.
+- Home shipped 43.7 KB of CSS and 30.5 KB of JavaScript over one stylesheet and
+  one script, with 525 DOM nodes.
+- With `prefers-reduced-motion: reduce` emulated, the media query matched,
+  scroll behaviour computed to `auto` and card transition/animation to
+  `1e-05s`.
+- `check-site.mjs` now also fails if a representative page marks zero or more
+  than one current navigation link, or marks the wrong one. It caught the home
+  link being treated as an ancestor during this pass.
+- Final browser audit: no console errors or page exceptions; all 4.3–4.5
+  assertions passed (17 + 14 + 17 + 14 + 6 regression checks). Final build and
+  checks: 154 Hugo pages; `check-site.mjs` passed with 120 pages, 5,431
+  references, 115 search entries, 3 watch pages and 87 playback states;
+  `node --test` passed 24/24; `check-playback.mjs` passed with 3 verified
+  sources, 3 samples and 115 catalogue ids.
+
 ## Known limitations
 
 - Only three public-domain films are approved for playback. Everything else is
@@ -452,8 +610,8 @@ Edge 157.
 
 ## Next
 
-Phase 3 is closed for the verified library, and Phases 4.1 and 4.2 are complete.
-Phase 4.3 (search and navigation) is the next planned subphase and has not been
-started. More public-domain films can be added through the same
+Phase 3 is closed for the verified library and Phase 4 (4.1–4.5) is complete.
+Phase 5.1, the backend decision for content requests, is the next planned step
+and has not been started. More public-domain films can be added through the same
 registry once their rights and exact playback file are verified. Live TMDB
 credentials remain the main catalogue limitation.

@@ -5,6 +5,9 @@
 (function() {
   'use strict';
 
+  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const motionBehavior = () => reduceMotionQuery.matches ? 'auto' : 'smooth';
+
   // ===========================
   // Theme Toggle
   // ===========================
@@ -129,6 +132,27 @@
         navbarToggle.focus();
       }
     });
+
+    // Keep Tab inside the open mobile menu instead of reaching the page behind it.
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab' || !mobileNavQuery.matches || !navbarMenu.classList.contains('active')) return;
+
+      const focusable = Array.from(navbarMenu.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter(element => !element.hidden && element.offsetParent !== null);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const activeInside = navbarMenu.contains(document.activeElement);
+
+      if (e.shiftKey && (!activeInside || document.activeElement === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (!activeInside || document.activeElement === last)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   // ===========================
@@ -197,7 +221,7 @@
         
         window.scrollTo({
           top: targetPosition,
-          behavior: 'smooth'
+          behavior: motionBehavior()
         });
         
         // Close mobile menu if open
@@ -341,7 +365,7 @@
         const direction = Number(this.dataset.railScroll);
         rail.scrollBy({
           left: direction * Math.round(rail.clientWidth * 0.8),
-          behavior: 'smooth'
+          behavior: motionBehavior()
         });
       });
     });
@@ -400,31 +424,50 @@
     const searchForm = searchRoot.querySelector('[data-search-form]');
     const searchInput = searchRoot.querySelector('[data-search-input]');
     const searchPanel = searchRoot.querySelector('[data-search-results]');
+    const searchStatus = searchRoot.querySelector('[data-search-status]');
     const indexUrl = searchRoot.dataset.index;
+    const genresUrl = searchRoot.dataset.genresUrl || '';
 
     let searchIndex = null;
-    let indexLoading = false;
+    let indexPromise = null;
     let indexFailed = false;
     let results = [];
+    let resultTotal = 0;
     let activeResult = -1;
     let searchTimer;
+    let searchRequest = 0;
 
-    const loadIndex = async () => {
-      if (searchIndex || indexLoading) return searchIndex;
-      indexLoading = true;
+    const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport', sample: 'Free film' };
 
-      try {
-        const response = await fetch(indexUrl, { headers: { Accept: 'application/json' } });
-        if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
-        const data = await response.json();
-        searchIndex = Array.isArray(data) ? data : [];
-      } catch (error) {
-        indexFailed = true;
-        searchIndex = [];
-      }
+    const setStatus = (message) => {
+      if (searchStatus) searchStatus.textContent = message;
+    };
 
-      indexLoading = false;
-      return searchIndex;
+    const loadIndex = () => {
+      if (searchIndex) return Promise.resolve(searchIndex);
+      if (indexPromise) return indexPromise;
+
+      indexPromise = fetch(indexUrl, { headers: { Accept: 'application/json' } })
+        .then(response => {
+          if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+          return response.json();
+        })
+        .then(data => {
+          searchIndex = Array.isArray(data) ? data : [];
+          return searchIndex;
+        })
+        .catch(() => {
+          indexFailed = true;
+          searchIndex = [];
+          return searchIndex;
+        });
+
+      return indexPromise;
+    };
+
+    const showPanel = () => {
+      searchPanel.hidden = false;
+      searchInput.setAttribute('aria-expanded', 'true');
     };
 
     const closeResults = () => {
@@ -433,6 +476,117 @@
       searchInput.setAttribute('aria-expanded', 'false');
       searchInput.removeAttribute('aria-activedescendant');
       activeResult = -1;
+      setStatus('');
+    };
+
+    const renderMessage = (message) => {
+      searchPanel.textContent = '';
+      const paragraph = document.createElement('p');
+      paragraph.className = 'search-empty';
+      paragraph.textContent = message;
+      searchPanel.append(paragraph);
+
+      if (genresUrl) {
+        const link = document.createElement('a');
+        link.className = 'search-empty-link';
+        link.href = genresUrl;
+        link.textContent = 'Browse all genres →';
+        searchPanel.append(link);
+      }
+
+      showPanel();
+      searchInput.removeAttribute('aria-activedescendant');
+    };
+
+    const renderLoading = (message) => {
+      searchPanel.textContent = '';
+      searchPanel.setAttribute('aria-busy', 'true');
+      const paragraph = document.createElement('p');
+      paragraph.className = 'search-empty search-loading';
+      paragraph.textContent = message;
+      searchPanel.append(paragraph);
+      showPanel();
+    };
+
+    const renderDiscovery = (data) => {
+      searchPanel.textContent = '';
+      searchPanel.removeAttribute('aria-busy');
+      searchInput.removeAttribute('aria-activedescendant');
+      activeResult = -1;
+
+      if (indexFailed) {
+        renderMessage('Search is unavailable right now.');
+        setStatus('Search is unavailable right now.');
+        return;
+      }
+
+      const counts = new Map();
+      (data || []).forEach(entry => {
+        (entry.genres || []).forEach(genre => {
+          const label = String(genre || '').trim();
+          if (!label) return;
+          counts.set(label, (counts.get(label) || 0) + 1);
+        });
+      });
+
+      const topGenres = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 8);
+
+      if (topGenres.length) {
+        const label = document.createElement('p');
+        label.className = 'search-discovery-label';
+        label.textContent = 'Browse by genre';
+
+        const suggestions = document.createElement('div');
+        suggestions.className = 'search-suggestions';
+
+        topGenres.forEach(([genre, count]) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'search-suggestion';
+          button.dataset.searchSuggestion = genre;
+          button.textContent = genre;
+
+          const badge = document.createElement('span');
+          badge.className = 'search-suggestion-count';
+          badge.textContent = String(count);
+          button.append(badge);
+
+          suggestions.append(button);
+        });
+
+        searchPanel.append(label, suggestions);
+      }
+
+      if (genresUrl) {
+        const link = document.createElement('a');
+        link.className = 'search-discovery-link';
+        link.href = genresUrl;
+        link.textContent = 'All genres →';
+        searchPanel.append(link);
+      }
+
+      if (!topGenres.length && !genresUrl) {
+        renderMessage('Start typing to search titles.');
+        return;
+      }
+
+      setStatus('Browse by genre, or type at least two letters.');
+      showPanel();
+    };
+
+    const showDiscovery = async () => {
+      const requestId = ++searchRequest;
+
+      if (!searchIndex && !indexFailed) {
+        setStatus('Loading genres.');
+        renderLoading('Loading genres…');
+      }
+
+      const data = await loadIndex();
+      if (requestId !== searchRequest) return;
+      renderDiscovery(data);
     };
 
     const scoreEntry = (entry, terms) => {
@@ -445,22 +599,35 @@
       return 2;
     };
 
-    const renderResults = () => {
+    const renderResults = (query) => {
       searchPanel.textContent = '';
+      searchPanel.removeAttribute('aria-busy');
+
+      if (indexFailed) {
+        renderMessage('Search is unavailable right now.');
+        return;
+      }
 
       if (!results.length) {
         const empty = document.createElement('p');
         empty.className = 'search-empty';
-        empty.textContent = indexFailed
-          ? 'Search is unavailable right now.'
-          : 'No titles match that search.';
+        empty.textContent = 'No titles match "' + query + '".';
         searchPanel.append(empty);
+
+        if (genresUrl) {
+          const link = document.createElement('a');
+          link.className = 'search-empty-link';
+          link.href = genresUrl;
+          link.textContent = 'Browse all genres →';
+          searchPanel.append(link);
+        }
       } else {
         results.forEach((entry, position) => {
           const link = document.createElement('a');
           link.className = 'search-result';
           link.href = entry.url;
           link.id = 'search-result-' + position;
+          link.tabIndex = -1;
           link.setAttribute('role', 'option');
           link.setAttribute('aria-selected', String(position === activeResult));
 
@@ -469,52 +636,91 @@
             link.rel = 'noopener noreferrer';
           }
 
+          const main = document.createElement('span');
+          main.className = 'search-result-main';
+
           const title = document.createElement('span');
           title.className = 'search-result-title';
           title.textContent = entry.title;
+          main.append(title);
 
-          const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport', sample: 'Free film' };
-          const kindLabel = kindLabels[entry.kind] || '';
-          const meta = document.createElement('span');
-          meta.className = 'search-result-meta';
-          meta.textContent = [kindLabel, entry.meta].filter(Boolean).join(' · ');
+          if (entry.meta) {
+            const meta = document.createElement('span');
+            meta.className = 'search-result-meta';
+            meta.textContent = entry.meta;
+            main.append(meta);
+          }
 
-          link.append(title, meta);
+          const kind = document.createElement('span');
+          kind.className = 'search-result-kind';
+          kind.textContent = kindLabels[entry.kind] || 'Title';
+
+          link.append(main, kind);
           searchPanel.append(link);
         });
       }
 
-      searchPanel.hidden = false;
-      searchInput.setAttribute('aria-expanded', 'true');
+      showPanel();
 
       if (activeResult >= 0) {
         searchInput.setAttribute('aria-activedescendant', 'search-result-' + activeResult);
+        const active = searchPanel.querySelector('#search-result-' + activeResult);
+        if (active && typeof active.scrollIntoView === 'function') {
+          active.scrollIntoView({ block: 'nearest' });
+        }
       } else {
         searchInput.removeAttribute('aria-activedescendant');
       }
     };
 
     const runSearch = async () => {
-      const value = searchInput.value.trim().toLowerCase();
+      const rawValue = searchInput.value.trim();
+      const value = rawValue.toLowerCase();
+      const requestId = ++searchRequest;
 
       if (value.length < 2) {
         results = [];
-        closeResults();
+        resultTotal = 0;
+        activeResult = -1;
+        if (document.activeElement === searchInput) showDiscovery();
+        else closeResults();
         return;
       }
 
-      const data = await loadIndex();
-      const terms = value.split(/\s+/).filter(Boolean);
+      if (!searchIndex && !indexFailed) {
+        setStatus('Searching titles.');
+        renderLoading('Searching titles…');
+      }
 
-      results = (data || [])
+      const data = await loadIndex();
+      if (requestId !== searchRequest) return;
+
+      if (indexFailed) {
+        results = [];
+        resultTotal = 0;
+        renderResults(rawValue);
+        setStatus('Search is unavailable right now.');
+        return;
+      }
+
+      const terms = value.split(/\s+/).filter(Boolean);
+      const matches = (data || [])
         .map(entry => ({ entry, score: scoreEntry(entry, terms) }))
         .filter(result => result.score >= 0)
-        .sort((a, b) => a.score - b.score || a.entry.title.localeCompare(b.entry.title))
-        .slice(0, 8)
-        .map(result => result.entry);
+        .sort((a, b) => a.score - b.score || a.entry.title.localeCompare(b.entry.title));
 
+      resultTotal = matches.length;
+      results = matches.slice(0, 8).map(result => result.entry);
       activeResult = -1;
-      renderResults();
+      renderResults(rawValue);
+
+      if (!resultTotal) {
+        setStatus('No titles match ' + rawValue + '.');
+      } else if (resultTotal > results.length) {
+        setStatus('Showing ' + results.length + ' of ' + resultTotal + ' results for ' + rawValue + '.');
+      } else {
+        setStatus(resultTotal + (resultTotal === 1 ? ' result' : ' results') + ' for ' + rawValue + '.');
+      }
     };
 
     const openResult = (position) => {
@@ -530,25 +736,38 @@
       searchTimer = setTimeout(runSearch, 120);
     });
 
+    searchInput.addEventListener('search', function() {
+      clearTimeout(searchTimer);
+      runSearch();
+    });
+
     searchInput.addEventListener('focus', function() {
-      loadIndex();
       if (searchInput.value.trim().length >= 2) runSearch();
+      else showDiscovery();
     });
 
     searchInput.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
-        closeResults();
+        // Close the results first and keep the event from also closing the
+        // mobile menu; a second Escape reaches the document handler.
+        if (!searchPanel.hidden) {
+          closeResults();
+          event.stopPropagation();
+        }
         return;
       }
 
       if (searchPanel.hidden || !results.length) return;
 
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
         event.preventDefault();
-        activeResult = event.key === 'ArrowDown'
-          ? (activeResult + 1) % results.length
-          : (activeResult <= 0 ? results.length - 1 : activeResult - 1);
-        renderResults();
+
+        if (event.key === 'Home') activeResult = 0;
+        else if (event.key === 'End') activeResult = results.length - 1;
+        else if (event.key === 'ArrowDown') activeResult = (activeResult + 1) % results.length;
+        else activeResult = activeResult <= 0 ? results.length - 1 : activeResult - 1;
+
+        renderResults(searchInput.value.trim());
       }
 
       if (event.key === 'Enter') {
@@ -564,6 +783,15 @@
       });
     }
 
+    searchPanel.addEventListener('click', function(event) {
+      const suggestion = event.target.closest('[data-search-suggestion]');
+      if (!suggestion) return;
+
+      searchInput.value = suggestion.dataset.searchSuggestion || '';
+      searchInput.focus();
+      runSearch();
+    });
+
     document.addEventListener('click', function(event) {
       if (!searchRoot.contains(event.target)) closeResults();
     });
@@ -576,12 +804,38 @@
         if (!searchRoot.contains(document.activeElement)) closeResults();
       }, 0);
     });
+
+    // "/" focuses search from anywhere on the page, matching common site-search
+    // shortcuts without stealing the key from form fields.
+    document.addEventListener('keydown', function(event) {
+      if (event.key !== '/' || event.defaultPrevented) return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (document.querySelector('[data-trailer-dialog][open]')) return;
+
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.closest('input, textarea, select') || target.isContentEditable)) return;
+
+      event.preventDefault();
+
+      if (mobileNavQuery.matches && navbarMenu && !navbarMenu.classList.contains('active')) {
+        navbarToggle.click();
+        // Apply the open state before focusing: a visibility transition can
+        // otherwise leave the field unfocusable in the same task.
+        navbarMenu.getBoundingClientRect();
+      }
+
+      searchInput.focus();
+      searchInput.select();
+    });
   }
 
   // ===========================
   // Native Video Playback and Progress
   // ===========================
   const WATCH_PROGRESS_PREFIX = 'pixy:watch:progress:';
+  const WATCH_PROGRESS_VERSION = 1;
+  const WATCH_COMPLETED_KEY = 'pixy:watch:completed';
+  const WATCH_COMPLETED_VERSION = 1;
 
   const formatWatchTime = (seconds) => {
     const total = Math.max(0, Math.floor(seconds));
@@ -611,7 +865,7 @@
     try {
       localStorage.setItem(
         WATCH_PROGRESS_PREFIX + id,
-        JSON.stringify({ t: currentTime, d: duration, at: Date.now() })
+        JSON.stringify({ version: WATCH_PROGRESS_VERSION, t: currentTime, d: duration, at: Date.now() })
       );
     } catch (error) {
       // Progress is a convenience; private browsing can reject storage.
@@ -627,20 +881,149 @@
     }
   };
 
+  const readWatchCompleted = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(WATCH_COMPLETED_KEY) || '[]');
+      const items = Array.isArray(parsed)
+        ? parsed
+        : (parsed && Array.isArray(parsed.items) ? parsed.items : []);
+      return items
+        .map(item => (typeof item === 'string' ? { id: item, at: 0 } : item))
+        .filter(item => item && typeof item.id === 'string');
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const writeWatchCompleted = (items) => {
+    try {
+      localStorage.setItem(
+        WATCH_COMPLETED_KEY,
+        JSON.stringify({ version: WATCH_COMPLETED_VERSION, items: items.slice(0, 50) })
+      );
+    } catch (error) {
+      // Completion state is a convenience; storage can be unavailable.
+    }
+  };
+
+  const markWatchComplete = (id) => {
+    if (!id) return;
+    const items = readWatchCompleted().filter(item => item.id !== id);
+    items.unshift({ id, at: Date.now() });
+    writeWatchCompleted(items);
+  };
+
+  const clearWatchComplete = (id) => {
+    if (!id) return;
+    writeWatchCompleted(readWatchCompleted().filter(item => item.id !== id));
+  };
+
+  const isWatchComplete = (id) => Boolean(id) && readWatchCompleted().some(item => item.id === id);
+
+  const hasWatchHistory = () => {
+    if (readWatchCompleted().length) return true;
+    return Array.from(document.querySelectorAll('.watch-library .watch-card[data-watch-id]'))
+      .some(card => Boolean(readWatchProgress(card.getAttribute('data-watch-id'))));
+  };
+
+  const clearWatchHistory = () => {
+    try {
+      const keys = [];
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (key && key.startsWith(WATCH_PROGRESS_PREFIX)) keys.push(key);
+      }
+      keys.forEach(key => localStorage.removeItem(key));
+      localStorage.removeItem(WATCH_COMPLETED_KEY);
+    } catch (error) {
+      // Clearing history is best-effort in restricted storage contexts.
+    }
+  };
+
   // The watch library lists every sample, so Continue Watching can reuse the
-  // existing cards instead of keeping a second copy of the metadata.
+  // existing cards instead of keeping a second copy of the metadata. Completed
+  // records are separate from progress so a finished film can be labelled
+  // without keeping a resume position around.
+  const watchLibraryCards = Array.from(document.querySelectorAll('.watch-library .watch-card[data-watch-id]'));
   const continueSection = document.querySelector('[data-watch-continue]');
   const continueGrid = continueSection ? continueSection.querySelector('[data-watch-continue-grid]') : null;
+  const historyClear = document.querySelector('[data-watch-history-clear]');
 
-  if (continueSection && continueGrid) {
-    const entries = [];
-    document.querySelectorAll('.watch-library .watch-card[data-watch-id]').forEach(card => {
+  const updateWatchCardStates = () => {
+    const completed = new Set(readWatchCompleted().map(item => item.id));
+
+    watchLibraryCards.forEach(card => {
       const id = card.getAttribute('data-watch-id');
+      const poster = card.querySelector('.watch-card-poster');
+      if (!id || !poster) return;
+
+      let state = poster.querySelector('[data-watch-state]');
+      if (!state) {
+        state = document.createElement('span');
+        state.className = 'watch-card-state';
+        state.setAttribute('data-watch-state', '');
+        poster.append(state);
+      }
+
+      let track = poster.querySelector('[data-watch-progress-track]');
+      let fill = track ? track.querySelector('.watch-card-progress-fill') : null;
+      if (!track) {
+        track = document.createElement('span');
+        track.className = 'watch-card-progress-track';
+        track.setAttribute('data-watch-progress-track', '');
+        track.setAttribute('aria-hidden', 'true');
+
+        fill = document.createElement('span');
+        fill.className = 'watch-card-progress-fill';
+        track.append(fill);
+        poster.append(track);
+      }
+
+      const progress = readWatchProgress(id);
+      const finished = completed.has(id);
+      const percent = progress
+        ? Math.max(1, Math.min(99, Math.round((progress.t / progress.d) * 100)))
+        : 0;
+
+      card.classList.toggle('is-completed', finished);
+      card.classList.toggle('is-in-progress', Boolean(progress) && !finished);
+
+      if (finished) {
+        state.hidden = false;
+        state.textContent = 'Watched';
+        track.hidden = true;
+      } else if (progress) {
+        state.hidden = false;
+        state.textContent = percent + '% watched';
+        track.hidden = false;
+        if (fill) fill.style.width = percent + '%';
+      } else {
+        state.hidden = true;
+        state.textContent = '';
+        track.hidden = true;
+        if (fill) fill.style.width = '0%';
+      }
+    });
+
+    if (historyClear) historyClear.hidden = !hasWatchHistory();
+  };
+
+  const renderWatchContinue = () => {
+    if (!continueSection || !continueGrid) return;
+
+    const completed = new Set(readWatchCompleted().map(item => item.id));
+    const entries = [];
+
+    watchLibraryCards.forEach(card => {
+      const id = card.getAttribute('data-watch-id');
+      if (!id || completed.has(id)) return;
+
       const progress = readWatchProgress(id);
       if (progress) entries.push({ card, progress });
     });
 
     entries.sort((a, b) => (b.progress.at || 0) - (a.progress.at || 0));
+    continueGrid.textContent = '';
 
     entries.forEach(({ card, progress }) => {
       const clone = card.cloneNode(true);
@@ -664,7 +1047,31 @@
     });
 
     continueSection.hidden = entries.length === 0;
+    if (historyClear) historyClear.hidden = !hasWatchHistory();
+  };
+
+  const refreshWatchHistory = () => {
+    updateWatchCardStates();
+    renderWatchContinue();
+  };
+
+  if (historyClear) {
+    historyClear.addEventListener('click', function() {
+      if (!window.confirm('Clear watch progress and completed titles in this browser?')) return;
+      clearWatchHistory();
+      refreshWatchHistory();
+    });
   }
+
+  window.addEventListener('storage', function(event) {
+    if (!event.key) return;
+    if (event.key === WATCH_COMPLETED_KEY || event.key.startsWith(WATCH_PROGRESS_PREFIX)) {
+      refreshWatchHistory();
+    }
+  });
+
+  window.addEventListener('pageshow', refreshWatchHistory);
+  refreshWatchHistory();
 
   // Internet Archive MP4s and the self-hosted branch render
   // <video data-watch-video>. Surface a failure instead of leaving a silent,
@@ -735,6 +1142,7 @@
       resumeReset.addEventListener('click', () => {
         resumeTarget = null;
         clearWatchProgress(watchId);
+        clearWatchComplete(watchId);
         hideResume();
         try {
           video.currentTime = 0;
@@ -773,8 +1181,10 @@
       if (currentTime < 5) return;
       if (video.duration - currentTime < 10) {
         clearWatchProgress(watchId);
+        markWatchComplete(watchId);
         return;
       }
+      if (isWatchComplete(watchId)) clearWatchComplete(watchId);
       writeWatchProgress(watchId, currentTime, video.duration);
       savedAt = Date.now();
     };
@@ -783,7 +1193,10 @@
       if (Date.now() - savedAt >= 5000) saveProgress();
     });
     video.addEventListener('pause', saveProgress);
-    video.addEventListener('ended', () => clearWatchProgress(watchId));
+    video.addEventListener('ended', () => {
+      clearWatchProgress(watchId);
+      markWatchComplete(watchId);
+    });
     window.addEventListener('pagehide', saveProgress);
   });
 
@@ -871,6 +1284,7 @@
   // My List (saved titles, browser-local)
   // ===========================
   const LIST_KEY = 'pixy-my-list';
+  const LIST_VERSION = 1;
   const listGrid = document.querySelector('[data-my-list]');
   const listEmpty = document.querySelector('[data-my-list-empty]');
   const listToolbar = document.querySelector('[data-my-list-toolbar]');
@@ -880,8 +1294,10 @@
   const readList = () => {
     try {
       const parsed = JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
-      if (!Array.isArray(parsed)) return [];
-      return parsed.filter(item => item && typeof item.url === 'string' && typeof item.title === 'string');
+      const items = Array.isArray(parsed)
+        ? parsed
+        : (parsed && Array.isArray(parsed.items) ? parsed.items : []);
+      return items.filter(item => item && typeof item.url === 'string' && typeof item.title === 'string');
     } catch (error) {
       return [];
     }
@@ -889,7 +1305,7 @@
 
   const writeList = (items) => {
     try {
-      localStorage.setItem(LIST_KEY, JSON.stringify(items));
+      localStorage.setItem(LIST_KEY, JSON.stringify({ version: LIST_VERSION, items }));
     } catch (error) {
       // Storage may be blocked or full; the list simply will not persist.
     }
@@ -1091,7 +1507,7 @@
     }
   };
 
-  const buildHomeCard = (item) => {
+  const buildHomeCard = (item, options = {}) => {
     const card = document.createElement('a');
     card.className = 'rail-card';
     card.href = item.url;
@@ -1130,6 +1546,26 @@
       poster.append(fallback);
     }
 
+    if (options.badge) {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = options.badge;
+      poster.append(badge);
+    }
+
+    if (options.progress && options.progress.d > 0) {
+      const percent = Math.max(1, Math.min(99, Math.round((options.progress.t / options.progress.d) * 100)));
+      const track = document.createElement('span');
+      track.className = 'rail-progress-track';
+      track.setAttribute('aria-hidden', 'true');
+
+      const fill = document.createElement('span');
+      fill.className = 'rail-progress-fill';
+      fill.style.width = percent + '%';
+      track.append(fill);
+      poster.append(track);
+    }
+
     const title = document.createElement('h3');
     title.className = 'rail-title';
     title.textContent = item.title;
@@ -1154,9 +1590,10 @@
   const renderHomeContinue = () => {
     if (!homeContinue || !homeContinueRail) return;
 
+    const completed = new Set(readWatchCompleted().map(item => item.id));
     const entries = readJsonScript('[data-home-watch]')
       .map(item => ({ item, progress: readWatchProgress(item.progressId) }))
-      .filter(entry => entry.progress)
+      .filter(entry => entry.progress && !completed.has(entry.item.progressId))
       .sort((a, b) => (b.progress.at || 0) - (a.progress.at || 0));
 
     homeContinueRail.textContent = '';
@@ -1165,7 +1602,7 @@
       const percent = Math.max(1, Math.min(99, Math.round((progress.t / progress.d) * 100)));
       const card = buildHomeCard(Object.assign({}, item, {
         meta: 'Resume at ' + formatWatchTime(progress.t) + ' · ' + percent + '%'
-      }));
+      }), { progress, badge: 'Resume' });
 
       const target = new URL(item.url, window.location.href);
       target.searchParams.set('resume', '1');
@@ -1183,6 +1620,7 @@
     const catalogue = readJsonScript('[data-home-recommend-data]');
     const saved = readList();
     const savedUrls = new Set(saved.map(item => item.url));
+    const completed = new Set(readWatchCompleted().map(item => item.id));
     const weights = new Map();
     const watching = new Set();
 
@@ -1205,7 +1643,8 @@
     });
 
     const picks = catalogue
-      .filter(item => !savedUrls.has(item.url) && !(item.progressId && watching.has(item.progressId)))
+      .filter(item => !savedUrls.has(item.url))
+      .filter(item => !(item.progressId && (watching.has(item.progressId) || completed.has(item.progressId))))
       .map(item => ({
         item,
         weight: (item.genres || []).reduce((total, genre) => {
@@ -1233,34 +1672,30 @@
     if (picks.length) refreshRailControls();
   };
 
-  renderHomeContinue();
-  renderHomeRecommend();
+  const refreshHomePersonal = () => {
+    renderHomeContinue();
+    renderHomeRecommend();
+  };
+
+  refreshHomePersonal();
 
   window.addEventListener('storage', function(event) {
-    if (event.key !== LIST_KEY) return;
-    renderHomeRecommend();
+    if (!event.key) return;
+
+    if (event.key === LIST_KEY) {
+      renderHomeRecommend();
+      return;
+    }
+
+    if (event.key === WATCH_COMPLETED_KEY || event.key.startsWith(WATCH_PROGRESS_PREFIX)) {
+      refreshHomePersonal();
+    }
   });
 
-  // ===========================
-  // Active Nav Link Highlighting
-  // ===========================
-  function setActiveNavLink() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-      const linkPath = new URL(link.href).pathname;
-      const navItem = link.closest('.nav-item');
-      
-      if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
-        navItem?.classList.add('active');
-      } else {
-        navItem?.classList.remove('active');
-      }
-    });
-  }
-  
-  setActiveNavLink();
+  window.addEventListener('pageshow', refreshHomePersonal);
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) refreshHomePersonal();
+  });
 
   // ===========================
   // Lazy Loading Images
@@ -1312,7 +1747,7 @@
     button.addEventListener('click', () => {
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: motionBehavior()
       });
     });
   }

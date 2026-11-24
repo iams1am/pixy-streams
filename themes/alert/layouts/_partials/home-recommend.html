@@ -71,7 +71,7 @@
       </div>
     </div>
   </div>
-  <div class="rail" data-home-recommend-rail></div>
+  <div class="rail" data-home-recommend-rail tabindex="0" role="group" aria-label="Picked for you titles"></div>
 </section>
 <script type="application/json" data-home-recommend-data>{{ $items | jsonify | safeJS }}</script>
 {{- end }}

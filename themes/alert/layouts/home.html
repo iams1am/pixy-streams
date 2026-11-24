@@ -78,15 +78,19 @@
 {{ with partial "sample-items.html" . }}
   {{ $rails = $rails | append (dict "id" "free-films" "title" "Free to watch" "subtitle" "Public-domain films with a verified rights record" "href" "/watch/" "items" .) }}
 {{ end }}
+{{ $trending := slice }}
 {{ with $movies }}
-  {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
-    {{ $rails = $rails | append (dict "id" "movies" "title" "Trending movies" "subtitle" "What everyone is watching this week" "href" "/movies/#trending" "items" .) }}
+  {{ range partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
+    {{ $trending = $trending | append . }}
   {{ end }}
 {{ end }}
 {{ with $series }}
-  {{ with partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
-    {{ $rails = $rails | append (dict "id" "series" "title" "Trending TV" "subtitle" "Series worth starting this week" "href" "/tv/#trending" "items" .) }}
+  {{ range partial "catalog-items.html" (dict "items" .items "list" "trending" "limit" 14) }}
+    {{ $trending = $trending | append . }}
   {{ end }}
+{{ end }}
+{{ with $trending }}
+  {{ $rails = $rails | append (dict "id" "trending" "title" "Trending now" "subtitle" "Films and series everyone is watching this week" "href" "/movies/#trending" "items" .) }}
 {{ end }}
 {{ with $anime }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "seasonal" "limit" 14) }}
@@ -122,11 +126,11 @@
   {{ end }}
 {{ end }}
 {{ with first 14 $fresh }}
-  {{ $rails = $rails | append (dict "id" "new-additions" "title" "New additions" "subtitle" "The latest films, series and anime in the catalogue" "items" .) }}
+  {{ $rails = $rails | append (dict "id" "new-additions" "title" "New additions" "subtitle" "Recent films and the newest series and anime in the catalogue" "items" .) }}
 {{ end }}
 {{ with $sports }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "upcoming" "limit" 14) }}
-    {{ $rails = $rails | append (dict "id" "sports" "title" "Sport this week" "subtitle" "Next fixtures across football, basketball and motorsport" "href" "/sports/" "items" .) }}
+    {{ $rails = $rails | append (dict "id" "sports" "title" "Sports this week" "subtitle" "Next fixtures across football, basketball and motorsport" "note" "Fixtures are schedules, not live streams. Broadcast rights vary by region." "href" "/sports/" "items" .) }}
   {{ end }}
 {{ end }}
 

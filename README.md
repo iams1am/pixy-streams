@@ -157,9 +157,12 @@ in the United States. `/watch/` plays each one from its verified MP4 derivative
 with native HTML5 controls, and every page also links to the archive's official
 player. The native player stores progress in `localStorage`, offers a resume
 prompt, and lists in-progress films in a Continue Watching rail on `/watch/`.
-If a stream delivers no metadata within 20 seconds, the page shows a slow-stream
-notice with the official-player link; a hard source error replaces the player.
-Everything else on the site is discovery only.
+Cards show "N% watched" with a bottom progress track, or "Watched" when the film
+was finished; completed titles leave Continue Watching. A confirmed "Clear watch
+history" control removes both progress and completed records. If a stream
+delivers no metadata within 20 seconds, the page shows a slow-stream notice with
+the official-player link; a hard source error replaces the player. Everything
+else on the site is discovery only.
 
 Adding a source requires a recorded rights basis, HTTPS evidence, a named
 reviewer, an availability region and a provider/method pair that matches.
@@ -202,7 +205,32 @@ entry `parent = "<identifier>"`; the header renders `MenuEntry.Children`.
 ```
 
 Internal links in templates go through `partials/link.html`, which prefixes the
-site base path so the site works from the `/pixy-streams/` subpath.
+site base path so the site works from the `/pixy-streams/` subpath. The current
+page gets `aria-current="page"`; the home link only matches the site root exactly
+so it does not also mark every page under the base path.
+
+## Search and personalisation
+
+The header search reads the build-time `/search.json` index. Focusing it shows
+the most common genres with counts and a link to `/genres/`; typing two or more
+characters returns categorised results (Movie, TV Series, Anime, Sport, Free
+film) with a live result count. Arrow keys, Home, End, Enter and Escape work
+without leaving the field, and `/` focuses search from anywhere. On mobile the
+shortcut opens the menu first. Loading, no-match and unavailable states are
+explicit rather than silent.
+
+Local records are versioned and read defensively:
+
+| Key | Shape | Purpose |
+|---|---|---|
+| `pixy-my-list` | `{ version: 1, items: [...] }` | saved titles |
+| `pixy:watch:progress:<id>` | `{ version: 1, t, d, at }` | native-player position |
+| `pixy:watch:completed` | `{ version: 1, items: [...] }` | finished films |
+
+Earlier raw arrays and objects are still accepted; malformed or blocked storage
+falls back to empty data. Completed titles are excluded from Continue Watching
+and recommendations, and personal rails stay hidden until real local data
+exists. There are no accounts or cloud synchronization.
 
 ## Deployment
 
@@ -230,7 +258,9 @@ Pages at the `gh-pages` branch, which the older manual flow force-pushed.
 - **Done** - trailer modal on title pages, scheduled catalogue refresh workflow
 - **Done** - TV catalogue, browse-all grids with sorting, post-build checks in CI
 - **Done** - playback model, rights registry, three verified public-domain films on `/watch/` with native MP4 playback and Continue Watching
-- **Next** - TMDB key for live movie artwork, film trailers and episode guides
+- **Done** - Phase 4 premium UX: merged homepage rails, search discovery and keyboard support, mobile navigation focus trap, versioned My List/watch history with completed states, reduced-motion and accessibility polish
+- **Next** - Phase 5.1: choose the content-request backend (Supabase or Cloudflare D1) before implementation
+- **Blocked** - live TMDB credentials for movie artwork, film trailers and episode guides
 - **Later** - Vimeo and self-hosted playback once authorized content needs them
 
 ## Attribution

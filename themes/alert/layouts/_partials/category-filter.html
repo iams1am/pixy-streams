@@ -27,7 +27,10 @@
 <section class="category-bar container" id="genres" data-category-filter aria-label="Filter by category">
   <div class="category-bar-head">
     <h2>Categories</h2>
-    <button type="button" class="category-clear" data-clear hidden>Clear selection</button>
+    <div class="category-bar-actions">
+      <a class="category-all" href="{{ partial "link.html" "/genres/" }}">All genres</a>
+      <button type="button" class="category-clear" data-clear hidden>Clear selection</button>
+    </div>
   </div>
   <div class="category-options">
     {{- range sort . "order" }}

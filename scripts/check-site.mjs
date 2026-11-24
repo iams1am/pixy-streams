@@ -151,6 +151,68 @@ check('accessible markup', () => {
   }
 });
 
+check('homepage', () => {
+  const home = readFileSync(path.join(OUT, 'index.html'), 'utf8');
+  const hasId = (id) => new RegExp(`\\bid=(?:"${id}"|${id})(?=[\\s>])`).test(home);
+  const sectionTag = (marker) => home.match(new RegExp(`<section[^>]*${marker}[^>]*>`))?.[0] || '';
+
+  if (!/class=(?:"hero hero-featured"|hero hero-featured)/.test(home)) {
+    fail('homepage: missing featured hero');
+  }
+  if (!/class=(?:"hero-title"|hero-title)/.test(home)) {
+    fail('homepage: missing hero headline');
+  }
+  if (!hasId('genres') || !home.includes('data-category-filter')) {
+    fail('homepage: missing category filter');
+  }
+
+  for (const id of ['free-films', 'trending', 'anime', 'new-additions', 'sports']) {
+    if (!hasId(id)) fail(`homepage: missing ${id} rail`);
+  }
+
+  for (const heading of ['Trending now', 'New additions', 'Sports this week']) {
+    if (!home.includes(heading)) fail(`homepage: missing "${heading}" rail heading`);
+  }
+
+  const newAdditions = home.match(/<section[^>]*id=(?:"new-additions"|new-additions)[^>]*>([\s\S]*?)<\/section>/)?.[1] || '';
+  if (!newAdditions.includes('rail-card')) fail('homepage: New additions rail has no titles');
+
+  for (const marker of ['data-home-continue', 'data-home-recommend']) {
+    const tag = sectionTag(marker);
+    if (!tag) fail(`homepage: missing ${marker} section`);
+    else if (!/\shidden(?:\s|>|=)/.test(tag)) fail(`homepage: ${marker} must ship hidden`);
+  }
+
+  if (!home.includes('data-home-watch')) fail('homepage: missing Continue watching data');
+  if (!home.includes('data-home-recommend-data')) fail('homepage: missing recommendation data');
+});
+
+check('navigation state', () => {
+  const cases = [
+    ['index.html', 'page', 'Home'],
+    ['movies/index.html', 'page', 'Movies'],
+    ['movies/dune-part-two/index.html', 'true', 'Movies']
+  ];
+
+  for (const [file, token, label] of cases) {
+    const full = path.join(OUT, file);
+    if (!existsSync(full)) {
+      fail(`navigation: missing ${file}`);
+      continue;
+    }
+
+    const html = readFileSync(full, 'utf8');
+    const nav = html.match(/<ul[^>]*class=(?:"navbar-nav"|navbar-nav)[^>]*>([\s\S]*?)<\/ul>/)?.[1] || '';
+    const current = [...nav.matchAll(/<a[^>]*aria-current=(?:"([^"]+)"|([^\s>]+))[^>]*>([^<]*)/g)]
+      .map(match => [match[1] || match[2], match[3].trim()]);
+
+    if (current.length !== 1) fail(`navigation: ${file} marks ${current.length} current links`);
+    else if (current[0][0] !== token || current[0][1] !== label) {
+      fail(`navigation: ${file} marks ${current[0][1]} as ${current[0][0]}, expected ${label} as ${token}`);
+    }
+  }
+});
+
 check('search index', () => {
   const index = JSON.parse(readFileSync(path.join(OUT, 'search.json'), 'utf8'));
   if (!Array.isArray(index) || !index.length) {

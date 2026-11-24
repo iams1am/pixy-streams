@@ -148,6 +148,19 @@ img {
   display: block;
 }
 
+/* Available to assistive technology without occupying visual space. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 ul, ol {
   padding-left: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
@@ -164,6 +177,11 @@ ul, ol {
 
 #main-content {
   min-height: calc(100vh - var(--header-height) - 300px);
+}
+
+/* Keep deep links clear of the sticky header. */
+[id] {
+  scroll-margin-top: calc(var(--header-height) + var(--spacing-sm));
 }
 
 /* ===========================
@@ -900,7 +918,8 @@ ul, ol {
     transform: translateY(-100%);
     opacity: 0;
     visibility: hidden;
-    transition: transform var(--transition-base), opacity var(--transition-base), visibility var(--transition-base);
+    /* Hide only after the close animation; opening must be focusable at once. */
+    transition: transform var(--transition-base), opacity var(--transition-base), visibility 0s linear var(--transition-base);
     box-shadow: var(--shadow-lg);
     max-height: calc(100vh - var(--header-height));
     overflow-y: auto;
@@ -910,6 +929,7 @@ ul, ol {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
+    transition-delay: 0s;
   }
 
   .navbar-nav {
@@ -1065,6 +1085,50 @@ ul, ol {
   max-width: 640px;
 }
 
+/* The global h1 rule sets a dark colour, so the hero headline needs its own. */
+.hero.hero-featured .hero-title {
+  color: #fff;
+  font-size: clamp(2.5rem, 4.6vw, 4.25rem);
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
+  text-wrap: balance;
+}
+
+.hero.hero-featured .hero-subtitle {
+  max-width: 58ch;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  line-height: 1.55;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+}
+
+.hero.hero-featured .hero-tagline {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero.hero-featured .hero-overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 28%;
+  background: linear-gradient(to top, var(--color-bg) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .hero.hero-featured .hero-overlay {
+  background: linear-gradient(to top, var(--color-bg) 0%, rgba(11, 16, 32, 0) 100%);
+}
+
+.hero.hero-featured .hero-eyebrow {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background-color: rgba(8, 10, 20, 0.38);
+  backdrop-filter: blur(6px);
+}
+
 .hero-eyebrow {
   display: inline-block;
   font-size: 0.75rem;
@@ -1108,11 +1172,6 @@ ul, ol {
   padding: var(--spacing-xl) var(--spacing-md) 0;
 }
 
-.home-continue[hidden],
-.home-recommend[hidden] {
-  display: none;
-}
-
 .rail-header {
   display: flex;
   align-items: flex-end;
@@ -1130,6 +1189,51 @@ ul, ol {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   margin: 0;
+}
+
+.rail-note {
+  margin: var(--spacing-sm) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+/* Genre hub: one row per genre with the number of titles behind it. */
+.genre-hub {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.genre-hub-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.genre-hub-card:hover,
+.genre-hub-card:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.genre-hub-count {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.rail-section[hidden],
+.home-continue[hidden],
+.home-recommend[hidden] {
+  display: none;
 }
 
 .rail-link {
@@ -1212,6 +1316,21 @@ ul, ol {
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.rail-progress-track {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background-color: rgba(8, 10, 20, 0.55);
+}
+
+.rail-progress-fill {
+  display: block;
+  height: 100%;
+  background-color: var(--color-secondary);
 }
 
 .rail-title {
@@ -1308,11 +1427,25 @@ a.specialty-item:hover {
 
 @media (max-width: 768px) {
   .hero.hero-featured {
-    min-height: 520px;
+    min-height: 560px;
+    align-items: flex-end;
+    padding-top: 6rem;
+    padding-bottom: 5rem;
+    background-image:
+      linear-gradient(180deg, rgba(8, 10, 20, 0.6) 0%, rgba(8, 10, 20, 0.9) 55%, rgba(8, 10, 20, 0.98) 100%),
+      var(--hero-backdrop, none);
   }
 
   .hero-title {
     font-size: 2.25rem;
+  }
+
+  .hero.hero-featured .hero-title {
+    font-size: clamp(2.15rem, 8vw, 2.75rem);
+  }
+
+  .hero.hero-featured .hero-overlay {
+    height: 14%;
   }
 
   .hero-subtitle {
@@ -1662,21 +1795,6 @@ a.specialty-item:hover {
   .catalog-poster {
     flex-basis: 150px;
   }
-
-  .category-options {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.25rem;
-    scrollbar-width: none;
-  }
-
-  .category-options::-webkit-scrollbar {
-    display: none;
-  }
-
-  .category-chip {
-    flex: 0 0 auto;
-  }
 }
 
 /* Keyboard focus */
@@ -1727,6 +1845,25 @@ button:focus-visible,
   justify-content: space-between;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
+}
+
+.category-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.category-all {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.category-all:hover {
+  color: var(--color-primary-dark);
 }
 
 .category-bar h2 {
@@ -1799,6 +1936,25 @@ button:focus-visible,
 
 .category-status:empty {
   margin: 0;
+}
+
+/* Keep the chip row compact on small screens instead of wrapping into a tall
+   block. This must come after the base .category-options rule above. */
+@media (max-width: 768px) {
+  .category-options {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .category-options::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-chip {
+    flex: 0 0 auto;
+  }
 }
 
 .rail-card.is-filtered-out,
@@ -1905,7 +2061,7 @@ button:focus-visible,
 .search-input {
   width: 100%;
   min-width: 0;
-  padding: 0.45rem 0.85rem 0.45rem 2.1rem;
+  padding: 0.45rem 2rem 0.45rem 2.1rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background-color: var(--color-bg-secondary);
@@ -1914,6 +2070,24 @@ button:focus-visible,
   font-size: 0.875rem;
   line-height: 1.4;
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.search-shortcut {
+  position: absolute;
+  right: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  font-family: var(--font-primary);
+  font-size: 0.6875rem;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .search-input::placeholder {
@@ -1945,7 +2119,7 @@ button:focus-visible,
 
 .search-result {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.5rem 0.6rem;
@@ -1960,19 +2134,45 @@ button:focus-visible,
   color: var(--color-primary);
 }
 
+.search-result-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
 .search-result-title {
+  overflow: hidden;
   font-size: 0.875rem;
   font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-result-meta {
-  flex: none;
-  max-width: 45%;
   overflow: hidden;
   color: var(--color-text-muted);
   font-size: 0.75rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.search-result-kind {
+  flex: none;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.search-result:hover .search-result-kind,
+.search-result[aria-selected="true"] .search-result-kind {
+  background-color: var(--color-bg);
+  color: var(--color-primary);
 }
 
 .search-empty {
@@ -1982,6 +2182,95 @@ button:focus-visible,
   font-size: 0.875rem;
 }
 
+.search-empty-link,
+.search-discovery-link {
+  display: inline-block;
+  margin: 0 0.6rem 0.6rem;
+  color: var(--color-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.search-discovery-label {
+  margin: 0;
+  padding: 0.4rem 0.6rem 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 0.6rem 0.45rem;
+}
+
+.search-suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.search-suggestion:hover,
+.search-suggestion:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.search-suggestion-count {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.search-loading {
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+/* The slash hint is for hardware keyboards; the mobile menu opens search
+   itself. These rules must follow the base .search-input styles. */
+@media (max-width: 1279px) {
+  .search-shortcut {
+    display: none;
+  }
+
+  .search-input {
+    padding-right: 0.85rem;
+  }
+
+  /* These must follow the base rules above: this drawer is a later cascade
+     layer than the first mobile block. */
+  .navbar-actions {
+    align-items: flex-start;
+  }
+
+  .site-search {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  /* Inside the drawer an absolutely positioned panel is clipped by the menu's
+     scroll box. Put it in flow so the menu grows and scrolls to every result. */
+  .search-results {
+    position: static;
+    margin-top: 0.4rem;
+    min-width: 0;
+    max-height: 50vh;
+  }
+}
 
 .search-results[hidden],
 .my-list-toolbar[hidden],
@@ -2167,6 +2456,35 @@ button:focus-visible,
   margin-top: var(--spacing-xl);
 }
 
+.watch-library-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.watch-history-clear {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.watch-history-clear:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.watch-history-clear[hidden] {
+  display: none;
+}
+
 .watch-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -2217,6 +2535,48 @@ button:focus-visible,
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.watch-card-state {
+  position: absolute;
+  bottom: 10px;
+  left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: rgba(8, 10, 20, 0.8);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(6px);
+}
+
+.watch-card.is-completed .watch-card-state {
+  background-color: var(--color-accent);
+  color: #0b1020;
+}
+
+.watch-card-state[hidden] {
+  display: none;
+}
+
+.watch-card-progress-track {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background-color: rgba(8, 10, 20, 0.5);
+}
+
+.watch-card-progress-fill {
+  display: block;
+  height: 100%;
+  background-color: var(--color-secondary);
+}
+
+.watch-card-progress-track[hidden] {
+  display: none;
 }
 
 .watch-card h3 {
@@ -2510,4 +2870,42 @@ button:focus-visible,
 .playback-state-play_here .playback-state-label {
   background-color: var(--color-primary);
   color: #fff;
+}
+
+/* ===========================
+   Reduced motion and final polish
+   =========================== */
+main h2,
+.rail-heading h2 {
+  text-wrap: balance;
+}
+
+.watch-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--border-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .fade-in {
+    animation: none;
+  }
+
+  .rail-card:hover .rail-poster,
+  .watch-card:hover .watch-card-poster {
+    transform: none;
+  }
+
+  .rail-card:hover .rail-poster img {
+    transform: none;
+  }
 }

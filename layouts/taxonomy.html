@@ -9,14 +9,11 @@
 <div class="container page-content">
   <div class="content-main">
     {{ .Content }}
-    <div class="specialties-grid">
+    <div class="genre-hub">
       {{ range .Pages }}
-      <a class="specialty-item" href="{{ .RelPermalink }}">
-        <svg class="specialty-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+      <a class="genre-hub-card" href="{{ .RelPermalink }}">
         <span>{{ .Title }}</span>
-        <span class="specialty-count">{{ len .Pages }}</span>
+        <span class="genre-hub-count">{{ len .Pages }}</span>
       </a>
       {{ end }}
     </div>

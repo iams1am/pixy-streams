@@ -15,7 +15,10 @@
     {{ with $samples }}
       {{ if .items }}
       <section class="watch-library" aria-labelledby="watch-library-heading">
-        <h2 id="watch-library-heading">The sample library</h2>
+        <div class="watch-library-head">
+          <h2 id="watch-library-heading">The sample library</h2>
+          <button type="button" class="watch-history-clear" data-watch-history-clear hidden>Clear watch history</button>
+        </div>
         <div class="watch-grid">
           {{ range .items }}
           <a class="watch-card" href="{{ partial "link.html" (printf "/watch/%s/" .slug) }}" data-watch-id="{{ .id }}" data-watch-slug="{{ .slug }}">
