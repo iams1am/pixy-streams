@@ -21,13 +21,12 @@
 
 {{- with site.Data.catalog.sports -}}
   {{- range $event := .items -}}
-    {{- with $event.href -}}
+    {{- with $event.slug -}}
       {{- $entries = $entries | append (dict
         "title" $event.title
-        "url" .
+        "url" (partial "link.html" (printf "/sports/%s/" .))
         "meta" ($event.meta | default "")
         "kind" "event"
-        "external" true
         "genres" ($event.genres | default slice)) -}}
     {{- end -}}
   {{- end -}}

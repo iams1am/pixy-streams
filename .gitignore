@@ -39,6 +39,8 @@ yarn.lock
 # Build files
 dist/
 build/
+public-browser/
+public-test/
 
 # Cache
 .cache/

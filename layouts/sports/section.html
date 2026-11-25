@@ -8,37 +8,98 @@
 
 {{ $catalog := site.Data.catalog.sports }}
 {{ if $catalog }}
+  {{ $live := partial "catalog-items.html" (dict "items" $catalog.items "list" "live" "limit" 14) }}
+  {{ $upcoming := partial "catalog-items.html" (dict "items" $catalog.items "list" "upcoming" "limit" 14) }}
+  {{ $results := partial "catalog-items.html" (dict "items" $catalog.items "list" "results" "limit" 14) }}
+  {{ $football := partial "catalog-items.html" (dict "items" $catalog.items "group" "football" "limit" 14) }}
+  {{ $basketball := partial "catalog-items.html" (dict "items" $catalog.items "group" "basketball" "limit" 14) }}
+  {{ $motorsport := partial "catalog-items.html" (dict "items" $catalog.items "group" "motorsport" "limit" 14) }}
+
+  <section class="sports-intro container" aria-labelledby="sports-desk-heading">
+    <div class="sports-intro-copy">
+      <h2 id="sports-desk-heading">The sports desk</h2>
+      <p>Fixtures, results and score states from public scoreboards. Times are stored in UTC and converted to your device's local time when JavaScript is available.</p>
+      <p class="sports-freshness">
+        {{ with $catalog.generated_at }}Refreshed <time datetime="{{ . }}">{{ (time .).Format "2 Jan 2006, 15:04 UTC" }}</time>{{ end }}
+        {{ with $catalog.source }} · Source {{ if $catalog.source_url }}<a href="{{ $catalog.source_url }}" target="_blank" rel="noopener">{{ . }}</a>{{ else }}{{ . }}{{ end }}{{ end }}
+        {{ with $catalog.partial }} · <span class="sports-partial">partial refresh; some leagues use cached fixtures</span>{{ end }}
+      </p>
+      {{ with $catalog.league_status }}
+      <ul class="sports-leagues" aria-label="Leagues in this refresh">
+        {{ range . }}
+        {{ $count := len (where $catalog.items "league" .label) }}
+        <li class="sports-league{{ if ne .status "fresh" }} is-cached{{ end }}">
+          <span class="sports-league-name">{{ .label }}</span>
+          <span class="sports-league-count">{{ $count }}</span>
+          {{ if ne .status "fresh" }}<span class="sports-league-state">cached</span>{{ end }}
+        </li>
+        {{ end }}
+      </ul>
+      {{ end }}
+    </div>
+    <aside class="sports-notice sports-notice-compact" aria-labelledby="sports-live-note">
+      <h3 id="sports-live-note">Live scores are not live video</h3>
+      <p>Score states reflect the last build. Pixy Streams does not provide live sports streams, mirrors or unverified player links. Broadcaster names are listings only; rights and availability vary by region.</p>
+    </aside>
+  </section>
+
   {{ partial "category-filter.html" (dict "items" $catalog.items) }}
 
+  {{ with $live }}
+  {{ partial "rail.html" (dict
+    "id" "live-scores"
+    "title" "Live scores"
+    "subtitle" "Score state at the last refresh — not a live video feed"
+    "items" .
+    "note" "A live score is a number, not a stream. Refresh the page after the next catalogue build to see a newer score.") }}
+  {{ end }}
+
+  {{ with $upcoming }}
+  {{ partial "rail.html" (dict
+    "id" "upcoming"
+    "title" "Upcoming fixtures"
+    "subtitle" "Next scheduled fixtures; times convert to your device"
+    "items" .
+    "note" "Schedules can move. Check the official competition or broadcaster before making plans.") }}
+  {{ end }}
+
+  {{ with $results }}
   {{ partial "rail.html" (dict
     "id" "results"
     "title" "Latest results"
-    "subtitle" "Full-time scores from the last round of fixtures"
-    "items" (partial "catalog-items.html" (dict "items" $catalog.items "list" "results" "limit" 14))) }}
+    "subtitle" "Full-time and final scores from the latest scoreboard refresh"
+    "items" .) }}
+  {{ end }}
 
+  {{ with $football }}
   {{ partial "rail.html" (dict
     "id" "football"
     "title" "Football"
-    "subtitle" "Next up in the Premier League, La Liga, Serie A, Bundesliga and Europe"
-    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "football" "limit" 14))) }}
+    "subtitle" "Premier League, La Liga, Serie A, Bundesliga and Europe"
+    "items" .) }}
+  {{ end }}
 
+  {{ with $basketball }}
   {{ partial "rail.html" (dict
     "id" "basketball"
     "title" "Basketball"
-    "subtitle" "The next tip-offs on the NBA calendar"
-    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "basketball" "limit" 14))) }}
+    "subtitle" "The NBA calendar and recent finals"
+    "items" .) }}
+  {{ end }}
 
+  {{ with $motorsport }}
   {{ partial "rail.html" (dict
     "id" "motorsport"
     "title" "Motorsport"
     "subtitle" "Grand Prix weekends and sessions"
-    "items" (partial "catalog-items.html" (dict "items" $catalog.items "group" "motorsport" "limit" 14))) }}
+    "items" .) }}
+  {{ end }}
 
   {{ partial "catalog-grid.html" (dict
     "id" "all-fixtures"
     "items" $catalog.items
-    "title" "All fixtures"
-    "subtitle" "Every fixture and result from the latest scoreboard refresh"
+    "title" "All fixtures and results"
+    "subtitle" "Every event from the latest scoreboard refresh"
     "sorts" (slice
       (dict "value" "default" "label" "Catalogue order")
       (dict "value" "time" "label" "Soonest first")

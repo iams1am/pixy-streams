@@ -1,7 +1,11 @@
 {{- /* Returns the link for a catalogue item: its own page, or an external source. */ -}}
 {{- $item := . -}}
 {{- $href := $item.href | default "" -}}
-{{- if not $href -}}
+{{- if eq $item.kind "event" -}}
+  {{- if $item.slug -}}
+    {{- $href = printf "/sports/%s/" $item.slug -}}
+  {{- end -}}
+{{- else if not $href -}}
   {{- $section := "anime" -}}
   {{- if eq $item.kind "movie" }}{{ $section = "movies" }}{{ end -}}
   {{- if eq $item.kind "series" }}{{ $section = "tv" }}{{ end -}}

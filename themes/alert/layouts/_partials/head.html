@@ -59,9 +59,6 @@
 
 <title>{{ if .IsHome }}{{ site.Title }} - {{ site.Params.tagline }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
 
-<!-- Preconnect to external resources -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Self-hosted fonts: no third-party CSS in the render path. -->
+<link rel="preload" href="{{ "fonts/inter-var.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "fonts/space-grotesk-var.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>

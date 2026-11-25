@@ -16,7 +16,11 @@
       <a class="rail-card" href="{{ .RelPermalink }}">
         <div class="rail-poster">
           {{ if .Params.poster }}
-          <img src="{{ .Params.poster }}" alt="{{ .Title }}" loading="lazy">
+          {{ if .Params.poster_small }}
+          <img src="{{ .Params.poster_small }}" srcset="{{ .Params.poster_small }} 230w, {{ .Params.poster }} 460w" sizes="(max-width: 640px) 45vw, 168px" alt="{{ .Title }}" width="230" height="345" loading="lazy" decoding="async">
+          {{ else }}
+          <img src="{{ .Params.poster }}" alt="{{ .Title }}" width="300" height="450" loading="lazy" decoding="async">
+          {{ end }}
           {{ else }}
           {{ partial "poster-fallback.html" (dict "title" .Title "accent" .Params.accent) }}
           {{ end }}

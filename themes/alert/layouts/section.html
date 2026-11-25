@@ -20,7 +20,7 @@
         {{ if .Params.featured_image }}
         <div class="item-image">
           <a href="{{ .Permalink }}">
-            <img src="{{ .Params.featured_image }}" alt="{{ .Title }}" loading="lazy">
+            <img src="{{ .Params.featured_image }}" alt="{{ .Title }}" width="1200" height="675" loading="lazy" decoding="async">
           </a>
         </div>
         {{ end }}

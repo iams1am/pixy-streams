@@ -44,7 +44,11 @@
     <div class="container catalog-hero-inner">
       <div class="catalog-poster">
         {{ if .Params.poster }}
-        <img src="{{ .Params.poster }}" alt="{{ .Title }}" loading="lazy">
+        {{ if .Params.poster_small }}
+        <img src="{{ .Params.poster_small }}" srcset="{{ .Params.poster_small }} 230w, {{ .Params.poster }} 460w" sizes="(max-width: 640px) 45vw, 300px" alt="{{ .Title }}" width="230" height="345" loading="eager" decoding="async">
+        {{ else }}
+        <img src="{{ .Params.poster }}" alt="{{ .Title }}" width="300" height="450" loading="lazy" decoding="async">
+        {{ end }}
         {{ else }}
         {{ partial "poster-fallback.html" (dict "title" .Title "accent" .Params.accent) }}
         {{ end }}
@@ -240,6 +244,7 @@
     "title" $p.Title
     "meta" $p.Params.meta
     "poster" $p.Params.poster
+    "poster_small" $p.Params.poster_small
     "accent" $p.Params.accent
     "badge" $p.Params.badge
     "kind" $p.Params.catalog

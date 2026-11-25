@@ -3,18 +3,41 @@
 {{- $genres := slice -}}
 {{- range (.genres | default slice) }}{{ $genres = $genres | append (. | urlize) }}{{ end -}}
 {{- if eq $item.kind "event" }}{{ $genres = $genres | append "sports" }}{{ end -}}
-<a class="rail-card{{ if eq $item.kind "event" }} is-event{{ end }}" href="{{ $href }}" data-genres="{{ delimit $genres "," }}" data-sort-title="{{ $item.title }}"{{ with $item.score }} data-sort-score="{{ . }}"{{ end }}{{ with $item.year }} data-sort-year="{{ . }}"{{ end }}{{ with $item.kickoff }} data-sort-time="{{ . }}"{{ end }}>
-  {{- if and (eq $item.kind "event") $item.home $item.away $item.home.logo $item.away.logo -}}
+{{- $isEvent := eq $item.kind "event" -}}
+{{- $liveStale := false -}}
+{{- if and $isEvent (eq $item.state "live") $item.observed_at -}}
+  {{- $observed := time $item.observed_at -}}
+  {{- if gt (div (sub now.Unix $observed.Unix) 3600) 6 }}{{ $liveStale = true }}{{ end -}}
+{{- end -}}
+{{- $cached := or $item.stale $liveStale -}}
+{{- $badge := $item.badge -}}
+{{- if and $isEvent $liveStale }}{{ $badge = "Cached score" }}{{ end -}}
+<a class="rail-card{{ if $isEvent }} is-event{{ end }}" href="{{ $href }}" data-genres="{{ delimit $genres "," }}" data-sort-title="{{ $item.title }}"{{ with $item.score }} data-sort-score="{{ . }}"{{ end }}{{ with $item.year }} data-sort-year="{{ . }}"{{ end }}{{ with $item.kickoff }} data-sort-time="{{ . }}"{{ end }}{{ with $item.state }} data-state="{{ . }}"{{ end }}>
+  {{- if and $isEvent $item.home $item.away $item.home.logo $item.away.logo -}}
   <div class="rail-poster poster-match">
-    <img class="crest" src="{{ $item.home.logo }}" alt="{{ $item.home.name }}" loading="lazy">
+    <img class="crest" src="{{ $item.home.logo }}" alt="{{ $item.home.name }}" width="64" height="64" loading="lazy" decoding="async">
+    {{- if $item.score -}}
+    <span class="match-score">{{ $item.score }}</span>
+    {{- else -}}
     <span class="match-vs">vs</span>
-    <img class="crest" src="{{ $item.away.logo }}" alt="{{ $item.away.name }}" loading="lazy">
-    {{ with $item.badge }}<span class="badge">{{ . }}</span>{{ end }}
+    {{- end -}}
+    <img class="crest" src="{{ $item.away.logo }}" alt="{{ $item.away.name }}" width="64" height="64" loading="lazy" decoding="async">
+    {{ with $badge }}<span class="badge {{ if eq $item.state "live" }}badge-live{{ else if eq $item.state "finished" }}badge-final{{ end }}">{{ . }}</span>{{ end }}
+  </div>
+  {{- else if $isEvent -}}
+  <div class="rail-poster poster-match poster-event">
+    <span class="event-glyph" aria-hidden="true">{{ if eq $item.group "motorsport" }}F1{{ else if eq $item.group "basketball" }}NBA{{ else }}VS{{ end }}</span>
+    {{ with $item.league }}<span class="event-league-label">{{ . }}</span>{{ end }}
+    {{ with $badge }}<span class="badge {{ if eq $item.state "live" }}badge-live{{ else if eq $item.state "finished" }}badge-final{{ end }}">{{ . }}</span>{{ end }}
   </div>
   {{- else -}}
   <div class="rail-poster">
     {{- if $item.poster -}}
-    <img src="{{ $item.poster }}" alt="{{ $item.title }}" loading="lazy" decoding="async">
+    {{- if $item.poster_small -}}
+    <img src="{{ $item.poster_small }}" srcset="{{ $item.poster_small }} 230w, {{ $item.poster }} 460w" sizes="(max-width: 640px) 45vw, 168px" alt="{{ $item.title }}" width="230" height="345" loading="lazy" decoding="async">
+    {{- else -}}
+    <img src="{{ $item.poster }}" alt="{{ $item.title }}" width="300" height="450" loading="lazy" decoding="async">
+    {{- end -}}
     {{- else -}}
     {{ partial "poster-fallback.html" (dict "title" $item.title "accent" $item.accent) }}
     {{- end -}}
@@ -22,5 +45,20 @@
   </div>
   {{- end -}}
   <h3 class="rail-title">{{ $item.title }}</h3>
+  {{- if $isEvent -}}
+  <p class="rail-meta event-meta">
+    {{ with $item.league }}<span class="event-league">{{ . }}</span>{{ end }}
+    {{- if eq $item.state "live" -}}
+    <span class="event-state is-live{{ if $cached }} is-cached{{ end }}">{{ if $liveStale }}Live score · cached{{ else }}{{ $item.state_label }}{{ end }}{{ with $item.status_detail }} · {{ . }}{{ end }}{{ with $item.score }} · {{ . }}{{ end }}</span>
+    {{- else if eq $item.state "finished" -}}
+    <span class="event-state is-finished">{{ $item.state_label }}{{ with $item.score }} · {{ . }}{{ end }}{{ if $cached }} · cached{{ end }}</span>
+    {{- else if $item.kickoff -}}
+    <time datetime="{{ $item.kickoff }}" data-local-time>{{ $item.date_label }}, {{ $item.time_utc }}</time>
+    {{- else -}}
+    <span class="event-state">{{ $item.state_label }}</span>
+    {{- end -}}
+  </p>
+  {{- else -}}
   {{ with $item.meta }}<p class="rail-meta">{{ . }}</p>{{ end }}
+  {{- end -}}
 </a>

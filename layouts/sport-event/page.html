@@ -1,0 +1,195 @@
+{{ define "main" }}
+{{ $home := .Params.home }}
+{{ $away := .Params.away }}
+{{ $state := .Params.state | default "scheduled" }}
+{{ $catalog := site.Data.catalog.sports }}
+{{ $links := .Params.links | default dict }}
+{{ $sessions := .Params.sessions | default slice }}
+{{ $broadcasts := .Params.broadcasts | default slice }}
+{{ $watch := .Params.watch | default slice }}
+{{ $hasTeams := and $home $away $home.name $away.name }}
+{{ $stateLabel := .Params.state_label | default "Scheduled" }}
+{{ $liveStale := false }}
+{{ if and (eq $state "live") .Params.observed_at }}
+  {{ $observed := time .Params.observed_at }}
+  {{ if gt (div (sub now.Unix $observed.Unix) 3600) 6 }}{{ $liveStale = true }}{{ end }}
+{{ end }}
+{{ $cached := or .Params.stale $liveStale }}
+{{ if $liveStale }}{{ $stateLabel = "Live score (cached)" }}{{ end }}
+{{ $schemaStatus := "https://schema.org/EventScheduled" }}
+{{ if eq $state "canceled" }}{{ $schemaStatus = "https://schema.org/EventCancelled" }}{{ end }}
+{{ if eq $state "postponed" }}{{ $schemaStatus = "https://schema.org/EventPostponed" }}{{ end }}
+
+{{ $sportsPage := site.GetPage "/sports" }}
+{{ $sportsURL := "" }}
+{{ with $sportsPage }}{{ $sportsURL = .Permalink }}{{ end }}
+
+{{ $schema := dict
+  "@context" "https://schema.org"
+  "@type" "SportsEvent"
+  "name" .Title
+  "url" .Permalink
+  "eventStatus" $schemaStatus }}
+{{ with .Params.kickoff }}{{ $schema = merge $schema (dict "startDate" .) }}{{ end }}
+{{ with .Params.overview }}{{ $schema = merge $schema (dict "description" .) }}{{ end }}
+{{ with .Params.venue }}{{ $schema = merge $schema (dict "location" (dict "@type" "Place" "name" .)) }}{{ end }}
+{{ if $hasTeams }}
+  {{ $homeTeam := dict "@type" "SportsTeam" "name" $home.name }}
+  {{ with $home.logo }}{{ $homeTeam = merge $homeTeam (dict "logo" .) }}{{ end }}
+  {{ with $home.link }}{{ $homeTeam = merge $homeTeam (dict "url" .) }}{{ end }}
+  {{ $awayTeam := dict "@type" "SportsTeam" "name" $away.name }}
+  {{ with $away.logo }}{{ $awayTeam = merge $awayTeam (dict "logo" .) }}{{ end }}
+  {{ with $away.link }}{{ $awayTeam = merge $awayTeam (dict "url" .) }}{{ end }}
+  {{ $schema = merge $schema (dict "homeTeam" $homeTeam "awayTeam" $awayTeam) }}
+{{ end }}
+<script type="application/ld+json">{{ $schema | jsonify | safeJS }}</script>
+
+{{ $crumbs := slice }}
+{{ if $sportsURL }}{{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" 1 "name" "Sports" "item" $sportsURL) }}{{ end }}
+{{ $crumbs = $crumbs | append (dict "@type" "ListItem" "position" (add (len $crumbs) 1) "name" $.Title "item" $.Permalink) }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs | jsonify | safeJS }}</script>
+
+<article class="sport-event" data-event-page data-event-state="{{ $state }}" data-event-stale="{{ $cached }}" data-event-league="{{ .Params.league }}">
+  <header class="event-hero">
+    <div class="container">
+      <nav class="catalog-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ partial "link.html" "/sports/" }}">Sports</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ .Title }}</span>
+      </nav>
+
+      <p class="hero-eyebrow">{{ with .Params.league }}{{ . }}{{ end }}{{ with .Params.sport }} · {{ . }}{{ end }}</p>
+      <h1>{{ .Title }}</h1>
+
+      <p class="event-status event-status-{{ $state }}{{ if $cached }} is-cached{{ end }}">
+        <span class="event-status-dot" aria-hidden="true"></span>
+        <span>{{ $stateLabel }}</span>
+        {{ with .Params.status_detail }}<span class="event-status-detail">{{ . }}</span>{{ end }}
+      </p>
+
+      {{ if $hasTeams }}
+      <div class="event-scoreline">
+        <div class="event-team">
+          {{ with $home.logo }}<img class="event-team-crest" src="{{ . }}" alt="" width="72" height="72" loading="eager" decoding="async">{{ end }}
+          <p class="event-team-name">{{ $home.name }}</p>
+          {{ with $home.record }}<p class="event-team-record">Record {{ . }}</p>{{ end }}
+          {{ with $home.form }}<p class="event-team-form">Form {{ . }}</p>{{ end }}
+          {{ with $home.link }}<a class="event-team-link" href="{{ . }}" target="_blank" rel="noopener" aria-label="Team page for {{ $home.name }}">Team page</a>{{ end }}
+        </div>
+
+        <div class="event-score"{{ if .Params.score }} role="img" aria-label="{{ $home.name }} {{ .Params.home_score }}, {{ $away.name }} {{ .Params.away_score }}"{{ end }}>
+          {{ if .Params.score }}
+          <span>{{ .Params.home_score }}</span>
+          <span class="event-score-sep" aria-hidden="true">–</span>
+          <span>{{ .Params.away_score }}</span>
+          {{ else }}
+          <span class="event-vs">vs</span>
+          {{ end }}
+        </div>
+
+        <div class="event-team">
+          {{ with $away.logo }}<img class="event-team-crest" src="{{ . }}" alt="" width="72" height="72" loading="eager" decoding="async">{{ end }}
+          <p class="event-team-name">{{ $away.name }}</p>
+          {{ with $away.record }}<p class="event-team-record">Record {{ . }}</p>{{ end }}
+          {{ with $away.form }}<p class="event-team-form">Form {{ . }}</p>{{ end }}
+          {{ with $away.link }}<a class="event-team-link" href="{{ . }}" target="_blank" rel="noopener" aria-label="Team page for {{ $away.name }}">Team page</a>{{ end }}
+        </div>
+      </div>
+      {{ end }}
+
+      {{ with .Params.kickoff }}
+      <p class="event-kickoff">
+        <span class="event-kickoff-label">{{ if eq $state "finished" }}Played{{ else if eq $state "live" }}Started{{ else }}Kick-off{{ end }}</span>
+        <time datetime="{{ . }}">{{ $.Params.date_label }}, {{ $.Params.time_utc }}</time>
+        <span class="event-local">
+          <span class="event-local-label">Your time</span>
+          <time datetime="{{ . }}" data-local-time>{{ $.Params.date_label }}, {{ $.Params.time_utc }}</time>
+        </span>
+      </p>
+      {{ end }}
+
+      <div class="hero-actions">
+        {{ with $links.fixture }}
+        <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener">Match centre on {{ $.Params.source }}</a>
+        {{ end }}
+        {{ range first 2 $watch }}
+        <a class="btn btn-ghost" href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a>
+        {{ end }}
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-content">
+    <div class="content-main">
+      {{ with .Params.overview }}
+      <h2>Match report</h2>
+      <p>{{ . }}</p>
+      {{ end }}
+
+      <h2>Match details</h2>
+      <dl class="event-facts">
+        <div><dt>League</dt><dd>{{ .Params.league }}</dd></div>
+        <div><dt>Sport</dt><dd>{{ .Params.sport }}</dd></div>
+        {{ with .Params.venue }}<div><dt>Venue</dt><dd>{{ . }}</dd></div>{{ end }}
+        <div><dt>Status</dt><dd>{{ $stateLabel }}{{ with .Params.status_detail }} · {{ . }}{{ end }}</dd></div>
+        {{ with .Params.observed_at }}<div><dt>Last observed</dt><dd><time datetime="{{ . }}">{{ (time .).Format "2 Jan 2006, 15:04 UTC" }}</time></dd></div>{{ end }}
+        {{ with $catalog.generated_at }}<div><dt>Catalogue refreshed</dt><dd><time datetime="{{ . }}">{{ (time .).Format "2 Jan 2006, 15:04 UTC" }}</time></dd></div>{{ end }}
+        <div><dt>Source</dt><dd>{{ with .Params.source_url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ $.Params.source }}</a>{{ else }}{{ .Params.source }}{{ end }}</dd></div>
+      </dl>
+
+      {{ if $cached }}
+      <p class="sports-cache-note" role="status">This fixture is shown from the last successful refresh. Scores and states can lag behind the provider until the next catalogue build.</p>
+      {{ end }}
+
+      {{ with $sessions }}
+      <h2>Sessions</h2>
+      <ul class="event-sessions">
+        {{ range . }}
+        <li class="event-session event-session-{{ .state }}">
+          <span class="event-session-label">{{ .label }}</span>
+          {{ with .kickoff }}<time datetime="{{ . }}" data-local-time>{{ (time .).Format "Mon 2 Jan, 15:04 UTC" }}</time>{{ end }}
+          <span class="event-session-state">{{ .state_label }}{{ with .status_detail }} · {{ . }}{{ end }}</span>
+        </li>
+        {{ end }}
+      </ul>
+      {{ end }}
+
+      {{ if $broadcasts }}
+      <h2 id="broadcast-listings">Broadcast listings</h2>
+      <p class="watch-region">Broadcaster names supplied by {{ .Params.source }}. They are listings, not links to live video.</p>
+      <ul class="watch-list event-broadcasts">
+        {{ range $broadcasts }}
+        <li>
+          {{ if .url }}<a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a>{{ else }}<span class="event-broadcast-name">{{ .name }}</span>{{ end }}
+          {{ with .type }}<span class="watch-type">{{ . }}</span>{{ end }}
+          {{ with .region }}<span class="event-broadcast-region">{{ . }}</span>{{ end }}
+        </li>
+        {{ end }}
+      </ul>
+      {{ end }}
+
+      {{ if $watch }}
+      <h2 id="official-highlights">Official highlights</h2>
+      <p class="watch-region">Links published by the provider. Highlights are not a live stream.</p>
+      <ul class="watch-list">
+        {{ range $watch }}
+        <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}{{ with .type }}<span class="watch-type">{{ . }}</span>{{ end }}</a></li>
+        {{ end }}
+      </ul>
+      {{ end }}
+
+      {{ .Content }}
+
+      <aside class="sports-notice" aria-labelledby="live-video-heading">
+        <h2 id="live-video-heading">Live scores, not live video</h2>
+        <p>Pixy Streams reports the score state from the last catalogue build. It does not host, mirror or link to live sports streams. Broadcaster names are shown for reference only; check the broadcaster for rights and availability where you live.</p>
+      </aside>
+
+      <p class="catalog-note">
+        {{ with .Params.source }}Fixture data from {{ . }}{{ end }}{{ with $catalog }}{{ with .generated_at }} · catalogue updated {{ (time .).Format "2 Jan 2006" }}{{ end }}{{ end }}.
+        Live scores and schedules are informational and are not a playback licence.
+      </p>
+    </div>
+  </div>
+</article>
+{{ end }}

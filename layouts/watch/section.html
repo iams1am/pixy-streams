@@ -24,7 +24,7 @@
           <a class="watch-card" href="{{ partial "link.html" (printf "/watch/%s/" .slug) }}" data-watch-id="{{ .id }}" data-watch-slug="{{ .slug }}">
             <div class="watch-card-poster">
               {{ if .poster }}
-              <img src="{{ .poster }}" alt="{{ .title }} poster" loading="lazy" decoding="async">
+              <img src="{{ .poster }}" alt="{{ .title }} poster" width="300" height="450" loading="lazy" decoding="async">
               {{ else }}
               {{ partial "poster-fallback.html" (dict "title" .title "accent" "#1f6feb") }}
               {{ end }}

@@ -131,7 +131,9 @@ check('accessible markup', () => {
     const name = relative(file);
 
     for (const match of html.matchAll(/<img\b[^>]*>/g)) {
-      if (!/\salt=/.test(match[0])) fail(`${name}: img without alt → ${match[0].slice(0, 80)}`);
+      // The minifier writes an empty alt as a bare `alt` attribute, which is
+      // still valid and still marks the image as decorative.
+      if (!/\salt(?=[\s=>])/.test(match[0])) fail(`${name}: img without alt → ${match[0].slice(0, 80)}`);
     }
 
     for (const match of html.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)) {
@@ -147,6 +149,43 @@ check('accessible markup', () => {
     for (const match of html.matchAll(/\sid="([^"]+)"/g)) {
       if (seen.has(match[1])) fail(`${name}: duplicate id #${match[1]}`);
       seen.add(match[1]);
+    }
+
+    if (!/class=(?:"skip-link"|skip-link)[^>]*href=(?:"#main-content"|#main-content)/.test(html)) {
+      fail(`${name}: missing skip link to #main-content`);
+    }
+    if (!/<main[^>]*\sid=(?:"main-content"|main-content)/.test(html)) {
+      fail(`${name}: main landmark has no id="main-content"`);
+    }
+    if (/\stabindex=(?:"[1-9]|[1-9])/.test(html)) fail(`${name}: positive tabindex`);
+
+    for (const match of html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)) {
+      const text = match[1].replace(/<[^>]*>/g, "").trim();
+      const altText = [...match[1].matchAll(/\salt=(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)]
+        .map((m) => (m[1] ?? m[2] ?? m[3] ?? "").trim())
+        .join("");
+      if (!text && !altText && !/aria-label=/.test(match[0]) && !/<img\b/.test(match[1])) {
+        fail(`${name}: link without an accessible name → ${match[0].slice(0, 80)}`);
+      }
+    }
+
+    const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+    for (let i = 1; i < levels.length; i += 1) {
+      if (levels[i] - levels[i - 1] > 1) {
+        fail(`${name}: heading jumps h${levels[i - 1]} → h${levels[i]}`);
+        break;
+      }
+    }
+  }
+});
+
+check('image dimensions', () => {
+  for (const file of pages) {
+    const html = readFileSync(file, "utf8");
+    for (const match of html.matchAll(/<img\b[^>]*>/g)) {
+      if (!/\swidth=/.test(match[0]) || !/\sheight=/.test(match[0])) {
+        fail(`${relative(file)}: img without width and height → ${match[0].slice(0, 90)}`);
+      }
     }
   }
 });

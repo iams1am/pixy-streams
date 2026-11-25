@@ -15,7 +15,7 @@
   <div class="content-main">
     {{ if .Params.featured_image }}
     <div class="featured-image">
-      <img src="{{ .Params.featured_image }}" alt="{{ .Title }}">
+      <img src="{{ .Params.featured_image }}" alt="{{ .Title }}" width="1200" height="675" loading="lazy" decoding="async">
     </div>
     {{ end }}
     
@@ -28,7 +28,7 @@
     <div class="gallery-grid">
       {{ range .Params.gallery }}
       <div class="gallery-item">
-        <img src="{{ . }}" alt="Gallery image" loading="lazy">
+        <img src="{{ . }}" alt="Gallery image" width="800" height="600" loading="lazy" decoding="async">
       </div>
       {{ end }}
     </div>

@@ -1,0 +1,23 @@
+{{- /* One freshness line for every fetched catalogue. The age is measured at
+       build time, so a stale committed cache is visible instead of silent. */ -}}
+{{- $catalog := .catalog -}}
+{{- $maxAge := .maxAge | default 60 -}}
+{{- with $catalog -}}
+<p class="catalogue-freshness">
+  {{- with .generated_at -}}
+  <span>Catalogue refreshed <time datetime="{{ . }}">{{ (time .).Format "2 Jan 2006, 15:04 UTC" }}</time></span>
+  {{- end -}}
+  {{- with .source -}}
+  <span>Source {{ if $catalog.source_url }}<a href="{{ $catalog.source_url }}" target="_blank" rel="noopener">{{ . }}</a>{{ else }}{{ . }}{{ end }}</span>
+  {{- end -}}
+  {{- with .generated_at -}}
+    {{- $age := div (sub now.Unix (time .).Unix) 86400 -}}
+    {{- if gt $age $maxAge -}}
+    <span class="catalogue-stale">Cached snapshot, {{ $age }} days old; the next successful refresh updates it.</span>
+    {{- end -}}
+  {{- end -}}
+  {{- if .partial -}}
+  <span class="catalogue-stale">Partial refresh: cached fixtures fill failed leagues.</span>
+  {{- end -}}
+</p>
+{{- end -}}

@@ -41,8 +41,11 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Test playback model
-        run: node --test scripts/playback-model.test.mjs
+      - name: Unit tests
+        run: node --test scripts/*.test.mjs
+
+      - name: Check configuration and secrets
+        run: node scripts/check-config.mjs
 
       - name: Refresh catalogue
         # Missing keys are fine: each source falls back to its committed JSON.
@@ -52,6 +55,9 @@ jobs:
           TMDB_REGION: ${{ vars.TMDB_REGION }}
           SPORTSDB_KEY: ${{ secrets.SPORTSDB_KEY }}
         run: node scripts/fetch-catalog.mjs
+
+      - name: Validate the catalogue
+        run: node scripts/check-catalog.mjs
 
       - name: Setup Pages
         id: pages
@@ -68,6 +74,9 @@ jobs:
 
       - name: Check playback registry
         run: node scripts/check-playback.mjs
+
+      - name: Browser smoke test
+        run: node scripts/check-browser.mjs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

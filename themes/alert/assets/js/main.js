@@ -9,6 +9,41 @@
   const motionBehavior = () => reduceMotionQuery.matches ? 'auto' : 'smooth';
 
   // ===========================
+  // Local kick-off times
+  // ===========================
+  // The source timestamps stay UTC in the markup so the page remains correct
+  // without JavaScript. When it is available, show the same instant in the
+  // visitor's own time zone.
+  const applyLocalTimes = () => {
+    if (!window.Intl || !window.Intl.DateTimeFormat) return;
+    let formatter;
+    try {
+      formatter = new Intl.DateTimeFormat(undefined, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return;
+    }
+
+    document.querySelectorAll('[data-local-time]').forEach(element => {
+      const iso = element.getAttribute('datetime') || element.getAttribute('data-local-time');
+      if (!iso) return;
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return;
+
+      element.textContent = formatter.format(date);
+      element.setAttribute('title', date.toISOString());
+      element.setAttribute('data-local-time-applied', 'true');
+    });
+  };
+
+  applyLocalTimes();
+
+  // ===========================
   // Theme Toggle
   // ===========================
   const themeToggle = document.querySelector('.theme-toggle');

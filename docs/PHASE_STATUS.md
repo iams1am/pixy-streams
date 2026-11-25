@@ -1,9 +1,11 @@
 # Pixy Streams — Phase Status
 
-Phases 1 and 2 are complete against `plan.md`, and Phase 3 is complete for the
-verified Internet Archive library. Verifications were run on 2026-11-20 and
-2026-11-21 against the production build with Hugo extended 0.154.5 and headless
-Edge 157.
+Phases 1 and 2 are complete against `plan.md`, Phase 3 is complete for the
+verified Internet Archive library, Phase 4 (4.1–4.5) is complete, and Phase 6
+(6.1–6.5) is complete. Phase 5 was skipped by owner instruction; its proposed
+backend decision remains unbuilt in `docs/BACKEND_DECISION.md`. Verifications
+were run on 2026-11-25 against Hugo extended 0.154.5, Node 22.14 and headless
+Edge 157. Phase 6.3 measurements are lab data from the local production build.
 
 ## Phase 1.1 — Baseline audit — Complete
 
@@ -579,6 +581,163 @@ Edge 157.
   `node --test` passed 24/24; `check-playback.mjs` passed with 3 verified
   sources, 3 samples and 115 catalogue ids.
 
+## Phase 6.1 — Sports Centre — Complete
+
+- **Sports index.** Added an Upcoming fixtures rail beside live scores, results
+  and the per-sport rails. The intro now has a styled two-column layout, a live
+  score/live video notice, the refresh time, per-league chips with counts and a
+  cached marker for any league served from the previous snapshot.
+- **Event pages.** The previously uncommitted Phase 3 sports layer is finished:
+  a dark event hero, status pill, scoreline with crests and records/form/team
+  links, UTC kick-off plus converted local time, venue and source facts,
+  sessions, broadcaster listings, official highlights, cached-snapshot note and
+  a Schema.org SportsEvent plus breadcrumb. Every event now has a working page;
+  the build produces 18 sports pages instead of only the section page.
+- **Build fixes found while enabling the pages.** Two bugs had kept the sports
+  detail layer out of production. `layouts/sport-event/page.html` ranged over
+  the page context instead of `$broadcasts`/`$watch`, aborting every build with
+  a sports event; and ESPN timestamps such as `2026-11-20T00:30Z` were rejected
+  by Hugo's date parser. The template now ranges the right slices, and
+  `normaliseKickoff` inserts seconds for minute-precision timestamps. The
+  committed sports snapshot was regenerated with the fixed normaliser.
+- **Broadcaster links.** `espnBroadcasts` keeps an http(s) URL when the provider
+  supplies one and the page renders it as a link; otherwise the name remains a
+  listing. Validation rejects a malformed broadcast URL. The current ESPN
+  payloads supply no broadcaster URLs, so no link is invented.
+- **Separation of score and video.** Every surface says a live score is not a
+  live video feed. Live scores are labelled "Live score" (or "Live score ·
+  cached" after six hours), highlights are provider-published links, and
+  broadcaster names are explicitly listings only.
+
+### Verification
+
+- `node --test scripts/*.test.mjs`: 35/35, including score states, minute-only
+  kick-off normalisation, broadcaster URL mapping and partial-refresh recovery.
+- Browser: sports index and event pages at 1440 and 390 px, no horizontal
+  overflow, local time rendered from UTC, upcoming/live/results rails present,
+  league counts match the events, and the event page has one h1 and a readable
+  scoreline at 390 px.
+- `check-site.mjs` passes on 142 HTML pages and confirms one current nav item,
+  image dimensions, heading order, skip links and landmarks across the new
+  pages.
+
+## Phase 6.2 — Catalogue reliability — Complete
+
+- **Network handling.** Requests time out after 25 seconds, retry twice with
+  backoff, and honour `Retry-After` up to 20 seconds. TheSportsDB's 200-body
+  rate limit is detected and retried once after five seconds.
+- **Cache preservation.** A failed source leaves its previous JSON untouched. A
+  failed detail request keeps that title's cached trailer, providers, runtime
+  and episode guide. Sports merges fresh leagues with carried items from failed
+  leagues, marks them stale and records `partial` and `carried_leagues`.
+- **Validation.** `validateCatalogue` checks item shape, duplicate ids/slugs,
+  watch URLs, event states, scores, fixture links, broadcast URLs and sessions;
+  the fetcher refuses to write an invalid snapshot. `check-catalog.mjs` adds
+  freshness windows (60 days for film/TV, 30 for anime, 7 for sports), a
+  six-hour live-score warning and per-league status, and now runs in CI.
+- **Freshness UI.** `/movies/`, `/tv/` and `/anime/` show the snapshot time,
+  source and a warning when the cache is older than its window. Sports already
+  showed refresh time and partial-refresh state; its league chips now count the
+  events actually present, including carried fixtures.
+- **Reproducibility.** The committed JSON means `hugo` alone reproduces the site
+  without network access; `check-config.mjs` and `check-catalog.mjs` validate it
+  before a build. A provider failure only changes how old the snapshot is, not
+  whether the build can run.
+
+## Phase 6.3 — Performance — Complete
+
+Measured cold with a local production build in headless Edge at 1440×950, DPR 1,
+remote artwork enabled, cache disabled. Baseline was taken after the sports pages
+were buildable but before the font and image changes.
+
+| Page | Before | After |
+|---|---|---|
+| Home | 2,089 KB · LCP 1,400 ms · CLS 0.13 · 171 KB fonts | 1,131 KB · LCP 288 ms · CLS 0 · 69 KB fonts |
+| Title detail | 2,439 KB · LCP 140 ms · CLS 0.001 | 839 KB · LCP 84 ms · CLS 0 |
+| Sports | 1,311 KB · LCP 132 ms · CLS 0.013 | 1,727 KB · LCP 120 ms · CLS 0 |
+| Movies | 173 KB · LCP 180 ms | 181 KB · LCP 92 ms |
+
+- The 0.129 layout shift on the home page came from the Google Fonts swap; the
+  section below the hero moved at 1,060 ms. Inter and Space Grotesk are now
+  self-hosted as two variable WOFF2 files (69 KB total) and preloaded, removing
+  the third-party stylesheet and the measured shift on every audited page.
+- Anime cards request a 230 px `poster_small` through `srcset` and fall back to
+  the 460 px cover on 2× displays. This cut the home image transfer from 1,773
+  to 905 KB and the detail page from 2,278 to 668 KB.
+- Every rendered image has intrinsic width/height; `check-site.mjs` fails if one
+  does not. CSS (52 KB), JS (30 KB) and both fonts are fingerprinted/preloaded
+  as appropriate; JS remains deferred.
+- At 390×844 the home LCP is 312 ms, sports 104 ms and detail 68 ms, with CLS 0
+  and no horizontal overflow. Sports grew to 1.7 MB because 96 team crests are
+  now part of the desk; they remain lazy, low-priority images.
+- The watch page LCP (about 4 s) is an artifact of blocking the MP4 request: the
+  player waits for metadata and the measurement sees the later error state. Its
+  document, CSS, JS and fonts are about 172 KB. This is documented rather than
+  optimised away by removing the poster or the player.
+
+## Phase 6.4 — Quality assurance — Complete
+
+- **Unit tests.** `node --test scripts/*.test.mjs`: 35/35 across the playback and
+  sports models, including the new kick-off and broadcaster cases.
+- **Configuration and secrets.** `scripts/check-config.mjs` validates the Hugo
+  base URL/path, theme, menu, playback region, required content and data files,
+  `.gitignore` entries and 88 text files for committed credentials.
+- **Site checks.** `check-site.mjs` still checks links, base path, metadata,
+  search index, watch/playback states and leaked credentials, and now also
+  checks `aria-current`, skip links, main landmarks, positive tabindex, empty
+  links, heading order and width/height on every image.
+- **Browser integration.** `scripts/check-browser.mjs` builds and serves the site
+  and drives Chrome/Edge over CDP with no npm dependencies. It covers server
+  navigation state, search discovery and keyboards, the 390 px drawer, genre
+  cards, seeded watch history and horizontal overflow: 14/14.
+- **CI.** The deploy workflow now runs both test files, `check-config.mjs`,
+  `check-catalog.mjs`, `check-site.mjs`, `check-playback.mjs` and the browser
+  smoke test before uploading the Pages artifact.
+
+## Phase 6.5 — Documentation and release — Complete
+
+- README now describes the sports desk, catalogue recovery, measured
+  performance, the QA commands and the actual Pages deployment model.
+- `docs/DEPLOYMENT.md` covers prerequisites, local previews, secrets, the
+  workflow stages, rollback and common failures.
+- `docs/RELEASE_REPORT.md` records the release scope, evidence, acceptance
+  criteria and known limitations.
+
+## Phase 5.1 — Backend decision — Proposed (awaiting approval)
+
+- Full decision record: `docs/BACKEND_DECISION.md`.
+- **Recommendation: Cloudflare Workers + D1**, keeping Hugo on GitHub Pages.
+  A single Worker exposes the public request/status API and the protected admin
+  API; D1 stores requests, status events and optional rate-limit counters.
+- **Why not Supabase:** it has the better account system for a future Phase 5.4,
+  but its free projects pause after one week of inactivity, and avoiding that
+  needs the $25/month Pro plan. A low-traffic personal site should not depend on
+  a keepalive workaround. Its public anon key also makes RLS the only boundary
+  around the queue, and anonymous inserts still need an Edge Function for
+  Turnstile and rate limiting.
+- **Why not a hosted form service:** Formspree/Basin/Getform free tiers are
+  sized for contact forms (roughly 50–100 submissions per month) and provide no
+  duplicate detection, status API or Phase 5.3 review workflow. Netlify Forms
+  would require moving hosting; Google Forms, Airtable and GitHub Issues all
+  still need custom duplicate, status and admin-authorisation code.
+- **Workers + D1 fit:** no inactivity pause; free Workers allow 100,000
+  requests/day with 10 ms CPU, and free D1 allows 5 million rows read/day,
+  100,000 rows written/day and 5 GB. Turnstile is free with unlimited
+  challenges. The API is the only public surface and no database credential
+  reaches the browser.
+- **Proposed security model:** 32-byte admin secret stored as a Worker secret,
+  exchanged for a two-hour HMAC-signed session token held in `sessionStorage`
+  and sent as a bearer token. No cookies, so third-party cookie blocking does
+  not apply. Turnstile, rate limits, strict input caps, duplicate detection and
+  a D1-backed audit trail cover abuse and moderation. No raw IP is stored.
+- **Rights rule preserved:** a request can only become `available` after an
+  admin records an https viewing option and a rights note. The playback
+  registry remains the only source of `play_here`; user-supplied links are never
+  treated as playback sources.
+- **No external resources were created.** No Cloudflare account, Worker, D1
+  database, Turnstile widget, secret or migration exists yet. Phase 5.2 starts
+  only after the approval checklist in the decision record is accepted.
+
 ## Known limitations
 
 - Only three public-domain films are approved for playback. Everything else is
@@ -610,8 +769,10 @@ Edge 157.
 
 ## Next
 
-Phase 3 is closed for the verified library and Phase 4 (4.1–4.5) is complete.
-Phase 5.1, the backend decision for content requests, is the next planned step
-and has not been started. More public-domain films can be added through the same
-registry once their rights and exact playback file are verified. Live TMDB
-credentials remain the main catalogue limitation.
+Phase 6 is complete. Phase 5 was skipped by owner instruction: the Cloudflare
+Workers + D1 decision remains a proposal in `docs/BACKEND_DECISION.md`, no
+external resources exist, and there is no request UI or admin workflow. More
+public-domain films can be added through the same registry once their rights and
+exact playback file are verified. Live TMDB credentials remain the main
+catalogue limitation; they unlock movie and series artwork, trailers, watch
+providers and episode guides without further template work.

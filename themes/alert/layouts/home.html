@@ -129,6 +129,9 @@
   {{ $rails = $rails | append (dict "id" "new-additions" "title" "New additions" "subtitle" "Recent films and the newest series and anime in the catalogue" "items" .) }}
 {{ end }}
 {{ with $sports }}
+  {{ with partial "catalog-items.html" (dict "items" .items "list" "live" "limit" 14) }}
+    {{ $rails = $rails | append (dict "id" "sports-live" "title" "Live scores" "subtitle" "Score state at the last refresh" "note" "Live score, not live video. Pixy Streams does not link to live sports streams." "href" "/sports/#live-scores" "items" .) }}
+  {{ end }}
   {{ with partial "catalog-items.html" (dict "items" .items "list" "upcoming" "limit" 14) }}
     {{ $rails = $rails | append (dict "id" "sports" "title" "Sports this week" "subtitle" "Next fixtures across football, basketball and motorsport" "note" "Fixtures are schedules, not live streams. Broadcast rights vary by region." "href" "/sports/" "items" .) }}
   {{ end }}

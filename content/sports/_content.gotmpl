@@ -1,0 +1,46 @@
+{{ $catalog := site.Data.catalog.sports }}
+{{ if and $catalog $catalog.items }}
+{{ range $index, $item := $catalog.items }}
+{{ $.AddPage (dict
+  "path" $item.slug
+  "title" $item.title
+  "type" "sport-event"
+  "params" (dict
+    "catalog" "event"
+    "sports_id" $item.id
+    "sport" $item.sport
+    "group" $item.group
+    "league" $item.league
+    "league_key" $item.league_key
+    "state" $item.state
+    "state_label" $item.state_label
+    "status_detail" $item.status_detail
+    "badge" $item.badge
+    "score" $item.score
+    "home_score" $item.home_score
+    "away_score" $item.away_score
+    "home" $item.home
+    "away" $item.away
+    "date" $item.date
+    "time" $item.time
+    "time_utc" $item.time_utc
+    "date_label" $item.date_label
+    "kickoff" $item.kickoff
+    "venue" $item.venue
+    "overview" $item.overview
+    "broadcasts" $item.broadcasts
+    "sessions" $item.sessions
+    "links" $item.links
+    "watch" $item.watch
+    "href" $item.href
+    "source" $item.source
+    "source_url" $item.source_url
+    "meta" $item.meta
+    "genres" $item.genres
+    "observed_at" $item.observed_at
+    "stale" $item.stale
+    "weight" $index
+  )
+) }}
+{{ end }}
+{{ end }}

@@ -8,6 +8,8 @@
 
 {{ $catalog := site.Data.catalog.anime }}
 {{ if $catalog }}
+  <div class="container">{{ partial "catalogue-freshness.html" (dict "catalog" $catalog "maxAge" 30) }}</div>
+
   {{ partial "category-filter.html" (dict "items" $catalog.items) }}
 
   {{ partial "rail.html" (dict

@@ -2,13 +2,13 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-section">
-        <h3>{{ site.Title }}</h3>
+        <h2>{{ site.Title }}</h2>
         <p>{{ site.Params.description }}</p>
         <p class="footer-tagline">{{ site.Params.tagline }}</p>
       </div>
 
       <div class="footer-section">
-        <h3>Browse</h3>
+        <h2>Browse</h2>
         <ul class="footer-links">
           {{ range site.Menus.main }}
           <li><a href="{{ .URL }}">{{ .Name }}</a></li>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="footer-section">
-        <h3>Data &amp; credits</h3>
+        <h2>Data &amp; credits</h2>
         <ul class="footer-links">
           <li><a href="https://www.themoviedb.org/" target="_blank" rel="noopener">Movie &amp; TV data: TMDB</a></li>
           <li><a href="https://anilist.co/" target="_blank" rel="noopener">Anime data: AniList</a></li>
@@ -30,7 +30,7 @@
       </div>
 
       <div class="footer-section">
-        <h3>How it works</h3>
+        <h2>How it works</h2>
         <p>
           Pixy Streams is a discovery layer. We link to official trailers and to the
           services that hold the rights to each title. Public-domain films are streamed

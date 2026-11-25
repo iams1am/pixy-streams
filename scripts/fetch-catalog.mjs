@@ -29,6 +29,16 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { validateCatalogue } from "./lib/catalogue-validation.mjs";
+import {
+  mergeSportsSnapshot,
+  normaliseEspnEvent,
+  normaliseSportsDbEvent,
+  sortSportsItems,
+  SPORTS_GROUP_LABELS,
+} from "./lib/sports-model.mjs";
+import { formatDay, formatRuntime, isoDate, shorten, slugify, stripHtml, uniqueSlugFactory } from "./lib/text-utils.mjs";
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** Read `KEY=value` pairs from .env at the repo root, without overriding the real environment. */
@@ -114,6 +124,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ---------------------------------------------------------------- helpers */
 
+function retryAfterMs(value) {
+  if (!value) return 0;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds)) return Math.max(0, seconds * 1000);
+  const date = Date.parse(value);
+  return Number.isFinite(date) ? Math.max(0, date - Date.now()) : 0;
+}
+
 async function fetchJson(url, options = {}) {
   const { retries = 2, backoff = 1200, ...init } = options;
   let lastError;
@@ -129,11 +147,21 @@ async function fetchJson(url, options = {}) {
         },
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        const error = new Error(`${res.status} ${res.statusText}`);
+        error.status = res.status;
+        error.retryAfter = retryAfterMs(res.headers.get("retry-after"));
+        throw error;
+      }
       return await res.json();
     } catch (error) {
       lastError = error;
-      if (attempt < retries) await sleep(backoff * attempt);
+      if (attempt < retries) {
+        // Honour Retry-After when a provider sends one, but cap the wait so a
+        // daily build cannot stall for an hour on a bad header.
+        const wait = Math.min(error.retryAfter || backoff * attempt, 20_000);
+        await sleep(wait);
+      }
     }
   }
 
@@ -148,76 +176,8 @@ function assertNotRateLimited(payload) {
   return payload;
 }
 
-function shorten(text, max) {
-  const value = String(text || "");
-  if (value.length <= max) return value;
-  const cut = value.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.–—-]+$/, "")}…`;
-}
-
-const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", apos: "'", nbsp: " " };
-
-function stripHtml(input) {
-  return String(input || "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, code) => {
-      if (ENTITIES[code]) return ENTITIES[code];
-      if (code[0] === "#") {
-        const value = code[1] === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
-        return Number.isFinite(value) ? String.fromCharCode(value) : match;
-      }
-      return match;
-    })
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input) {
-  const value = stripHtml(input)
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/['’`]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 72)
-    .replace(/-+$/g, "");
-  return value || "untitled";
-}
-
-function uniqueSlugFactory() {
-  const seen = new Map();
-  return (input) => {
-    const base = slugify(input);
-    const hits = seen.get(base) || 0;
-    seen.set(base, hits + 1);
-    return hits === 0 ? base : `${base}-${hits + 1}`;
-  };
-}
-
-const isoDate = (value) => (value ? String(value).slice(0, 10) : "");
-
-function formatRuntime(minutes) {
-  if (!minutes) return "";
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  if (!hours) return `${rest}m`;
-  return rest ? `${hours}h ${rest}m` : `${hours}h`;
-}
-
-function formatDay(iso) {
-  if (!iso) return "";
-  const date = new Date(`${iso}T12:00:00Z`);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString("en-GB", {
-    timeZone: "UTC",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
+/* Text helpers live in lib/text-utils.mjs so the sports unit tests can reuse
+   exactly the same slugging and HTML-stripping behaviour as the fetcher. */
 
 /* ----------------------------------------------------------------- anime */
 
@@ -235,7 +195,7 @@ const ANILIST_MEDIA = `
     format
     status
     genres
-    coverImage { extraLarge color }
+    coverImage { extraLarge large color }
     bannerImage
     trailer { id site }
     siteUrl
@@ -308,6 +268,9 @@ function normaliseAnime(media, nextSlug) {
     score: media.averageScore ? Number((media.averageScore / 10).toFixed(1)) : null,
     overview: shorten(stripHtml(media.description), 460),
     poster: media.coverImage?.extraLarge || "",
+    // Rails render cards at 168 px; the 230 px variant avoids downloading the
+    // 460 px artwork on standard-density screens. Detail pages keep `poster`.
+    poster_small: media.coverImage?.large || "",
     backdrop: media.bannerImage || "",
     accent: media.coverImage?.color || "",
     genres: media.genres || [],
@@ -1055,122 +1018,38 @@ const ESPN_LEAGUES = [
 
 /** TheSportsDB fallback, used when every ESPN scoreboard fails. */
 const LEAGUES = [
-  { id: "4328", group: "football" },
-  { id: "4335", group: "football" },
-  { id: "4480", group: "football" },
-  { id: "4387", group: "basketball" },
-  { id: "4370", group: "motorsport" },
+  { id: "4328", label: "Premier League", group: "football" },
+  { id: "4335", label: "La Liga", group: "football" },
+  { id: "4480", label: "Serie A", group: "football" },
+  { id: "4387", label: "NBA", group: "basketball" },
+  { id: "4370", label: "Formula 1", group: "motorsport" },
 ];
 
-const SPORTS_GROUP_LABELS = {
-  football: "Football",
-  basketball: "Basketball",
-  motorsport: "Motorsport",
-};
-
-function normaliseEvent(event, group) {
-  const homeScore = event.intHomeScore;
-  const awayScore = event.intAwayScore;
-  const finished = homeScore !== null && homeScore !== undefined && homeScore !== "";
-  const date = isoDate(event.dateEvent);
-  const kickoff = event.strTimestamp || (event.strTime ? `${date}T${event.strTime}` : "");
-  const score = finished ? `${homeScore}-${awayScore}` : "";
-  const league = stripHtml(event.strLeague || "");
-  const title = stripHtml(event.strEvent || "");
-
-  return {
-    slug: slugify(`${event.idEvent}-${title}`),
-    id: `sportsdb-${event.idEvent}`,
-    title,
-    kind: "event",
-    group,
-    sport: stripHtml(event.strSport || ""),
-    league,
-    home: { name: stripHtml(event.strHomeTeam || ""), logo: event.strHomeTeamBadge || "", record: "" },
-    away: { name: stripHtml(event.strAwayTeam || ""), logo: event.strAwayTeamBadge || "", record: "" },
-    score,
-    year: date ? Number(date.slice(0, 4)) : null,
-    date,
-    time: event.strTime || "",
-    kickoff,
-    venue: stripHtml(event.strVenue || ""),
-    overview: shorten(stripHtml(event.strDescriptionEN || ""), 320),
-    poster: event.strThumb || event.strHomeTeamBadge || "",
-    backdrop: event.strThumb || "",
-    accent: "",
-    genres: [SPORTS_GROUP_LABELS[group] || "Sport"],
-    meta: [league, finished ? `FT ${score}` : formatDay(date)].filter(Boolean).join(" · "),
-    badge: finished ? "Final" : "",
-    trailer: "",
-    watch: event.strVideo ? [{ name: "Highlights on YouTube", url: `https://www.youtube.com/watch?v=${event.strVideo}` }] : [],
-    lists: [finished ? "results" : "upcoming"],
-    href: `https://www.thesportsdb.com/event/${event.idEvent}`,
-    source: "TheSportsDB",
-    source_url: `https://www.thesportsdb.com/event/${event.idEvent}`,
-  };
+/**
+ * TheSportsDB signals its rate limit in a 200 body, not a status code. Retry
+ * once with a longer pause so a transient throttle does not erase a league.
+ */
+async function sportsDbJson(url) {
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      return assertNotRateLimited(await fetchJson(url, { retries: 1 }));
+    } catch (error) {
+      lastError = error;
+      const throttled = /rate|limit|too many|busy|slow/i.test(error.message);
+      if (attempt === 2 || !throttled) throw error;
+      console.warn(`   throttled, retrying in 5s: ${error.message}`);
+      await sleep(5000);
+    }
+  }
+  throw lastError;
 }
 
-function espnEvent(event, group, leagueName, leaguePath) {
-  const competition = (event.competitions || [])[0] || {};
-  const competitors = competition.competitors || [];
-  const pick = (side, index) =>
-    competitors.find((entry) => entry.homeAway === side) || competitors[index] || null;
-
-  const home = pick("home", 0);
-  const away = pick("away", 1);
-  const state = event.status?.type?.state || "pre";
-  const finished = state === "post";
-  const live = state === "in";
-  const date = isoDate(event.date);
-  const time = (event.date || "").slice(11, 16);
-  const hasTeams = Boolean(home && away);
-
-  const score = hasTeams && (finished || live) ? `${home.score}-${away.score}` : "";
-  const title = hasTeams ? `${home.team.displayName} vs ${away.team.displayName}` : stripHtml(event.name || "");
-  const league = stripHtml(leagueName || "");
-
-  const when = finished
-    ? `FT ${score}`
-    : live
-      ? `Live ${score}`
-      : [formatDay(date), time ? `${time} UTC` : ""].filter(Boolean).join(", ");
-
-  return {
-    slug: "",
-    id: `espn-${event.id}`,
-    title,
-    kind: "event",
-    group,
-    sport: group === "football" ? "Soccer" : group === "basketball" ? "Basketball" : "Motorsport",
-    league,
-    home: home ? { name: stripHtml(home.team.displayName || ""), logo: home.team.logo || "", record: home.records?.[0]?.summary || "" } : null,
-    away: away ? { name: stripHtml(away.team.displayName || ""), logo: away.team.logo || "", record: away.records?.[0]?.summary || "" } : null,
-    score,
-    year: date ? Number(date.slice(0, 4)) : null,
-    date,
-    time,
-    kickoff: event.date || "",
-    venue: stripHtml(competition.venue?.fullName || ""),
-    overview: stripHtml(event.status?.type?.detail || ""),
-    poster: "",
-    backdrop: "",
-    accent: "",
-    genres: [SPORTS_GROUP_LABELS[group] || "Sport"],
-    meta: [league, when].filter(Boolean).join(" · "),
-    badge: live ? "Live" : finished ? "FT" : "",
-    trailer: "",
-    watch: [],
-    lists: [live ? "live" : finished ? "results" : "upcoming"],
-    href: event.links?.[0]?.href || `https://www.espn.com/${leaguePath}`,
-    source: "ESPN",
-    source_url: event.links?.[0]?.href || `https://www.espn.com/${leaguePath}`,
-  };
-}
-
-async function espnCatalog() {
+async function espnCatalog(observedAt) {
   const nextSlug = uniqueSlugFactory();
   const seen = new Set();
   const items = [];
+  const leagueStatus = [];
 
   for (const league of ESPN_LEAGUES) {
     const url = `https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard`;
@@ -1179,36 +1058,72 @@ async function espnCatalog() {
       payload = await fetchJson(url, { retries: 2 });
     } catch (error) {
       console.warn(`   skipped ${league.path}: ${error.message}`);
+      leagueStatus.push({
+        path: league.path,
+        label: league.label,
+        group: league.group,
+        status: "unavailable",
+        count: 0,
+        error: error.message,
+      });
       continue;
     }
 
     const leagueName = league.label || payload.leagues?.[0]?.name || league.path;
+    let count = 0;
     for (const event of payload.events || []) {
       if (!event?.id || seen.has(event.id)) continue;
       seen.add(event.id);
-      const item = espnEvent(event, league.group, leagueName, league.path);
-      item.slug = nextSlug(`${event.id}-${item.title}`);
-      if (item.title) items.push(item);
+
+      // One malformed event must never abort the other leagues or let the
+      // fallback replace a valid ESPN cache.
+      try {
+        const item = normaliseEspnEvent(event, {
+          group: league.group,
+          leagueName,
+          leaguePath: league.path,
+          observedAt,
+        });
+        if (!item) continue;
+        item.slug = nextSlug(`${event.id}-${item.title}`);
+        item.fetched_at = observedAt;
+        items.push(item);
+        count += 1;
+      } catch (error) {
+        console.warn(`   skipped event ${event.id}: ${error.message}`);
+      }
     }
+
+    leagueStatus.push({
+      path: league.path,
+      label: leagueName,
+      group: league.group,
+      status: "fresh",
+      count,
+    });
 
     await sleep(250);
   }
 
-  items.sort((a, b) => String(a.kickoff).localeCompare(String(b.kickoff)));
-  return items;
+  return { items: sortSportsItems(items), league_status: leagueStatus };
 }
 
-async function sportsDbCatalog() {
+async function sportsDbCatalog(observedAt) {
   const nextSlug = uniqueSlugFactory();
   const seen = new Set();
   const items = [];
+  const leagueStatus = [];
 
   for (const league of LEAGUES) {
+    let succeeded = false;
+    let count = 0;
+
     for (const endpoint of ["eventsnextleague", "eventspastleague"]) {
       const url = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/${endpoint}.php?id=${league.id}`;
       let payload;
       try {
-        payload = assertNotRateLimited(await fetchJson(url, { retries: 2, backoff: 4000 }));
+        payload = await sportsDbJson(url);
+        succeeded = true;
       } catch (error) {
         console.warn(`   skipped ${endpoint} ${league.id}: ${error.message}`);
         continue;
@@ -1217,57 +1132,88 @@ async function sportsDbCatalog() {
       for (const event of (payload.events || []).slice(0, 8)) {
         if (!event?.idEvent || seen.has(event.idEvent)) continue;
         seen.add(event.idEvent);
-        const item = normaliseEvent(event, league.group);
-        item.slug = nextSlug(`${event.idEvent}-${item.title}`);
-        items.push(item);
+        try {
+          const item = normaliseSportsDbEvent(event, {
+            group: league.group,
+            leagueId: league.id,
+            observedAt,
+          });
+          if (!item) continue;
+          item.slug = nextSlug(`${event.idEvent}-${item.title}`);
+          item.fetched_at = observedAt;
+          items.push(item);
+          count += 1;
+        } catch (error) {
+          console.warn(`   skipped event ${event.idEvent}: ${error.message}`);
+        }
       }
 
       // The public key throttles hard, so pace the requests deliberately.
       await sleep(2500);
     }
+
+    leagueStatus.push({
+      path: `sportsdb-${league.id}`,
+      label: league.label || league.id,
+      group: league.group,
+      status: succeeded ? "fresh" : "unavailable",
+      count,
+    });
   }
 
   if (!items.length) throw new Error("TheSportsDB returned no events");
-
-  items.sort((a, b) => String(a.kickoff).localeCompare(String(b.kickoff)));
 
   return {
     source: "TheSportsDB",
     source_url: "https://www.thesportsdb.com",
     key_type: SPORTSDB_KEY === "123" ? "test" : "personal",
-    generated_at: new Date().toISOString(),
+    generated_at: observedAt,
     count: items.length,
-    items,
+    items: sortSportsItems(items),
+    league_status: leagueStatus,
   };
 }
 
-async function sportsCatalog() {
-  let items = [];
-  let source = "ESPN";
-  let sourceUrl = "https://www.espn.com";
+async function sportsCatalog(previous) {
+  const observedAt = new Date().toISOString();
+  let espn = null;
+  let espnError = "";
 
   try {
-    items = await espnCatalog();
+    espn = await espnCatalog(observedAt);
   } catch (error) {
+    espnError = error.message;
     console.warn(`   ESPN unavailable: ${error.message}`);
   }
 
-  if (!items.length) {
-    const fallback = await sportsDbCatalog();
-    items = fallback.items;
-    source = fallback.source;
-    sourceUrl = fallback.source_url;
+  if (espn?.items?.length) {
+    const merged = mergeSportsSnapshot(
+      {
+        source: "ESPN",
+        source_url: "https://www.espn.com",
+        generated_at: observedAt,
+        count: espn.items.length,
+        items: espn.items,
+        league_status: espn.league_status,
+      },
+      previous,
+      { now: new Date(observedAt) },
+    );
+
+    if (merged.partial) {
+      console.warn(`   kept cached fixtures for: ${(merged.carried_leagues || []).join(", ") || "failed leagues"}`);
+    }
+    return merged;
   }
 
-  if (!items.length) throw new Error("no sports fixtures available");
+  // A provider failure is not a reason to overwrite a valid cache. Throwing
+  // makes main() keep the previous file and report it as cached.
+  if (previous?.items?.length) {
+    throw new Error(`ESPN unavailable (${espnError || "no events"}); keeping cached sports data`);
+  }
 
-  return {
-    source,
-    source_url: sourceUrl,
-    generated_at: new Date().toISOString(),
-    count: items.length,
-    items,
-  };
+  console.warn("   no cached sports data; trying TheSportsDB fallback");
+  return sportsDbCatalog(observedAt);
 }
 
 /* ------------------------------------------------------------------ main */
@@ -1317,6 +1263,27 @@ async function printStatus() {
         (name === "series" ? ` · ${episodes} with episode guides` : "") +
         ` · ${data.source || "unknown source"}`,
     );
+
+    if (name === "sports") {
+      const states = items.reduce((counts, item) => {
+        const state = item.state || "unknown";
+        counts[state] = (counts[state] || 0) + 1;
+        return counts;
+      }, {});
+      console.log(
+        `          states: ${Object.entries(states)
+          .map(([state, count]) => `${state} ${count}`)
+          .join(" · ")}`,
+      );
+      console.log(
+        `          refreshed ${data.generated_at || "unknown"}` +
+          (data.partial ? ` · partial (${(data.carried_leagues || []).join(", ")})` : ""),
+      );
+      const unavailable = (data.league_status || []).filter((league) => league.status !== "fresh");
+      if (unavailable.length) {
+        console.log(`          unavailable leagues: ${unavailable.map((league) => league.label || league.path).join(", ")}`);
+      }
+    }
   }
 
   const movies = await existing("movies");
@@ -1359,16 +1326,21 @@ async function main() {
 
   for (const job of jobs) {
     process.stdout.write(`→ ${job.name} … `);
+    const previous = await existing(job.name);
     try {
-      const data = await job.run();
+      const data = await job.run(previous);
+      const validation = validateCatalogue(job.name, data);
+      if (!validation.ok) {
+        throw new Error(validation.errors.slice(0, 3).join("; "));
+      }
+      for (const warning of validation.warnings.slice(0, 5)) console.warn(`\n   warning: ${warning}`);
       await writeFile(path.join(OUT_DIR, `${job.name}.json`), `${JSON.stringify(data, null, 2)}\n`, "utf8");
-      console.log(`${data.count} items from ${data.source}`);
+      console.log(`${data.count} items from ${data.source}${data.partial ? " (partial refresh)" : ""}`);
       live++;
     } catch (error) {
       const hint = /TMDB credentials/.test(error.message)
         ? "\n  \u2192 copy .env.example to .env and set TMDB_API_KEY for live movie and TV data"
         : "";
-      const previous = await existing(job.name);
       if (previous) {
         console.log(`kept ${previous.count} cached items (${error.message})${hint}`);
         kept++;
