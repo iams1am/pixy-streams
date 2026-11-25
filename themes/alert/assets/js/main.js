@@ -862,6 +862,10 @@
       searchInput.focus();
       searchInput.select();
     });
+
+    // Lets the browser smoke test wait for real readiness instead of guessing
+    // a timeout on slower networks.
+    searchRoot.dataset.searchReady = 'true';
   }
 
   // ===========================

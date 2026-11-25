@@ -254,6 +254,7 @@ try {
   check("a detail page marks the section branch, not page", nav.page === 0 && nav.all.length === 1 && nav.all[0] === "Movies:true", nav);
 
   await goto(`${BASE}`);
+  await waitFor("document.querySelector('[data-search]')?.dataset.searchReady === 'true'");
   await cdp.evaluate(`document.querySelector('[data-search-input]').focus()`);
   await waitFor("document.querySelectorAll('[data-search-suggestion]').length === 8");
   const discovery = await cdp.evaluate(`({
@@ -280,6 +281,7 @@ try {
 
   await width(390, 844);
   await goto(`${BASE}`);
+  await waitFor("document.querySelector('[data-search]')?.dataset.searchReady === 'true'");
   await press("/", "Slash", 191, "body");
   await waitFor("document.querySelectorAll('[data-search-suggestion]').length === 8");
   const mobile = await cdp.evaluate(`(() => {
