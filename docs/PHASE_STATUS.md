@@ -692,7 +692,8 @@ were buildable but before the font and image changes.
   cards, seeded watch history and horizontal overflow: 14/14.
 - **CI.** The deploy workflow now runs both test files, `check-config.mjs`,
   `check-catalog.mjs`, `check-site.mjs`, `check-playback.mjs` and the browser
-  smoke test before uploading the Pages artifact.
+  smoke test before uploading the Pages artifact. Run `45541190105` passed and
+  deployed; the same browser suite then passed 14/14 against the live URL.
 
 ## Phase 6.5 — Documentation and release — Complete
 

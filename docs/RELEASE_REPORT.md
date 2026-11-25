@@ -5,9 +5,8 @@
 - **Date:** 25 November 2026
 - **Baseline commit:** `ca4d38e` (Phase 4 complete)
 - **Host:** GitHub Pages, built and published by GitHub Actions
-- **Status:** release candidate; all local checks pass and the deployed site is
-  verified after publish (see the deployment run in the final implementation
-  message)
+- **Status:** released. CI run `45541190105` built and deployed the release;
+  the live browser suite passed 14/14 afterwards.
 
 Phase 5 (content requests and accounts) was skipped by owner instruction. It is
 not part of this release and nothing external was created for it.
@@ -86,6 +85,7 @@ All commands were run on 25 November 2026 against the final working tree.
 | Config/secrets | `node scripts/check-config.mjs` | pass, 88 text files scanned |
 | Unit tests | `node --test scripts/*.test.mjs` | 35 pass, 0 fail |
 | Browser smoke | `node scripts/check-browser.mjs` | 14/14 pass |
+| Live browser suite | `PIXY_BASE_URL=https://iams1am.github.io/pixy-streams/ node scripts/check-browser.mjs` | 14/14 pass on the deployed site |
 | Mobile layout | 390 px home/sports/event/detail | no horizontal overflow, CLS 0 |
 | Local times | sports cards and event page | UTC rendered in markup, converted in the browser |
 | Reduced motion | emulated `prefers-reduced-motion: reduce` | scroll behavior `auto`, transitions collapsed (Phase 4.5 audit) |
