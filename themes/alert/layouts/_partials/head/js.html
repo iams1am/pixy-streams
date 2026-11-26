@@ -1,7 +1,25 @@
+{{ $core := resources.Get "js/search-core.js" }}
+{{ if $core }}
+  {{ if hugo.IsProduction }}
+    {{ $core = $core | minify | fingerprint }}
+  {{ end }}
+  <script src="{{ $core.RelPermalink }}" {{ if hugo.IsProduction }}integrity="{{ $core.Data.Integrity }}"{{ end }} defer></script>
+{{ end }}
+
 {{ $js := resources.Get "js/main.js" }}
 {{ if $js }}
   {{ if hugo.IsProduction }}
     {{ $js = $js | minify | fingerprint }}
   {{ end }}
   <script src="{{ $js.RelPermalink }}" {{ if hugo.IsProduction }}integrity="{{ $js.Data.Integrity }}"{{ end }} defer></script>
+{{ end }}
+
+{{ if eq .Type "search" }}
+  {{ $searchPage := resources.Get "js/search-page.js" }}
+  {{ if $searchPage }}
+    {{ if hugo.IsProduction }}
+      {{ $searchPage = $searchPage | minify | fingerprint }}
+    {{ end }}
+    <script src="{{ $searchPage.RelPermalink }}" {{ if hugo.IsProduction }}integrity="{{ $searchPage.Data.Integrity }}"{{ end }} defer></script>
+  {{ end }}
 {{ end }}

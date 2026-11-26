@@ -13,6 +13,7 @@
           {{ range site.Menus.main }}
           <li><a href="{{ .URL }}">{{ .Name }}</a></li>
           {{ end }}
+          <li><a href="{{ partial "link.html" "/search/" }}">Search</a></li>
         </ul>
       </div>
 

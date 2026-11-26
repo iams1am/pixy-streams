@@ -279,6 +279,64 @@ try {
   await sleep(1000);
   check("keyboard Enter opens the first result", (await cdp.evaluate("location.pathname")).endsWith(firstPath), firstPath);
 
+  await goto(`${BASE}`);
+  await waitFor("document.querySelector('[data-search]')?.dataset.searchReady === 'true'");
+  await cdp.evaluate(`document.querySelector('[data-search-input]').focus()`);
+  await cdp.evaluate(`(() => { const input = document.querySelector('[data-search-input]'); input.value = 'drama'; input.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  await waitFor("document.querySelector('.search-view-all') !== null");
+  const viewAll = await cdp.evaluate(`(() => {
+    const link = document.querySelector('.search-view-all');
+    return { href: link?.getAttribute('href') || '', text: link?.textContent.trim() || '' };
+  })()`);
+  check("header search links to the full results page", /\/search\/\?q=drama$/.test(viewAll.href) && /^View all \d+ results$/.test(viewAll.text), viewAll);
+
+  await press("End", "End", 35, "[data-search-input]");
+  const activeAfterEnd = await cdp.evaluate("document.querySelector('[data-search-input]').getAttribute('aria-activedescendant')");
+  check("End selects the view-all option", activeAfterEnd === "search-result-more", activeAfterEnd);
+
+  await press("Enter", "Enter", 13, "[data-search-input]");
+  await sleep(900);
+  const openedPage = await cdp.evaluate("({ path: location.pathname, query: location.search })");
+  check("keyboard Enter opens the full results page", openedPage.path.endsWith("/search/") && openedPage.query === "?q=drama", openedPage);
+
+  await waitFor("document.querySelector('[data-search-page]')?.dataset.searchPageReady === 'true'");
+  const fullSearch = await cdp.evaluate(`({
+    count: document.querySelectorAll('.search-page-result').length,
+    rows: document.querySelectorAll('.search-page-list li').length,
+    status: document.querySelector('[data-search-page-status]').textContent,
+    value: document.querySelector('[data-search-page-input]').value,
+    title: document.title,
+    missingKind: [...document.querySelectorAll('.search-page-result')].filter((link) => !link.querySelector('.search-result-kind')?.textContent.trim()).length
+  })`);
+  check("full search page shows every match and the query", fullSearch.count > 8 && fullSearch.rows === fullSearch.count && /^\d+ results for "drama"\.$/.test(fullSearch.status) && fullSearch.value === "drama" && fullSearch.title.startsWith("drama - Search") && fullSearch.missingKind === 0, fullSearch);
+
+  await goto(`${BASE}search/`);
+  await waitFor("document.querySelector('[data-search-page]')?.dataset.searchPageReady === 'true'");
+  const pageDiscovery = await cdp.evaluate(`({
+    suggestions: document.querySelectorAll('[data-search-page-genres] button').length,
+    hidden: document.querySelector('[data-search-page-discovery]').hidden,
+    status: document.querySelector('[data-search-page-status]').textContent
+  })`);
+  check("search page without a query offers genre discovery", pageDiscovery.suggestions >= 15 && pageDiscovery.hidden === false && /Type at least two/.test(pageDiscovery.status), pageDiscovery);
+
+  await cdp.evaluate(`(() => { const input = document.querySelector('[data-search-page-input]'); input.value = 'zzzznotathing'; input.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  await waitFor("document.querySelector('.search-page-empty') !== null");
+  const pageEmpty = await cdp.evaluate(`({
+    text: document.querySelector('.search-page-empty')?.textContent || '',
+    status: document.querySelector('[data-search-page-status]').textContent,
+    genres: document.querySelectorAll('[data-search-page-genres] button').length
+  })`);
+  check("a no-result query explains itself and offers genres", /No titles match "zzzznotathing"/.test(pageEmpty.text) && pageEmpty.genres >= 15 && /No results/.test(pageEmpty.status), pageEmpty);
+
+  await cdp.evaluate("document.querySelector('[data-search-page-genres] button').click()");
+  await waitFor("document.querySelectorAll('.search-page-result').length > 0");
+  const genreSearch = await cdp.evaluate(`({
+    value: document.querySelector('[data-search-page-input]').value,
+    count: document.querySelectorAll('.search-page-result').length,
+    status: document.querySelector('[data-search-page-status]').textContent
+  })`);
+  check("genre buttons run a full-catalogue search", genreSearch.count > 0 && genreSearch.value.length > 0 && genreSearch.value !== "zzzznotathing" && /results? for/.test(genreSearch.status), genreSearch);
+
   await width(390, 844);
   await goto(`${BASE}`);
   await waitFor("document.querySelector('[data-search]')?.dataset.searchReady === 'true'");
@@ -328,7 +386,7 @@ try {
   await goto(`${BASE}sports/`, 1200);
   const eventHref = await cdp.evaluate(`document.querySelector('.rail-card.is-event')?.getAttribute('href') || ''`);
   const eventRoute = eventHref ? new URL(eventHref, BASE).pathname.replace(new URL(BASE).pathname, "") : "";
-  for (const [label, route] of [["home", ""], ["sports", "sports/"], ["event", eventRoute], ["detail", "movies/dune-part-two/"]]) {
+  for (const [label, route] of [["home", ""], ["sports", "sports/"], ["event", eventRoute], ["detail", "movies/dune-part-two/"], ["search", "search/?q=drama"]]) {
     if (!route) continue;
     await goto(`${BASE}${route}`, 900);
     const overflow = await cdp.evaluate("document.documentElement.scrollWidth - innerWidth");

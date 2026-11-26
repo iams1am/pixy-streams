@@ -1,0 +1,47 @@
+{{ define "main" }}
+<div data-search-page data-index="{{ partial "link.html" "/search.json" }}" data-site-title="{{ site.Title }}">
+  <header class="search-page-hero">
+    <div class="container">
+      <p class="hero-eyebrow">Catalogue</p>
+      <h1>{{ .Title }}</h1>
+      {{ with .Params.description }}<p class="page-description">{{ . }}</p>{{ end }}
+
+      <form class="search-page-form" data-search-page-form role="search">
+        <label class="visually-hidden" for="search-page-input">Search titles and fixtures</label>
+        <input
+          class="search-page-input"
+          id="search-page-input"
+          type="search"
+          name="q"
+          placeholder="Search movies, series, anime and sport"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-search-page-input>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </form>
+    </div>
+  </header>
+
+  <section class="container search-page" aria-label="Search results">
+    <p class="search-page-status" data-search-page-status role="status" aria-live="polite">Type at least two characters to search.</p>
+    <div data-search-page-results></div>
+
+    <div class="search-page-discovery" data-search-page-discovery hidden>
+      <h2>Browse by genre</h2>
+      <div class="search-suggestions" data-search-page-genres></div>
+    </div>
+
+    <noscript>
+      <p class="search-page-noscript">
+        Search needs JavaScript. Browse
+        <a href="{{ partial "link.html" "/movies/" }}">movies</a>,
+        <a href="{{ partial "link.html" "/tv/" }}">TV</a>,
+        <a href="{{ partial "link.html" "/anime/" }}">anime</a>,
+        <a href="{{ partial "link.html" "/sports/" }}">sport</a> or
+        <a href="{{ partial "link.html" "/genres/" }}">all genres</a> instead.
+      </p>
+    </noscript>
+  </section>
+</div>
+{{ end }}

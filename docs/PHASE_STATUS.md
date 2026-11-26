@@ -1,11 +1,13 @@
 # Pixy Streams — Phase Status
 
 Phases 1 and 2 are complete against `plan.md`, Phase 3 is complete for the
-verified Internet Archive library, Phase 4 (4.1–4.5) is complete, and Phase 6
-(6.1–6.5) is complete. Phase 5 was skipped by owner instruction; its proposed
+verified Internet Archive library, Phase 4 (4.1–4.5) is complete, Phase 6
+(6.1–6.5) is complete, and Phase 7 adds a full search results page beyond the
+six phases in `plan.md`. Phase 5 was skipped by owner instruction; its proposed
 backend decision remains unbuilt in `docs/BACKEND_DECISION.md`. Verifications
-were run on 2026-11-25 against Hugo extended 0.154.5, Node 22.14 and headless
-Edge 157. Phase 6.3 measurements are lab data from the local production build.
+were run on 2026-11-25 and 2026-11-26 against Hugo extended 0.154.5, Node 22.14
+and headless Edge 157. Phase 6.3 measurements are lab data from the local
+production build.
 
 ## Phase 1.1 — Baseline audit — Complete
 
@@ -704,6 +706,50 @@ were buildable but before the font and image changes.
 - `docs/RELEASE_REPORT.md` records the release scope, evidence, acceptance
   criteria and known limitations.
 
+## Phase 7 — Full search results page — Complete
+
+`plan.md` stops at Phase 6. This phase extends the existing Phase 4 search work
+without a search library, backend or new dependency.
+
+- **Shared matcher.** Query parsing and ranking moved into
+  `themes/alert/assets/js/search-core.js`, exposed as `window.PixySearch` and
+  loaded before `main.js`. The header drawer and the full page now rank a query
+  identically instead of keeping two copies.
+- **Full page.** `/search/` loads the same build-time `/search.json` index and
+  lists every match rather than eight. The query lives in `?q=`, so results can
+  be linked, reloaded and navigated with back/forward; the document title follows
+  the query. It shows categorical result counts, kind badges, loading, no-result
+  and index-unavailable states, a genre discovery panel with counts for an empty
+  query, and genre buttons that run a search. Escape clears the field.
+- **Header integration.** When a query has more than eight matches, the drawer
+  adds "View all N results" as the final keyboard option. End selects it and
+  Enter opens the full page with the current query; form submission does the same
+  when it is selected. It is reachable and announced through the existing
+  combobox/`aria-activedescendant` pattern rather than being a click-only link.
+- **Discoverability.** `/search/` is linked from the footer's Browse list and
+  from the header's view-all option. A no-JavaScript block links to the movie, TV,
+  anime, sport and genre pages.
+- **Bug found during verification.** The header first used
+  `data-search-page="/search/"`, which also matched the full page's own
+  `[data-search-page]` root selector. The page script therefore grabbed the
+  header wrapper, failed on the missing input and never initialised. The header
+  attribute is now `data-search-page-url`, and the page starts cleanly.
+- **Checks.** `check-config.mjs` requires the new content, layout and scripts;
+  `check-site.mjs` requires `search/index.html` and verifies its root markers,
+  labelled input and `name=q`; `check-browser.mjs` gained eight assertions for
+  the view-all link, End/Enter navigation, every-match rendering, discovery,
+  no-result recovery and genre buttons. The 390 px overflow matrix now includes
+  the search page.
+
+### Verification
+
+- Production build: 181 Hugo pages; `check-site.mjs` passes on 143 HTML pages,
+  6,813 references, 106 search entries, 3 watch pages and 89 playback states.
+- `check-config.mjs` passes with 92 text files scanned; 35/35 unit tests pass.
+- `check-browser.mjs`: 22/22, including "drama" returning 56 results on the full
+  page and 26 genre suggestions with no query.
+- No horizontal overflow at 390 px on the search page; no uncaught page errors.
+
 ## Phase 5.1 — Backend decision — Proposed (awaiting approval)
 
 - Full decision record: `docs/BACKEND_DECISION.md`.
@@ -770,10 +816,11 @@ were buildable but before the font and image changes.
 
 ## Next
 
-Phase 6 is complete. Phase 5 was skipped by owner instruction: the Cloudflare
-Workers + D1 decision remains a proposal in `docs/BACKEND_DECISION.md`, no
-external resources exist, and there is no request UI or admin workflow. More
-public-domain films can be added through the same registry once their rights and
-exact playback file are verified. Live TMDB credentials remain the main
-catalogue limitation; they unlock movie and series artwork, trailers, watch
-providers and episode guides without further template work.
+Phase 7 is complete, on top of Phases 1–4 and 6. Phase 5 was skipped by owner
+instruction: the Cloudflare Workers + D1 decision remains a proposal in
+`docs/BACKEND_DECISION.md`, no external resources exist, and there is no request
+UI or admin workflow. More public-domain films can be added through the same
+registry once their rights and exact playback file are verified. Live TMDB
+credentials remain the main catalogue limitation; they unlock movie and series
+artwork, trailers, watch providers and episode guides without further template
+work.

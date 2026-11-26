@@ -454,14 +454,16 @@
   // Header Search
   // ===========================
   const searchRoot = document.querySelector('[data-search]');
+  const searchApi = window.PixySearch;
 
-  if (searchRoot) {
+  if (searchRoot && searchApi) {
     const searchForm = searchRoot.querySelector('[data-search-form]');
     const searchInput = searchRoot.querySelector('[data-search-input]');
     const searchPanel = searchRoot.querySelector('[data-search-results]');
     const searchStatus = searchRoot.querySelector('[data-search-status]');
     const indexUrl = searchRoot.dataset.index;
     const genresUrl = searchRoot.dataset.genresUrl || '';
+    const searchPageUrl = searchRoot.dataset.searchPageUrl || '';
 
     let searchIndex = null;
     let indexPromise = null;
@@ -472,7 +474,7 @@
     let searchTimer;
     let searchRequest = 0;
 
-    const kindLabels = { movie: 'Movie', series: 'TV Series', anime: 'Anime', event: 'Sport', sample: 'Free film' };
+    const kindLabels = searchApi.kindLabels;
 
     const setStatus = (message) => {
       if (searchStatus) searchStatus.textContent = message;
@@ -624,16 +626,6 @@
       renderDiscovery(data);
     };
 
-    const scoreEntry = (entry, terms) => {
-      const title = (entry.title || '').toLowerCase();
-      const haystack = [title, entry.meta || '', (entry.genres || []).join(' ')].join(' ').toLowerCase();
-
-      if (!terms.every(term => haystack.includes(term))) return -1;
-      if (title.startsWith(terms[0])) return 0;
-      if (title.includes(terms[0])) return 1;
-      return 2;
-    };
-
     const renderResults = (query) => {
       searchPanel.textContent = '';
       searchPanel.removeAttribute('aria-busy');
@@ -693,13 +685,30 @@
           link.append(main, kind);
           searchPanel.append(link);
         });
+
+        if (resultTotal > results.length && searchPageUrl) {
+          const link = document.createElement('a');
+          link.className = 'search-view-all';
+          link.id = 'search-result-more';
+          link.href = searchPageUrl + '?q=' + encodeURIComponent(query);
+          link.textContent = 'View all ' + resultTotal + ' results';
+          link.tabIndex = -1;
+          link.setAttribute('role', 'option');
+          link.setAttribute('aria-selected', String(activeResult === results.length));
+          searchPanel.append(link);
+        }
       }
 
       showPanel();
 
-      if (activeResult >= 0) {
-        searchInput.setAttribute('aria-activedescendant', 'search-result-' + activeResult);
-        const active = searchPanel.querySelector('#search-result-' + activeResult);
+      const hasMore = resultTotal > results.length && Boolean(searchPageUrl);
+      const activeId = activeResult >= 0 && activeResult < results.length
+        ? 'search-result-' + activeResult
+        : (hasMore && activeResult === results.length ? 'search-result-more' : '');
+
+      if (activeId) {
+        searchInput.setAttribute('aria-activedescendant', activeId);
+        const active = searchPanel.querySelector('#' + activeId);
         if (active && typeof active.scrollIntoView === 'function') {
           active.scrollIntoView({ block: 'nearest' });
         }
@@ -738,14 +747,10 @@
         return;
       }
 
-      const terms = value.split(/\s+/).filter(Boolean);
-      const matches = (data || [])
-        .map(entry => ({ entry, score: scoreEntry(entry, terms) }))
-        .filter(result => result.score >= 0)
-        .sort((a, b) => a.score - b.score || a.entry.title.localeCompare(b.entry.title));
+      const matches = searchApi.search(data, rawValue);
 
       resultTotal = matches.length;
-      results = matches.slice(0, 8).map(result => result.entry);
+      results = matches.slice(0, 8);
       activeResult = -1;
       renderResults(rawValue);
 
@@ -792,29 +797,39 @@
         return;
       }
 
-      if (searchPanel.hidden || !results.length) return;
+      const hasMore = resultTotal > results.length && Boolean(searchPageUrl);
+      const optionCount = results.length + (hasMore ? 1 : 0);
+      if (searchPanel.hidden || !optionCount) return;
 
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
         event.preventDefault();
 
         if (event.key === 'Home') activeResult = 0;
-        else if (event.key === 'End') activeResult = results.length - 1;
-        else if (event.key === 'ArrowDown') activeResult = (activeResult + 1) % results.length;
-        else activeResult = activeResult <= 0 ? results.length - 1 : activeResult - 1;
+        else if (event.key === 'End') activeResult = optionCount - 1;
+        else if (event.key === 'ArrowDown') activeResult = (activeResult + 1) % optionCount;
+        else activeResult = activeResult <= 0 ? optionCount - 1 : activeResult - 1;
 
         renderResults(searchInput.value.trim());
       }
 
       if (event.key === 'Enter') {
         event.preventDefault();
-        openResult(activeResult >= 0 ? activeResult : 0);
+        if (hasMore && activeResult === results.length) {
+          window.location.href = searchPageUrl + '?q=' + encodeURIComponent(searchInput.value.trim());
+        } else {
+          openResult(activeResult >= 0 ? activeResult : 0);
+        }
       }
     });
 
     if (searchForm) {
       searchForm.addEventListener('submit', function(event) {
         event.preventDefault();
-        if (results.length) openResult(activeResult >= 0 ? activeResult : 0);
+        if (resultTotal > results.length && searchPageUrl && activeResult === results.length) {
+          window.location.href = searchPageUrl + '?q=' + encodeURIComponent(searchInput.value.trim());
+        } else if (results.length) {
+          openResult(activeResult >= 0 ? activeResult : 0);
+        }
       });
     }
 

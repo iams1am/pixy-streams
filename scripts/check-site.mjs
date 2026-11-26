@@ -78,9 +78,21 @@ const basePath = (() => {
 const pages = htmlFiles(OUT);
 
 check('required files', () => {
-  for (const file of ['index.html', '404.html', 'search.json', 'sitemap.xml']) {
+  for (const file of ['index.html', '404.html', 'search.json', 'sitemap.xml', 'search/index.html']) {
     if (!existsSync(path.join(OUT, file))) fail(`missing ${file}`);
   }
+});
+
+check('search page', () => {
+  const home = readFileSync(path.join(OUT, 'index.html'), 'utf8');
+  if (!home.includes('data-search-page-url=')) fail('homepage: header search has no full-page link');
+
+  const page = readFileSync(path.join(OUT, 'search', 'index.html'), 'utf8');
+  for (const marker of ['data-search-page', 'data-search-page-input', 'data-search-page-results', 'data-search-page-genres']) {
+    if (!page.includes(marker)) fail(`search page: missing ${marker}`);
+  }
+  if (!/<label[^>]*for=(?:"search-page-input"|search-page-input)/.test(page)) fail('search page: field has no label');
+  if (!/\sname=(?:"q"|q)(?=[\s>])/.test(page)) fail('search page: field is not named q');
 });
 
 check('internal links resolve', () => {
