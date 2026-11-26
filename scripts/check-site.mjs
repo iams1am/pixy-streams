@@ -88,7 +88,7 @@ check('search page', () => {
   if (!home.includes('data-search-page-url=')) fail('homepage: header search has no full-page link');
 
   const page = readFileSync(path.join(OUT, 'search', 'index.html'), 'utf8');
-  for (const marker of ['data-search-page', 'data-search-page-input', 'data-search-page-results', 'data-search-page-genres']) {
+  for (const marker of ['data-search-page', 'data-search-page-input', 'data-search-page-results', 'data-search-page-filters', 'data-search-page-types', 'data-search-page-genres']) {
     if (!page.includes(marker)) fail(`search page: missing ${marker}`);
   }
   if (!/<label[^>]*for=(?:"search-page-input"|search-page-input)/.test(page)) fail('search page: field has no label');

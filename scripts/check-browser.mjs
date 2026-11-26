@@ -310,23 +310,91 @@ try {
   })`);
   check("full search page shows every match and the query", fullSearch.count > 8 && fullSearch.rows === fullSearch.count && /^\d+ results for "drama"\.$/.test(fullSearch.status) && fullSearch.value === "drama" && fullSearch.title.startsWith("drama - Search") && fullSearch.missingKind === 0, fullSearch);
 
+  const filterState = await cdp.evaluate(`(() => {
+    const chips = [...document.querySelectorAll('[data-search-page-type]')].map((button) => ({
+      type: button.dataset.searchPageType,
+      count: Number(button.querySelector('.search-type-filter-count')?.textContent || -1),
+      pressed: button.getAttribute('aria-pressed'),
+      label: button.getAttribute('aria-label')
+    }));
+    return {
+      chips,
+      all: chips.find((chip) => chip.type === 'all'),
+      series: chips.find((chip) => chip.type === 'series')
+    };
+  })()`);
+  check("search page shows type filters with result counts", filterState.chips.length === 6 && filterState.all?.pressed === "true" && filterState.all?.count > 8 && filterState.series?.count > 0 && filterState.all?.label === `All: ${filterState.all?.count} results`, filterState);
+
+  await cdp.evaluate(`document.querySelector('[data-search-page-type="series"]').click()`);
+  await waitFor("document.querySelector('[data-search-page-type=\"series\"]')?.getAttribute('aria-pressed') === 'true'");
+  const filtered = await cdp.evaluate(`(() => {
+    const series = document.querySelector('[data-search-page-type="series"]');
+    return {
+      count: document.querySelectorAll('.search-page-result').length,
+      expected: Number(series?.querySelector('.search-type-filter-count')?.textContent || -1),
+      kinds: [...document.querySelectorAll('.search-page-result .search-result-kind')].map((kind) => kind.textContent.trim()),
+      status: document.querySelector('[data-search-page-status]').textContent,
+      url: location.search
+    };
+  })()`);
+  check("type filter narrows results and updates the URL", filtered.count === filtered.expected && filtered.count > 0 && filtered.kinds.every((kind) => kind === "TV Series") && filtered.url === "?q=drama&type=series" && /in TV Series/.test(filtered.status), filtered);
+
+  await goto(`${BASE}search/?q=drama&type=series`);
+  await waitFor("document.querySelector('[data-search-page]')?.dataset.searchPageReady === 'true'");
+  const sharedFilter = await cdp.evaluate(`(() => {
+    const series = document.querySelector('[data-search-page-type="series"]');
+    return {
+      selected: series?.getAttribute('aria-pressed'),
+      count: document.querySelectorAll('.search-page-result').length,
+      expected: Number(series?.querySelector('.search-type-filter-count')?.textContent || -1),
+      value: document.querySelector('[data-search-page-input]').value
+    };
+  })()`);
+  check("a filtered search URL restores the filter", sharedFilter.selected === "true" && sharedFilter.count === sharedFilter.expected && sharedFilter.count > 0 && sharedFilter.value === "drama", sharedFilter);
+
+  await cdp.evaluate(`document.querySelector('[data-search-page-type="event"]').click()`);
+  await waitFor("document.querySelector('.search-page-empty') !== null");
+  const filteredEmpty = await cdp.evaluate(`({
+    text: document.querySelector('.search-page-empty')?.textContent || '',
+    status: document.querySelector('[data-search-page-status]').textContent,
+    filtersHidden: document.querySelector('[data-search-page-filters]').hidden,
+    allCount: Number([...document.querySelectorAll('[data-search-page-type]')].find((button) => button.dataset.searchPageType === 'all')?.querySelector('.search-type-filter-count')?.textContent || -1)
+  })`);
+  check("an empty type filter explains itself without hiding the filters", /No Sport results for "drama"/.test(filteredEmpty.text) && filteredEmpty.filtersHidden === false && /No Sport results/.test(filteredEmpty.status) && filteredEmpty.allCount > 8, filteredEmpty);
+
+  await cdp.evaluate(`document.querySelector('[data-search-page-type="all"]').click()`);
+  await waitFor("document.activeElement?.dataset.searchPageType === 'all'");
+  const restored = await cdp.evaluate(`(() => {
+    const all = document.querySelector('[data-search-page-type="all"]');
+    return {
+      count: document.querySelectorAll('.search-page-result').length,
+      expected: Number(all?.querySelector('.search-type-filter-count')?.textContent || -1),
+      url: location.search,
+      status: document.querySelector('[data-search-page-status]').textContent
+    };
+  })()`);
+  check("All restores every match and keeps keyboard focus", restored.count === restored.expected && restored.count > 8 && restored.url === "?q=drama" && /results for "drama"\.$/.test(restored.status), restored);
+
   await goto(`${BASE}search/`);
   await waitFor("document.querySelector('[data-search-page]')?.dataset.searchPageReady === 'true'");
   const pageDiscovery = await cdp.evaluate(`({
     suggestions: document.querySelectorAll('[data-search-page-genres] button').length,
     hidden: document.querySelector('[data-search-page-discovery]').hidden,
+    filtersHidden: document.querySelector('[data-search-page-filters]').hidden,
     status: document.querySelector('[data-search-page-status]').textContent
   })`);
-  check("search page without a query offers genre discovery", pageDiscovery.suggestions >= 15 && pageDiscovery.hidden === false && /Type at least two/.test(pageDiscovery.status), pageDiscovery);
+  check("search page without a query offers genre discovery", pageDiscovery.suggestions >= 15 && pageDiscovery.hidden === false && pageDiscovery.filtersHidden === true && /Type at least two/.test(pageDiscovery.status), pageDiscovery);
 
-  await cdp.evaluate(`(() => { const input = document.querySelector('[data-search-page-input]'); input.value = 'zzzznotathing'; input.dispatchEvent(new Event('input', { bubbles: true })); })()`);
-  await waitFor("document.querySelector('.search-page-empty') !== null");
+  await goto(`${BASE}search/?q=zzzznotathing&type=series`);
+  await waitFor("document.querySelector('[data-search-page]')?.dataset.searchPageReady === 'true'");
   const pageEmpty = await cdp.evaluate(`({
     text: document.querySelector('.search-page-empty')?.textContent || '',
     status: document.querySelector('[data-search-page-status]').textContent,
-    genres: document.querySelectorAll('[data-search-page-genres] button').length
+    genres: document.querySelectorAll('[data-search-page-genres] button').length,
+    filtersHidden: document.querySelector('[data-search-page-filters]').hidden,
+    url: location.search
   })`);
-  check("a no-result query explains itself and offers genres", /No titles match "zzzznotathing"/.test(pageEmpty.text) && pageEmpty.genres >= 15 && /No results/.test(pageEmpty.status), pageEmpty);
+  check("a no-result query explains itself, offers genres and clears an invisible filter", /No titles match "zzzznotathing"/.test(pageEmpty.text) && pageEmpty.genres >= 15 && pageEmpty.filtersHidden === true && pageEmpty.url === "?q=zzzznotathing" && /No results/.test(pageEmpty.status), pageEmpty);
 
   await cdp.evaluate("document.querySelector('[data-search-page-genres] button').click()");
   await waitFor("document.querySelectorAll('.search-page-result').length > 0");

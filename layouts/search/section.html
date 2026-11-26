@@ -25,6 +25,12 @@
 
   <section class="container search-page" aria-label="Search results">
     <p class="search-page-status" data-search-page-status role="status" aria-live="polite">Type at least two characters to search.</p>
+
+    <div class="search-page-filters" data-search-page-filters hidden>
+      <h2 class="search-page-filters-label" id="search-page-filter-label">Filter by type</h2>
+      <div class="search-type-filters" role="group" aria-labelledby="search-page-filter-label" data-search-page-types></div>
+    </div>
+
     <div data-search-page-results></div>
 
     <div class="search-page-discovery" data-search-page-discovery hidden>

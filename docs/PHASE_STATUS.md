@@ -2,12 +2,12 @@
 
 Phases 1 and 2 are complete against `plan.md`, Phase 3 is complete for the
 verified Internet Archive library, Phase 4 (4.1–4.5) is complete, Phase 6
-(6.1–6.5) is complete, and Phase 7 adds a full search results page beyond the
-six phases in `plan.md`. Phase 5 was skipped by owner instruction; its proposed
-backend decision remains unbuilt in `docs/BACKEND_DECISION.md`. Verifications
-were run on 2026-11-25 and 2026-11-26 against Hugo extended 0.154.5, Node 22.14
-and headless Edge 157. Phase 6.3 measurements are lab data from the local
-production build.
+(6.1–6.5) is complete, and Phases 7–8 add full search results and type filters
+beyond the six phases in `plan.md`. Phase 5 was skipped by owner instruction;
+its proposed backend decision remains unbuilt in `docs/BACKEND_DECISION.md`.
+Verifications were run on 2026-11-25, 2026-11-26 and 2026-11-27 against Hugo
+extended 0.154.5, Node 22.14 and headless Edge 157. Phase 6.3 measurements are
+lab data from the local production build.
 
 ## Phase 1.1 — Baseline audit — Complete
 
@@ -750,6 +750,44 @@ without a search library, backend or new dependency.
   page and 26 genre suggestions with no query.
 - No horizontal overflow at 390 px on the search page; no uncaught page errors.
 
+## Phase 8 — Search type filters — Complete
+
+This adds one narrow control to the Phase 7 page; it does not introduce a
+backend, dependency or second search implementation.
+
+- **Filter rail.** `/search/` shows a single-select row above the results: All,
+  Movie, TV Series, Anime, Sport and Free film. Each button carries a count
+  computed from all matches for the current query, an `aria-pressed` state and a
+  descriptive `aria-label`, so a screen reader hears "TV Series: 5 results" and
+  not a label glued to a number. Zero-count types remain available and explain
+  themselves when selected instead of disappearing mid-query.
+- **URL state.** The choice is stored as `&type=series` alongside `?q=`. Loading
+  the URL, reloading or a `popstate` restores both the query and filter; an
+  unknown or malformed type falls back to All. Clearing the query removes both
+  parameters. A zero-match query clears any type that is about to become
+  invisible, so a later genre click cannot inherit a hidden filter.
+- **Empty and focus states.** A selected type with no matches keeps the filter
+  rail visible, names the type and points at All to restore the full set. A query
+  with no matches at all still hides the rail and offers genre discovery.
+  Rebuilding the rail after a filter change restores keyboard focus to the same
+  control rather than dropping it to the document.
+- **Checks.** `check-site.mjs` requires the filter containers; the browser suite
+  gained five assertions for the six counts, narrowing and URL update, restoring
+  a filtered URL, the empty-type recovery, and All plus focus restoration. The
+  no-result test now also starts with a stale `type=` and proves it is cleared;
+  the 390 px search route includes the filter row.
+
+### Verification
+
+- Production build: 181 Hugo pages; `check-site.mjs` passes on 143 HTML pages,
+  6,813 references, 106 search entries, 3 watch pages and 89 playback states.
+- `check-config.mjs` passes with 92 text files scanned; 35/35 unit tests pass.
+- `check-browser.mjs`: 27/27. For "drama", the filters report All 56, Movie 10,
+  TV Series 5, Anime 41, Sport 0 and Free film 0; TV Series returns five rows,
+  the filtered URL restores the same five, Sport shows its empty message and All
+  restores 56 with focus on the All button.
+- No uncaught page errors and no horizontal overflow at 390 px.
+
 ## Phase 5.1 — Backend decision — Proposed (awaiting approval)
 
 - Full decision record: `docs/BACKEND_DECISION.md`.
@@ -816,11 +854,12 @@ without a search library, backend or new dependency.
 
 ## Next
 
-Phase 7 is complete, on top of Phases 1–4 and 6. Phase 5 was skipped by owner
-instruction: the Cloudflare Workers + D1 decision remains a proposal in
+Phases 1–4, 6, 7 and 8 are complete. Phase 5 was skipped by owner instruction:
+the Cloudflare Workers + D1 decision remains a proposal in
 `docs/BACKEND_DECISION.md`, no external resources exist, and there is no request
-UI or admin workflow. More public-domain films can be added through the same
-registry once their rights and exact playback file are verified. Live TMDB
-credentials remain the main catalogue limitation; they unlock movie and series
-artwork, trailers, watch providers and episode guides without further template
-work.
+UI or admin workflow. Search now covers queries, genre discovery and type
+filters, and pagination is unnecessary at 106 entries. The meaningful remaining
+work is content and assurance rather than another frontend phase: more
+public-domain films through the existing rights registry, live TMDB credentials
+for artwork, trailers, providers and episode guides, and a manual screen-reader
+pass to complement the automated browser checks.

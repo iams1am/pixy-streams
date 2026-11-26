@@ -9,8 +9,8 @@
   the live browser suite passed 14/14 afterwards.
 
 Phase 5 (content requests and accounts) was skipped by owner instruction. It is
-not part of this release and nothing external was created for it. A follow-up
-Phase 7 later added the full `/search/` results page; see
+not part of this release and nothing external was created for it. Follow-up
+Phases 7–8 later added the full `/search/` results page and its type filters; see
 `docs/PHASE_STATUS.md` for that work and its evidence.
 
 ## What changed

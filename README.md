@@ -306,10 +306,13 @@ explicit rather than silent.
 When a query has more than eight matches, the header adds a "View all N results"
 option at the end of the keyboard list. It opens `/search/?q=...`, a shareable
 full-results page that uses the same matcher, lists every match and offers genre
-discovery when the query is empty or has no results. The page updates its URL and
-document title as you type, supports Escape to clear, and has a no-JavaScript
-fallback linking to the catalogues and genre hub. `/search/` is also linked from
-the footer under Browse.
+discovery when the query is empty or has no results. A single-select type filter
+narrows the matches to All, Movie, TV Series, Anime, Sport or Free film; counts
+follow the current query, the choice is kept in `&type=...`, and a type with no
+matches keeps the filter visible so All can restore the full set. The page
+updates its URL and document title as you type, supports Escape to clear, and has
+a no-JavaScript fallback linking to the catalogues and genre hub. `/search/` is
+also linked from the footer under Browse.
 
 Local records are versioned and read defensively:
 
@@ -355,6 +358,7 @@ so the site still builds. Pages uses `build_type: workflow`, which allows
 - **Done** - Phase 6.4 QA: 35 unit tests, config/secret scan, stricter site checks and a 14-assertion headless-browser smoke test in CI
 - **Done** - Phase 6.5 documentation and release report
 - **Done** - Phase 7 full search: shared matcher, keyboard-accessible "View all", `/search/` results page with shareable queries and genre discovery
+- **Done** - Phase 8 search type filters: query-aware counts, `&type=` URL state, filtered empty states and keyboard focus retention
 - **Skipped by owner** - Phase 5 content-request backend (5.1-5.4); the proposed Cloudflare Workers + D1 decision remains in `docs/BACKEND_DECISION.md` and nothing was deployed
 - **Blocked** - live TMDB credentials for movie artwork, film trailers and episode guides
 - **Later** - more verified public-domain films, and Vimeo/self-hosted playback when authorized content needs it
