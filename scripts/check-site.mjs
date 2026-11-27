@@ -78,8 +78,17 @@ const basePath = (() => {
 const pages = htmlFiles(OUT);
 
 check('required files', () => {
-  for (const file of ['index.html', '404.html', 'search.json', 'sitemap.xml', 'search/index.html']) {
+  for (const file of ['index.html', '404.html', 'search.json', 'sitemap.xml', 'robots.txt', 'search/index.html']) {
     if (!existsSync(path.join(OUT, file))) fail(`missing ${file}`);
+  }
+});
+
+check('robots.txt', () => {
+  const robots = readFileSync(path.join(OUT, 'robots.txt'), 'utf8');
+  if (!/^User-agent: \*$/m.test(robots)) fail('robots.txt: no wildcard user-agent rule');
+  const sitemap = robots.match(/^Sitemap: (.+)$/m)?.[1] || '';
+  if (!sitemap.startsWith('https://') || !sitemap.includes(basePath)) {
+    fail(`robots.txt: sitemap is not an absolute deployment URL (${sitemap || 'missing'})`);
   }
 });
 
@@ -93,6 +102,58 @@ check('search page', () => {
   }
   if (!/<label[^>]*for=(?:"search-page-input"|search-page-input)/.test(page)) fail('search page: field has no label');
   if (!/\sname=(?:"q"|q)(?=[\s>])/.test(page)) fail('search page: field is not named q');
+});
+
+check('sports calendars', () => {
+  const scheduledPages = pages
+    .filter((file) => relative(file).startsWith('sports/'))
+    .map((file) => ({ file, html: readFileSync(file, 'utf8') }))
+    .filter((page) => /data-event-state=(?:"scheduled"|scheduled)/.test(page.html));
+
+  if (!scheduledPages.length) {
+    checks.push({ name: 'calendar files', failures: 0, note: '0 scheduled' });
+    return;
+  }
+
+  const scheduled = scheduledPages.filter((page) => page.html.includes('Add to calendar'));
+  if (!scheduled.length) {
+    fail('scheduled event pages have no calendar download');
+    return;
+  }
+
+  let count = 0;
+  for (const { file, html } of scheduled) {
+    const match = html.match(/href=(?:"([^"]*\.ics)"|([^\s>"']+\.ics))/);
+    if (!match) {
+      fail(`${relative(file)}: calendar button has no .ics link`);
+      continue;
+    }
+
+    const href = match[1] ?? match[2] ?? '';
+    if (!href.startsWith(basePath)) {
+      fail(`${relative(file)}: calendar link misses the base path (${href})`);
+      continue;
+    }
+
+    const icsFile = path.join(OUT, href.slice(basePath.length));
+    if (!existsSync(icsFile)) {
+      fail(`${relative(file)}: missing ${href}`);
+      continue;
+    }
+
+    const ics = readFileSync(icsFile, 'utf8');
+    for (const marker of ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'DTSTART:', 'SUMMARY:', 'END:VEVENT', 'END:VCALENDAR']) {
+      if (!ics.includes(marker)) fail(`${relative(icsFile)}: missing ${marker}`);
+    }
+    if (!/^DTSTART:\d{8}T\d{6}Z$/m.test(ics)) fail(`${relative(icsFile)}: DTSTART is not a UTC timestamp`);
+    if (!/^DURATION:PT\d+H$/m.test(ics)) fail(`${relative(icsFile)}: DURATION is missing`);
+    if (!/^SUMMARY:[^\r\n]+$/m.test(ics)) fail(`${relative(icsFile)}: SUMMARY is empty`);
+    if (!/^X-WR-CALNAME:[^\r\n]+$/m.test(ics)) fail(`${relative(icsFile)}: X-WR-CALNAME is empty`);
+    if (!/^DESCRIPTION:.*\\;/m.test(ics)) fail(`${relative(icsFile)}: DESCRIPTION is not iCalendar-escaped`);
+    count += 1;
+  }
+
+  if (count) checks.push({ name: 'calendar files', failures: 0, note: String(count) });
 });
 
 check('internal links resolve', () => {

@@ -1,0 +1,9 @@
+{{- /* Escape a value for an iCalendar text property. */ -}}
+{{- $text := . | default "" | string -}}
+{{- $text = replace $text "\\" "\\\\" -}}
+{{- $text = replace $text "\r\n" "\\n" -}}
+{{- $text = replace $text "\n" "\\n" -}}
+{{- $text = replace $text "\r" "\\n" -}}
+{{- $text = replace $text ";" "\\;" -}}
+{{- $text = replace $text "," "\\," -}}
+{{- return $text -}}

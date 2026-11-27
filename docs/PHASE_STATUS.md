@@ -1,9 +1,10 @@
 # Pixy Streams — Phase Status
 
 Phases 1 and 2 are complete against `plan.md`, Phase 3 is complete for the
-verified Internet Archive library, Phase 4 (4.1–4.5) is complete, Phase 6
-(6.1–6.5) is complete, and Phases 7–8 add full search results and type filters
-beyond the six phases in `plan.md`. Phase 5 was skipped by owner instruction;
+verified Internet Archive library, Phase 4 (4.1-4.5) is complete, Phase 6
+(6.1-6.5) is complete, and Phases 7-9 add full search results, type filters,
+scheduled-fixture calendar downloads and robots.txt beyond the six phases in
+`plan.md`. Phase 5 was skipped by owner instruction;
 its proposed backend decision remains unbuilt in `docs/BACKEND_DECISION.md`.
 Verifications were run on 2026-11-25, 2026-11-26 and 2026-11-27 against Hugo
 extended 0.154.5, Node 22.14 and headless Edge 157. Phase 6.3 measurements are
@@ -788,7 +789,41 @@ backend, dependency or second search implementation.
   restores 56 with focus on the All button.
 - No uncaught page errors and no horizontal overflow at 390 px.
 
-## Phase 5.1 — Backend decision — Proposed (awaiting approval)
+## Phase 9 - Sports calendars and robots.txt - Complete
+
+Two small production improvements after the search work. Neither adds a service,
+a dependency or a new rights claim.
+
+- **Scheduled-fixture calendars.** Scheduled sports pages now emit a build-time
+  `event.ics` alongside the HTML and show an **Add to calendar** action next to
+  the official match-centre link. Live and finished events do not offer it.
+  Football and basketball produce one two-hour `VEVENT`; motorsport events with
+  sessions produce one `VEVENT` per session (one hour, two for the race). All
+  times are UTC and clients convert them locally. Titles, venues and descriptions
+  are escaped by `layouts/_partials/ics-text.html`.
+- **robots.txt.** `enableRobotsTXT` and `layouts/robots.txt` publish a wildcard
+  allow rule with the absolute sitemap URL, including the GitHub Pages subpath.
+- **Checks.** `check-config.mjs` requires the calendar template, escaping
+  partial and robots layout and asserts the config switches. `check-site.mjs`
+  requires `robots.txt`, validates its sitemap URL, follows every scheduled
+  event's `.ics` link and checks the calendar markers, UTC `DTSTART`, `DURATION`
+  and non-empty summary. `check-browser.mjs` fetches a scheduled fixture's
+  `.ics` in the browser and verifies the served calendar.
+
+### Verification
+
+- Production build: 206 Hugo pages, including 151 HTML pages and 16 scheduled
+  `event.ics` outputs.
+- `check-config.mjs`: pass, 94 text files scanned.
+- `check-site.mjs`: pass, 151 HTML pages, 7,138 references, 114 search entries,
+  3 watch pages and 89 playback states.
+- `check-playback.mjs`: pass, 3 verified sources, 3 samples and 114 catalogue ids.
+- `node --test scripts/*.test.mjs`: 35/35. `check-browser.mjs`: 28/28, including
+  the calendar fetch at 390 px.
+- The sports snapshot was refreshed to 25 ESPN events (9 finished, 16 scheduled);
+  `check-catalog.mjs` now passes without warnings.
+
+## Phase 5.1 - Backend decision - Proposed (awaiting approval)
 
 - Full decision record: `docs/BACKEND_DECISION.md`.
 - **Recommendation: Cloudflare Workers + D1**, keeping Hugo on GitHub Pages.
@@ -854,12 +889,13 @@ backend, dependency or second search implementation.
 
 ## Next
 
-Phases 1–4, 6, 7 and 8 are complete. Phase 5 was skipped by owner instruction:
+Phases 1-4 and 6-9 are complete. Phase 5 was skipped by owner instruction:
 the Cloudflare Workers + D1 decision remains a proposal in
 `docs/BACKEND_DECISION.md`, no external resources exist, and there is no request
 UI or admin workflow. Search now covers queries, genre discovery and type
-filters, and pagination is unnecessary at 106 entries. The meaningful remaining
-work is content and assurance rather than another frontend phase: more
-public-domain films through the existing rights registry, live TMDB credentials
-for artwork, trailers, providers and episode guides, and a manual screen-reader
-pass to complement the automated browser checks.
+filters, and pagination is unnecessary at 106 entries. Scheduled fixtures can be
+exported to a calendar, and the site advertises its sitemap through robots.txt.
+The meaningful remaining work is content and assurance rather than another
+frontend phase: more public-domain films through the existing rights registry,
+live TMDB credentials for artwork, trailers, providers and episode guides, and a
+manual screen-reader pass to complement the automated browser checks.

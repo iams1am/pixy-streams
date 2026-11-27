@@ -1,0 +1,52 @@
+{{- $title := .Title -}}
+{{- $stamp := now.UTC.Format "20060102T150405Z" -}}
+{{- $venue := .Params.venue | default "" -}}
+{{- $source := .Params.source | default "the provider" -}}
+{{- $description := printf "Fixture data from %s. Schedules can move; check the official competition or broadcaster. Pixy Streams reports scores and schedules; it does not host or link to live sports video." $source -}}
+{{- $events := slice -}}
+{{- $sessions := .Params.sessions | default slice -}}
+{{- range $sessions -}}
+  {{- $label := .label -}}
+  {{- with .kickoff -}}
+    {{- $duration := "PT1H" -}}
+    {{- if eq $.Params.group "motorsport" -}}
+      {{- if eq $label "Race" }}{{ $duration = "PT2H" }}{{ end -}}
+    {{- end -}}
+    {{- $events = $events | append (dict
+      "summary" (printf "%s: %s" $title $label)
+      "start" .
+      "duration" $duration
+      "uid" (printf "%s#%s" $.Permalink ($label | urlize))) -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $events -}}
+  {{- with .Params.kickoff -}}
+    {{- $events = $events | append (dict
+      "summary" $title
+      "start" .
+      "duration" "PT2H"
+      "uid" $.Permalink) -}}
+  {{- end -}}
+{{- end -}}
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Pixy Streams//Sports fixtures//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:{{ partial "ics-text.html" $title }}
+X-WR-TIMEZONE:UTC
+{{ range $events -}}
+BEGIN:VEVENT
+UID:{{ .uid }}
+DTSTAMP:{{ $stamp }}
+DTSTART:{{ (time .start).UTC.Format "20060102T150405Z" }}
+DURATION:{{ .duration }}
+SUMMARY:{{ partial "ics-text.html" .summary }}
+DESCRIPTION:{{ partial "ics-text.html" $description }}
+URL:{{ $.Permalink }}
+{{ with $venue -}}
+LOCATION:{{ partial "ics-text.html" . }}
+{{ end -}}
+END:VEVENT
+{{ end -}}
+END:VCALENDAR

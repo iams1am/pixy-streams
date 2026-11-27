@@ -50,8 +50,12 @@ content/
   search/_index.md          full search results page
 layouts/
   catalog/page.html         title page for a generated catalogue entry
+  sport-event/page.html     sports event detail page
+  sport-event/page.calendar.ics   build-time calendar for scheduled fixtures
   movies|tv|anime|sports/section.html   rails for each vertical
   search/section.html       full search page shell
+  robots.txt                crawler rules and the absolute sitemap URL
+  _partials/ics-text.html   iCalendar text escaping
   term.html taxonomy.html   genre browsing
 themes/alert/               design system: CSS, JS, shared partials
   assets/js/search-core.js  shared query matcher for header and full page
@@ -210,6 +214,10 @@ only, and a broadcaster link is rendered only when the provider publishes one.
 The section also shows the refresh time, per-league counts, cached league
 statuses and an explicit partial-refresh note.
 
+Scheduled event pages add an **Add to calendar** download. The `.ics` file is
+generated at build time from the same UTC kick-off data; motorsport weekends
+include each session. It is a schedule export, not a stream or a rights claim.
+
 `normaliseKickoff` adds seconds to provider timestamps before Hugo parses them,
 and `mergeSportsSnapshot` keeps cached fixtures for leagues that failed without
 overwriting healthy leagues. `node --test scripts/*.test.mjs` covers score
@@ -335,6 +343,8 @@ configuration/secret scan and the catalogue validation, refreshes the catalogue,
 builds with Hugo, runs the site, playback and browser checks, then publishes
 through GitHub Pages. A daily `cron` run at 05:00 UTC does the same so fixtures
 and seasonal anime do not go stale, and `workflow_dispatch` covers manual runs.
+The build also emits `robots.txt` with the sitemap URL and an `event.ics` for
+every scheduled fixture.
 
 See `docs/DEPLOYMENT.md` for the full flow, required secrets, local previews,
 rollback and troubleshooting. In short: the workflow reads `TMDB_API_KEY`,
@@ -359,6 +369,7 @@ so the site still builds. Pages uses `build_type: workflow`, which allows
 - **Done** - Phase 6.5 documentation and release report
 - **Done** - Phase 7 full search: shared matcher, keyboard-accessible "View all", `/search/` results page with shareable queries and genre discovery
 - **Done** - Phase 8 search type filters: query-aware counts, `&type=` URL state, filtered empty states and keyboard focus retention
+- **Done** - Phase 9 sports calendars: build-time `.ics` downloads for scheduled fixtures, session events for motorsport, and `robots.txt` with the sitemap URL
 - **Skipped by owner** - Phase 5 content-request backend (5.1-5.4); the proposed Cloudflare Workers + D1 decision remains in `docs/BACKEND_DECISION.md` and nothing was deployed
 - **Blocked** - live TMDB credentials for movie artwork, film trailers and episode guides
 - **Later** - more verified public-domain films, and Vimeo/self-hosted playback when authorized content needs it

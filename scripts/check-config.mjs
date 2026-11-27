@@ -56,6 +56,8 @@ check("hugo configuration", () => {
     fail("hugo.toml: params.playbackRegion is missing or not two uppercase letters");
   }
   if (!/\[\[menu\.main\]\]/.test(config)) fail("hugo.toml: no [[menu.main]] entries");
+  if (!/^enableRobotsTXT\s*=\s*true/m.test(config)) fail("hugo.toml: enableRobotsTXT is not true");
+  if (!/\[outputFormats\.calendar\]/.test(config)) fail("hugo.toml: no calendar output format");
 });
 
 check("required content and data", () => {
@@ -69,6 +71,9 @@ check("required content and data", () => {
     "content/my-list/_index.md",
     "content/search/_index.md",
     "layouts/search/section.html",
+    "layouts/robots.txt",
+    "layouts/sport-event/page.calendar.ics",
+    "layouts/_partials/ics-text.html",
     "themes/alert/assets/js/search-core.js",
     "themes/alert/assets/js/search-page.js",
     "data/playback/registry.json",

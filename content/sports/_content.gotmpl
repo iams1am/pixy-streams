@@ -5,6 +5,7 @@
   "path" $item.slug
   "title" $item.title
   "type" "sport-event"
+  "outputs" (cond (eq $item.state "scheduled") (slice "HTML" "calendar") (slice "HTML"))
   "params" (dict
     "catalog" "event"
     "sports_id" $item.id

@@ -64,6 +64,7 @@ const mime = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".xml": "application/xml",
+  ".ics": "text/calendar; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -459,6 +460,31 @@ try {
     await goto(`${BASE}${route}`, 900);
     const overflow = await cdp.evaluate("document.documentElement.scrollWidth - innerWidth");
     check(`${label} has no horizontal overflow at 390px`, overflow <= 0, overflow);
+  }
+
+  await goto(`${BASE}sports/`, 1200);
+  const scheduledHref = await cdp.evaluate(`document.querySelector('.rail-card.is-event[data-state="scheduled"]')?.getAttribute('href') || ''`);
+  if (scheduledHref) {
+    const scheduledRoute = new URL(scheduledHref, BASE).pathname.replace(new URL(BASE).pathname, "");
+    await goto(`${BASE}${scheduledRoute}`, 900);
+    const calendar = await cdp.evaluate(`(async () => {
+      const link = document.querySelector('a[href$=".ics"]');
+      if (!link) return { found: false };
+      const response = await fetch(link.href);
+      const text = await response.text();
+      return {
+        found: true,
+        href: link.getAttribute('href'),
+        status: response.status,
+        vcalendar: text.includes('BEGIN:VCALENDAR'),
+        vevent: text.includes('BEGIN:VEVENT')
+      };
+    })()`);
+    check(
+      "scheduled event offers a working calendar download",
+      calendar.found && calendar.status === 200 && calendar.vcalendar && calendar.vevent && calendar.href.includes(new URL(BASE).pathname),
+      calendar,
+    );
   }
 
   check("no uncaught page errors", pageErrors.length === 0, pageErrors.slice(0, 3));

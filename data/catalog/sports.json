@@ -1,110 +1,13 @@
 {
   "source": "ESPN",
   "source_url": "https://www.espn.com",
-  "generated_at": "2026-11-25T03:02:24.001Z",
-  "count": 17,
+  "generated_at": "2026-11-27T05:03:11.973Z",
+  "count": 25,
   "items": [
     {
-      "slug": "600057449-heineken-las-vegas-grand-prix",
-      "id": "espn-600057449",
-      "title": "Heineken Las Vegas Grand Prix",
-      "kind": "event",
-      "group": "motorsport",
-      "sport": "Motorsport",
-      "league": "Formula 1",
-      "league_key": "racing/f1",
-      "state": "finished",
-      "state_label": "Final",
-      "status_detail": "Final",
-      "badge": "FT",
-      "home": null,
-      "away": null,
-      "home_score": "",
-      "away_score": "",
-      "score": "",
-      "year": 2026,
-      "date": "2026-11-20",
-      "time": "00:30",
-      "time_utc": "00:30 UTC",
-      "date_label": "Fri 20 Nov",
-      "kickoff": "2026-11-20T00:30:00Z",
-      "venue": "",
-      "overview": "Final",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Motorsport"
-      ],
-      "meta": "Formula 1 · Final",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "Apple TV",
-          "type": "Streaming",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/f1/race/_/id/600057449",
-        "recap": "https://www.espn.com/f1/report/_/id/600057449",
-        "results": "https://www.espn.com/f1/results/_/id/600057449",
-        "boxscore": "",
-        "highlights": ""
-      },
-      "sessions": [
-        {
-          "label": "FP1",
-          "kickoff": "2026-11-20T00:30:00Z",
-          "state": "finished",
-          "state_label": "Final",
-          "status_detail": "Final"
-        },
-        {
-          "label": "FP2",
-          "kickoff": "2026-11-20T04:00:00Z",
-          "state": "finished",
-          "state_label": "Final",
-          "status_detail": "Final"
-        },
-        {
-          "label": "FP3",
-          "kickoff": "2026-11-21T00:30:00Z",
-          "state": "finished",
-          "state_label": "Final",
-          "status_detail": "Final"
-        },
-        {
-          "label": "Qual",
-          "kickoff": "2026-11-21T04:00:00Z",
-          "state": "finished",
-          "state_label": "Final",
-          "status_detail": "Final"
-        },
-        {
-          "label": "Race",
-          "kickoff": "2026-11-22T04:00:00Z",
-          "state": "finished",
-          "state_label": "Final",
-          "status_detail": "Final"
-        }
-      ],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/f1/race/_/id/600057449",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/f1/race/_/id/600057449",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915380-bodo-glimt-vs-lask-linz",
-      "id": "espn-401915380",
-      "title": "Bodo/Glimt vs LASK Linz",
+      "slug": "401915378-sabah-fk-vs-barcelona",
+      "id": "espn-401915378",
+      "title": "Sabah FK vs Barcelona",
       "kind": "event",
       "group": "football",
       "sport": "Soccer",
@@ -115,278 +18,35 @@
       "status_detail": "FT",
       "badge": "FT",
       "home": {
-        "name": "Bodo/Glimt",
-        "short_name": "Bodo/Glimt",
-        "abbreviation": "BODO",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2980.png",
-        "record": "2-1-2",
-        "form": "WWWDW",
-        "color": "FCEE33",
-        "link": "https://www.espn.com/soccer/club/_/id/2980/bodoglimt"
+        "name": "Sabah FK",
+        "short_name": "Sabah",
+        "abbreviation": "SAB",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/21922.png",
+        "record": "1-0-4",
+        "form": "LLLWL",
+        "color": "000000",
+        "link": "https://www.espn.com/soccer/club/_/id/21922/sabah-fk"
       },
       "away": {
-        "name": "LASK Linz",
-        "short_name": "LASK Linz",
-        "abbreviation": "LAS",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/4411.png",
-        "record": "2-0-3",
-        "form": "LWWWW",
-        "color": "ffffff",
-        "link": "https://www.espn.com/soccer/club/_/id/4411/lask-linz"
-      },
-      "home_score": "1",
-      "away_score": "0",
-      "score": "1-0",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "17:45",
-      "time_utc": "17:45 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T17:45:00Z",
-      "venue": "Aspmyra Stadion",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 1-0",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915380/lask-linz-bodoglimt",
-        "recap": "",
-        "results": "",
-        "boxscore": "",
-        "highlights": ""
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915380/lask-linz-bodoglimt",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915380/lask-linz-bodoglimt",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915300-galatasaray-vs-aston-villa",
-      "id": "espn-401915300",
-      "title": "Galatasaray vs Aston Villa",
-      "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "Galatasaray",
-        "short_name": "Galatasaray",
-        "abbreviation": "GAL",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/432.png",
-        "record": "3-0-2",
-        "form": "WWWWW",
-        "color": "aa0031",
-        "link": "https://www.espn.com/soccer/club/_/id/432/galatasaray"
-      },
-      "away": {
-        "name": "Aston Villa",
-        "short_name": "Aston Villa",
-        "abbreviation": "AVL",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png",
-        "record": "3-0-2",
-        "form": "LDDLD",
-        "color": "660e36",
-        "link": "https://www.espn.com/soccer/club/_/id/362/aston-villa"
-      },
-      "home_score": "1",
-      "away_score": "0",
-      "score": "1-0",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "17:45",
-      "time_utc": "17:45 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T17:45:00Z",
-      "venue": "RAMS Park",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 1-0",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915300/aston-villa-galatasaray",
-        "recap": "https://www.espn.com/soccer/report/_/gameId/401915300",
-        "results": "",
-        "boxscore": "",
-        "highlights": ""
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915300/aston-villa-galatasaray",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915300/aston-villa-galatasaray",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915295-arsenal-vs-borussia-dortmund",
-      "id": "espn-401915295",
-      "title": "Arsenal vs Borussia Dortmund",
-      "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "Arsenal",
-        "short_name": "Arsenal",
-        "abbreviation": "ARS",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png",
-        "record": "3-2-0",
-        "form": "DDWWW",
-        "color": "e20520",
-        "link": "https://www.espn.com/soccer/club/_/id/359/arsenal"
-      },
-      "away": {
-        "name": "Borussia Dortmund",
-        "short_name": "Dortmund",
-        "abbreviation": "DOR",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/124.png",
-        "record": "3-1-1",
-        "form": "DWWWD",
-        "color": "ffee00",
-        "link": "https://www.espn.com/soccer/club/_/id/124/borussia-dortmund"
-      },
-      "home_score": "1",
-      "away_score": "1",
-      "score": "1-1",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Emirates Stadium",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 1-1",
-      "trailer": "",
-      "watch": [
-        {
-          "name": "Official highlights on ESPN",
-          "url": "https://www.espn.com/soccer/video/_/gameId/401915295",
-          "type": "Highlights"
-        }
-      ],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915295/borussia-dortmund-arsenal",
-        "recap": "https://www.espn.com/soccer/report/_/gameId/401915295",
-        "results": "",
-        "boxscore": "",
-        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915295"
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915295/borussia-dortmund-arsenal",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915295/borussia-dortmund-arsenal",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915296-como-vs-aek-athens",
-      "id": "espn-401915296",
-      "title": "Como vs AEK Athens",
-      "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "Como",
-        "short_name": "Como",
-        "abbreviation": "COMO",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2572.png",
+        "name": "Barcelona",
+        "short_name": "Barcelona",
+        "abbreviation": "BAR",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/83.png",
         "record": "4-0-1",
-        "form": "WWLWW",
-        "color": "4169E1",
-        "link": "https://www.espn.com/soccer/club/_/id/2572/como"
-      },
-      "away": {
-        "name": "AEK Athens",
-        "short_name": "AEK Athens",
-        "abbreviation": "AEK",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/887.png",
-        "record": "1-0-4",
-        "form": "LWWLL",
-        "color": "ffff00",
-        "link": "https://www.espn.com/soccer/club/_/id/887/aek-athens"
+        "form": "WWWWW",
+        "color": "990000",
+        "link": "https://www.espn.com/soccer/club/_/id/83/barcelona"
       },
       "home_score": "1",
-      "away_score": "0",
-      "score": "1-0",
+      "away_score": "4",
+      "score": "1-4",
       "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Giuseppe Sinigaglia",
+      "date": "2026-11-25",
+      "time": "17:45",
+      "time_utc": "17:45 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T17:45:00Z",
+      "venue": "Baku Olympic Stadium",
       "overview": "FT",
       "poster": "",
       "backdrop": "",
@@ -394,7 +54,7 @@
       "genres": [
         "Football"
       ],
-      "meta": "Champions League · Full time 1-0",
+      "meta": "Champions League · Full time 1-4",
       "trailer": "",
       "watch": [],
       "broadcasts": [
@@ -406,8 +66,8 @@
         }
       ],
       "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915296/aek-athens-como",
-        "recap": "",
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915378/barcelona-sabah-fk",
+        "recap": "https://www.espn.com/soccer/report/_/gameId/401915378",
         "results": "",
         "boxscore": "",
         "highlights": ""
@@ -416,17 +76,17 @@
       "lists": [
         "results"
       ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915296/aek-athens-como",
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915378/barcelona-sabah-fk",
       "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915296/aek-athens-como",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915378/barcelona-sabah-fk",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
-      "slug": "401915294-feyenoord-rotterdam-vs-fc-porto",
-      "id": "espn-401915294",
-      "title": "Feyenoord Rotterdam vs FC Porto",
+      "slug": "401915293-slavia-prague-vs-villarreal",
+      "id": "espn-401915293",
+      "title": "Slavia Prague vs Villarreal",
       "kind": "event",
       "group": "football",
       "sport": "Soccer",
@@ -437,35 +97,35 @@
       "status_detail": "FT",
       "badge": "FT",
       "home": {
-        "name": "Feyenoord Rotterdam",
-        "short_name": "Feyenoord",
-        "abbreviation": "FEY",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/142.png",
-        "record": "1-0-4",
-        "form": "LLLLD",
-        "color": "ef2f24",
-        "link": "https://www.espn.com/soccer/club/_/id/142/feyenoord-rotterdam"
+        "name": "Slavia Prague",
+        "short_name": "Slavia Prague",
+        "abbreviation": "SLP",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/494.png",
+        "record": "0-1-4",
+        "form": "LLDLL",
+        "color": "dc1f26",
+        "link": "https://www.espn.com/soccer/club/_/id/494/slavia-prague"
       },
       "away": {
-        "name": "FC Porto",
-        "short_name": "FC Porto",
-        "abbreviation": "FCP",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/437.png",
+        "name": "Villarreal",
+        "short_name": "Villarreal",
+        "abbreviation": "VIL",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/102.png",
         "record": "2-0-3",
-        "form": "WWWWW",
-        "color": "0000dd",
-        "link": "https://www.espn.com/soccer/club/_/id/437/fc-porto"
+        "form": "WLWLL",
+        "color": "ffff00",
+        "link": "https://www.espn.com/soccer/club/_/id/102/villarreal"
       },
       "home_score": "0",
       "away_score": "1",
       "score": "0-1",
       "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "De Kuip",
+      "date": "2026-11-25",
+      "time": "17:45",
+      "time_utc": "17:45 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T17:45:00Z",
+      "venue": "Fortuna Arena",
       "overview": "FT",
       "poster": "",
       "backdrop": "",
@@ -485,7 +145,7 @@
         }
       ],
       "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915294/fc-porto-feyenoord-rotterdam",
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915293/villarreal-slavia-prague",
         "recap": "",
         "results": "",
         "boxscore": "",
@@ -495,17 +155,17 @@
       "lists": [
         "results"
       ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915294/fc-porto-feyenoord-rotterdam",
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915293/villarreal-slavia-prague",
       "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915294/fc-porto-feyenoord-rotterdam",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915293/villarreal-slavia-prague",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
-      "slug": "401915379-manchester-city-vs-napoli",
-      "id": "espn-401915379",
-      "title": "Manchester City vs Napoli",
+      "slug": "401915291-atletico-madrid-vs-viking-fk",
+      "id": "espn-401915291",
+      "title": "Atlético Madrid vs Viking FK",
       "kind": "event",
       "group": "football",
       "sport": "Soccer",
@@ -516,35 +176,521 @@
       "status_detail": "FT",
       "badge": "FT",
       "home": {
-        "name": "Manchester City",
-        "short_name": "Man City",
-        "abbreviation": "MNC",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/382.png",
-        "record": "3-1-1",
-        "form": "DDLWL",
-        "color": "99c5ea",
-        "link": "https://www.espn.com/soccer/club/_/id/382/manchester-city"
+        "name": "Atlético Madrid",
+        "short_name": "Atlético",
+        "abbreviation": "ATM",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/1068.png",
+        "record": "2-1-2",
+        "form": "WWLLW",
+        "color": "ca3624",
+        "link": "https://www.espn.com/soccer/club/_/id/1068/atletico-madrid"
       },
       "away": {
-        "name": "Napoli",
-        "short_name": "Napoli",
-        "abbreviation": "NAP",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/114.png",
+        "name": "Viking FK",
+        "short_name": "Viking FK",
+        "abbreviation": "VFK",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/510.png",
         "record": "1-1-3",
-        "form": "DWDLL",
-        "color": "0677d2",
-        "link": "https://www.espn.com/soccer/club/_/id/114/napoli"
+        "form": "LLWWL",
+        "color": "000080",
+        "link": "https://www.espn.com/soccer/club/_/id/510/viking-fk"
+      },
+      "home_score": "2",
+      "away_score": "0",
+      "score": "2-0",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Riyadh Air Metropolitano",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 2-0",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915291/viking-fk-atletico-madrid",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915291/viking-fk-atletico-madrid",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915291/viking-fk-atletico-madrid",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915292-club-brugge-vs-liverpool",
+      "id": "espn-401915292",
+      "title": "Club Brugge vs Liverpool",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Club Brugge",
+        "short_name": "Club Brugge",
+        "abbreviation": "BRU",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/570.png",
+        "record": "3-0-2",
+        "form": "LWDWW",
+        "color": "0081ff",
+        "link": "https://www.espn.com/soccer/club/_/id/570/club-brugge"
+      },
+      "away": {
+        "name": "Liverpool",
+        "short_name": "Liverpool",
+        "abbreviation": "LIV",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png",
+        "record": "4-0-1",
+        "form": "WWWLL",
+        "color": "d11317",
+        "link": "https://www.espn.com/soccer/club/_/id/364/liverpool"
+      },
+      "home_score": "0",
+      "away_score": "3",
+      "score": "0-3",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Jan Breydel Stadium",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 0-3",
+      "trailer": "",
+      "watch": [
+        {
+          "name": "Official highlights on ESPN",
+          "url": "https://www.espn.com/soccer/video/_/gameId/401915292",
+          "type": "Highlights"
+        }
+      ],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915292/liverpool-club-brugge",
+        "recap": "https://www.espn.com/soccer/report/_/gameId/401915292",
+        "results": "",
+        "boxscore": "",
+        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915292"
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915292/liverpool-club-brugge",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915292/liverpool-club-brugge",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915376-internazionale-vs-vfb-stuttgart",
+      "id": "espn-401915376",
+      "title": "Internazionale vs VfB Stuttgart",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Internazionale",
+        "short_name": "Inter Milan",
+        "abbreviation": "INT",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/110.png",
+        "record": "3-0-2",
+        "form": "WDWWL",
+        "color": "00239c",
+        "link": "https://www.espn.com/soccer/club/_/id/110/internazionale"
+      },
+      "away": {
+        "name": "VfB Stuttgart",
+        "short_name": "Stuttgart",
+        "abbreviation": "VFB",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/134.png",
+        "record": "2-1-2",
+        "form": "LDWLW",
+        "color": "ffffff",
+        "link": "https://www.espn.com/soccer/club/_/id/134/vfb-stuttgart"
+      },
+      "home_score": "2",
+      "away_score": "0",
+      "score": "2-0",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "San Siro",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 2-0",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915376/vfb-stuttgart-internazionale",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915376/vfb-stuttgart-internazionale",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915376/vfb-stuttgart-internazionale",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915377-lille-vs-bayern-munich",
+      "id": "espn-401915377",
+      "title": "Lille vs Bayern Munich",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Lille",
+        "short_name": "Lille",
+        "abbreviation": "LILL",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/166.png",
+        "record": "1-1-3",
+        "form": "WLWDW",
+        "color": "c2051b",
+        "link": "https://www.espn.com/soccer/club/_/id/166/lille"
+      },
+      "away": {
+        "name": "Bayern Munich",
+        "short_name": "Bayern",
+        "abbreviation": "MUN",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/132.png",
+        "record": "2-2-1",
+        "form": "LDWWD",
+        "color": "dc052d",
+        "link": "https://www.espn.com/soccer/club/_/id/132/bayern-munich"
+      },
+      "home_score": "2",
+      "away_score": "1",
+      "score": "2-1",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Decathlon Arena - Stade Pierre-Mauroy",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 2-1",
+      "trailer": "",
+      "watch": [
+        {
+          "name": "Official highlights on ESPN",
+          "url": "https://www.espn.com/soccer/video/_/gameId/401915377",
+          "type": "Highlights"
+        }
+      ],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915377/bayern-munich-lille",
+        "recap": "https://www.espn.com/soccer/report/_/gameId/401915377",
+        "results": "",
+        "boxscore": "",
+        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915377"
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915377/bayern-munich-lille",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915377/bayern-munich-lille",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915374-paris-saint-germain-vs-as-roma",
+      "id": "espn-401915374",
+      "title": "Paris Saint-Germain vs AS Roma",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Paris Saint-Germain",
+        "short_name": "PSG",
+        "abbreviation": "PSG",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/160.png",
+        "record": "4-1-0",
+        "form": "DWWWW",
+        "color": "011F68",
+        "link": "https://www.espn.com/soccer/club/_/id/160/paris-saint-germain"
+      },
+      "away": {
+        "name": "AS Roma",
+        "short_name": "AS Roma",
+        "abbreviation": "ROMA",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/104.png",
+        "record": "1-2-2",
+        "form": "DWWLW",
+        "color": "990a2c",
+        "link": "https://www.espn.com/soccer/club/_/id/104/as-roma"
       },
       "home_score": "2",
       "away_score": "2",
       "score": "2-2",
       "year": 2026,
-      "date": "2026-11-24",
+      "date": "2026-11-25",
       "time": "20:00",
       "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Etihad Stadium",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Parc des Princes",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 2-2",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915374/as-roma-paris-saint-germain",
+        "recap": "https://www.espn.com/soccer/report/_/gameId/401915374",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915374/as-roma-paris-saint-germain",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915374/as-roma-paris-saint-germain",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915375-shakhtar-donetsk-vs-fenerbahce",
+      "id": "espn-401915375",
+      "title": "Shakhtar Donetsk vs Fenerbahce",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Shakhtar Donetsk",
+        "short_name": "Shakhtar",
+        "abbreviation": "SHK",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/493.png",
+        "record": "1-1-3",
+        "form": "LLLWD",
+        "color": "ff5900",
+        "link": "https://www.espn.com/soccer/club/_/id/493/shakhtar-donetsk"
+      },
+      "away": {
+        "name": "Fenerbahce",
+        "short_name": "Fenerbahce",
+        "abbreviation": "FEN",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/436.png",
+        "record": "2-2-1",
+        "form": "WDWWL",
+        "color": "ffff00",
+        "link": "https://www.espn.com/soccer/club/_/id/436/fenerbahce"
+      },
+      "home_score": "0",
+      "away_score": "1",
+      "score": "0-1",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Stamford Bridge",
+      "overview": "FT",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Football"
+      ],
+      "meta": "Champions League · Full time 0-1",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Paramount+",
+          "type": "STREAMING",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915375/fenerbahce-shakhtar-donetsk",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "results"
+      ],
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915375/fenerbahce-shakhtar-donetsk",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915375/fenerbahce-shakhtar-donetsk",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401915373-sporting-cp-vs-manchester-united",
+      "id": "espn-401915373",
+      "title": "Sporting CP vs Manchester United",
+      "kind": "event",
+      "group": "football",
+      "sport": "Soccer",
+      "league": "Champions League",
+      "league_key": "soccer/uefa.champions",
+      "state": "finished",
+      "state_label": "Full time",
+      "status_detail": "FT",
+      "badge": "FT",
+      "home": {
+        "name": "Sporting CP",
+        "short_name": "Sporting",
+        "abbreviation": "SCP",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/2250.png",
+        "record": "3-1-1",
+        "form": "DWWWW",
+        "color": "008127",
+        "link": "https://www.espn.com/soccer/club/_/id/2250/sporting-cp"
+      },
+      "away": {
+        "name": "Manchester United",
+        "short_name": "Man Utd",
+        "abbreviation": "MAN",
+        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png",
+        "record": "2-1-2",
+        "form": "DLDWL",
+        "color": "da020e",
+        "link": "https://www.espn.com/soccer/club/_/id/360/manchester-united"
+      },
+      "home_score": "2",
+      "away_score": "2",
+      "score": "2-2",
+      "year": 2026,
+      "date": "2026-11-25",
+      "time": "20:00",
+      "time_utc": "20:00 UTC",
+      "date_label": "Wed 25 Nov",
+      "kickoff": "2026-11-25T20:00:00Z",
+      "venue": "Estádio José Alvalade",
       "overview": "FT",
       "poster": "",
       "backdrop": "",
@@ -557,7 +703,7 @@
       "watch": [
         {
           "name": "Official highlights on ESPN",
-          "url": "https://www.espn.com/soccer/video/_/gameId/401915379",
+          "url": "https://www.espn.com/soccer/video/_/gameId/401915373",
           "type": "Highlights"
         }
       ],
@@ -570,513 +716,119 @@
         }
       ],
       "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915379/napoli-manchester-city",
-        "recap": "https://www.espn.com/soccer/report/_/gameId/401915379",
+        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915373/manchester-united-sporting-cp",
+        "recap": "https://www.espn.com/soccer/report/_/gameId/401915373",
         "results": "",
         "boxscore": "",
-        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915379"
+        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915373"
       },
       "sessions": [],
       "lists": [
         "results"
       ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915379/napoli-manchester-city",
+      "href": "https://www.espn.com/soccer/match/_/gameId/401915373/manchester-united-sporting-cp",
       "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915379/napoli-manchester-city",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915373/manchester-united-sporting-cp",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
-      "slug": "401915299-rb-leipzig-vs-lens",
-      "id": "espn-401915299",
-      "title": "RB Leipzig vs Lens",
+      "slug": "600057450-qatar-airways-qatar-grand-prix",
+      "id": "espn-600057450",
+      "title": "Qatar Airways Qatar Grand Prix",
       "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "RB Leipzig",
-        "short_name": "RB Leipzig",
-        "abbreviation": "RBL",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/11420.png",
-        "record": "2-0-3",
-        "form": "DWWLW",
-        "color": "ffffff",
-        "link": "https://www.espn.com/soccer/club/_/id/11420/rb-leipzig"
-      },
-      "away": {
-        "name": "Lens",
-        "short_name": "Lens",
-        "abbreviation": "RCL",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/175.png",
-        "record": "1-0-4",
-        "form": "DDLLL",
-        "color": "E91514",
-        "link": "https://www.espn.com/soccer/club/_/id/175/lens"
-      },
-      "home_score": "3",
-      "away_score": "1",
-      "score": "3-1",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Red Bull Arena",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 3-1",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915299/lens-rb-leipzig",
-        "recap": "",
-        "results": "",
-        "boxscore": "",
-        "highlights": ""
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915299/lens-rb-leipzig",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915299/lens-rb-leipzig",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915298-real-madrid-vs-psv-eindhoven",
-      "id": "espn-401915298",
-      "title": "Real Madrid vs PSV Eindhoven",
-      "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "Real Madrid",
-        "short_name": "Real Madrid",
-        "abbreviation": "RMA",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/86.png",
-        "record": "5-0-0",
-        "form": "WWWWW",
-        "color": "ffffff",
-        "link": "https://www.espn.com/soccer/club/_/id/86/real-madrid"
-      },
-      "away": {
-        "name": "PSV Eindhoven",
-        "short_name": "PSV",
-        "abbreviation": "PSV",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/148.png",
-        "record": "1-1-3",
-        "form": "LWWLW",
-        "color": "ef2f24",
-        "link": "https://www.espn.com/soccer/club/_/id/148/psv-eindhoven"
-      },
-      "home_score": "5",
-      "away_score": "1",
-      "score": "5-1",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Santiago Bernabéu",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 5-1",
-      "trailer": "",
-      "watch": [
-        {
-          "name": "Official highlights on ESPN",
-          "url": "https://www.espn.com/soccer/video/_/gameId/401915298",
-          "type": "Highlights"
-        }
-      ],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915298/psv-eindhoven-real-madrid",
-        "recap": "https://www.espn.com/soccer/report/_/gameId/401915298",
-        "results": "",
-        "boxscore": "",
-        "highlights": "https://www.espn.com/soccer/video/_/gameId/401915298"
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915298/psv-eindhoven-real-madrid",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915298/psv-eindhoven-real-madrid",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401915297-slovan-bratislava-vs-real-betis",
-      "id": "espn-401915297",
-      "title": "Slovan Bratislava vs Real Betis",
-      "kind": "event",
-      "group": "football",
-      "sport": "Soccer",
-      "league": "Champions League",
-      "league_key": "soccer/uefa.champions",
-      "state": "finished",
-      "state_label": "Full time",
-      "status_detail": "FT",
-      "badge": "FT",
-      "home": {
-        "name": "Slovan Bratislava",
-        "short_name": "S Bratislava",
-        "abbreviation": "SLB",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/521.png",
-        "record": "0-0-5",
-        "form": "LLLLL",
-        "color": "81c0ff",
-        "link": "https://www.espn.com/soccer/club/_/id/521/slovan-bratislava"
-      },
-      "away": {
-        "name": "Real Betis",
-        "short_name": "Betis",
-        "abbreviation": "BET",
-        "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/244.png",
-        "record": "4-0-1",
-        "form": "WDWWL",
-        "color": "288A00",
-        "link": "https://www.espn.com/soccer/club/_/id/244/real-betis"
-      },
-      "home_score": "0",
-      "away_score": "2",
-      "score": "0-2",
-      "year": 2026,
-      "date": "2026-11-24",
-      "time": "20:00",
-      "time_utc": "20:00 UTC",
-      "date_label": "Tue 24 Nov",
-      "kickoff": "2026-11-24T20:00:00Z",
-      "venue": "Národny Futbalovy Stadión",
-      "overview": "FT",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Football"
-      ],
-      "meta": "Champions League · Full time 0-2",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "Paramount+",
-          "type": "STREAMING",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/soccer/match/_/gameId/401915297/real-betis-slovan-bratislava",
-        "recap": "",
-        "results": "",
-        "boxscore": "",
-        "highlights": ""
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/soccer/match/_/gameId/401915297/real-betis-slovan-bratislava",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/soccer/match/_/gameId/401915297/real-betis-slovan-bratislava",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401909314-orlando-magic-vs-detroit-pistons",
-      "id": "espn-401909314",
-      "title": "Orlando Magic vs Detroit Pistons",
-      "kind": "event",
-      "group": "basketball",
-      "sport": "Basketball",
-      "league": "NBA",
-      "league_key": "basketball/nba",
-      "state": "finished",
-      "state_label": "Final",
-      "status_detail": "Final",
-      "badge": "FT",
-      "home": {
-        "name": "Orlando Magic",
-        "short_name": "Magic",
-        "abbreviation": "ORL",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/orl.png",
-        "record": "7-10",
-        "form": "",
-        "color": "0150b5",
-        "link": "https://www.espn.com/nba/team/_/name/orl/orlando-magic"
-      },
-      "away": {
-        "name": "Detroit Pistons",
-        "short_name": "Pistons",
-        "abbreviation": "DET",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/det.png",
-        "record": "11-6",
-        "form": "",
-        "color": "1d428a",
-        "link": "https://www.espn.com/nba/team/_/name/det/detroit-pistons"
-      },
-      "home_score": "86",
-      "away_score": "104",
-      "score": "86-104",
-      "year": 2026,
-      "date": "2026-11-25",
-      "time": "00:00",
-      "time_utc": "00:00 UTC",
-      "date_label": "Wed 25 Nov",
-      "kickoff": "2026-11-25T00:00:00Z",
-      "venue": "Kia Center",
-      "overview": "Final",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Basketball"
-      ],
-      "meta": "NBA · Final 86-104",
-      "trailer": "",
-      "watch": [
-        {
-          "name": "Official highlights on ESPN",
-          "url": "https://www.espn.com/nba/video?gameId=401909314",
-          "type": "Highlights"
-        }
-      ],
-      "broadcasts": [],
-      "links": {
-        "fixture": "https://www.espn.com/nba/game/_/gameId/401909314/pistons-magic",
-        "recap": "https://www.espn.com/nba/recap?gameId=401909314",
-        "results": "",
-        "boxscore": "https://www.espn.com/nba/boxscore/_/gameId/401909314",
-        "highlights": "https://www.espn.com/nba/video?gameId=401909314"
-      },
-      "sessions": [],
-      "lists": [
-        "results"
-      ],
-      "href": "https://www.espn.com/nba/game/_/gameId/401909314/pistons-magic",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/nba/game/_/gameId/401909314/pistons-magic",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401909315-washington-wizards-vs-boston-celtics",
-      "id": "espn-401909315",
-      "title": "Washington Wizards vs Boston Celtics",
-      "kind": "event",
-      "group": "basketball",
-      "sport": "Basketball",
-      "league": "NBA",
-      "league_key": "basketball/nba",
-      "state": "live",
-      "state_label": "Live score",
-      "status_detail": "11:27 - 4th",
-      "badge": "Live score",
-      "home": {
-        "name": "Washington Wizards",
-        "short_name": "Wizards",
-        "abbreviation": "WSH",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/wsh.png",
-        "record": "7-11",
-        "form": "",
-        "color": "e31837",
-        "link": "https://www.espn.com/nba/team/_/name/wsh/washington-wizards"
-      },
-      "away": {
-        "name": "Boston Celtics",
-        "short_name": "Celtics",
-        "abbreviation": "BOS",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/bos.png",
-        "record": "11-6",
-        "form": "",
-        "color": "008348",
-        "link": "https://www.espn.com/nba/team/_/name/bos/boston-celtics"
-      },
-      "home_score": "89",
-      "away_score": "104",
-      "score": "89-104",
-      "year": 2026,
-      "date": "2026-11-25",
-      "time": "01:00",
-      "time_utc": "01:00 UTC",
-      "date_label": "Wed 25 Nov",
-      "kickoff": "2026-11-25T01:00:00Z",
-      "venue": "Capital One Arena",
-      "overview": "11:27 - 4th",
-      "poster": "",
-      "backdrop": "",
-      "accent": "",
-      "genres": [
-        "Basketball"
-      ],
-      "meta": "NBA · Live score 89-104",
-      "trailer": "",
-      "watch": [],
-      "broadcasts": [
-        {
-          "name": "NBC",
-          "type": "TV",
-          "market": "National",
-          "region": "US"
-        }
-      ],
-      "links": {
-        "fixture": "https://www.espn.com/nba/game?gameId=401909315",
-        "recap": "",
-        "results": "",
-        "boxscore": "https://www.espn.com/nba/boxscore/_/gameId/401909315",
-        "highlights": ""
-      },
-      "sessions": [],
-      "lists": [
-        "live"
-      ],
-      "href": "https://www.espn.com/nba/game?gameId=401909315",
-      "source": "ESPN",
-      "source_url": "https://www.espn.com/nba/game?gameId=401909315",
-      "observed_at": "2026-11-25T03:02:24.001Z",
-      "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
-    },
-    {
-      "slug": "401909316-denver-nuggets-vs-dallas-mavericks",
-      "id": "espn-401909316",
-      "title": "Denver Nuggets vs Dallas Mavericks",
-      "kind": "event",
-      "group": "basketball",
-      "sport": "Basketball",
-      "league": "NBA",
-      "league_key": "basketball/nba",
+      "group": "motorsport",
+      "sport": "Motorsport",
+      "league": "Formula 1",
+      "league_key": "racing/f1",
       "state": "scheduled",
       "state_label": "Scheduled",
-      "status_detail": "11/24 - 10:00 PM EST",
+      "status_detail": "11/27 - 8:30 AM EST",
       "badge": "",
-      "home": {
-        "name": "Denver Nuggets",
-        "short_name": "Nuggets",
-        "abbreviation": "DEN",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/den.png",
-        "record": "10-5",
-        "form": "",
-        "color": "0e2240",
-        "link": "https://www.espn.com/nba/team/_/name/den/denver-nuggets"
-      },
-      "away": {
-        "name": "Dallas Mavericks",
-        "short_name": "Mavericks",
-        "abbreviation": "DAL",
-        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png",
-        "record": "10-7",
-        "form": "",
-        "color": "0064b1",
-        "link": "https://www.espn.com/nba/team/_/name/dal/dallas-mavericks"
-      },
+      "home": null,
+      "away": null,
       "home_score": "",
       "away_score": "",
       "score": "",
       "year": 2026,
-      "date": "2026-11-25",
-      "time": "03:00",
-      "time_utc": "03:00 UTC",
-      "date_label": "Wed 25 Nov",
-      "kickoff": "2026-11-25T03:00:00Z",
-      "venue": "Ball Arena",
+      "date": "2026-11-27",
+      "time": "13:30",
+      "time_utc": "13:30 UTC",
+      "date_label": "Fri 27 Nov",
+      "kickoff": "2026-11-27T13:30:00Z",
+      "venue": "",
       "overview": "",
       "poster": "",
       "backdrop": "",
       "accent": "",
       "genres": [
-        "Basketball"
+        "Motorsport"
       ],
-      "meta": "NBA · Wed 25 Nov, 03:00 UTC",
+      "meta": "Formula 1 · Fri 27 Nov, 13:30 UTC",
       "trailer": "",
       "watch": [],
       "broadcasts": [
         {
-          "name": "NBC",
-          "type": "TV",
-          "market": "National",
-          "region": "US"
-        },
-        {
-          "name": "KFAA-TV",
-          "type": "TV",
-          "market": "Away",
-          "region": "US"
-        },
-        {
-          "name": "MavsTV",
+          "name": "Apple TV",
           "type": "Streaming",
-          "market": "Away",
+          "market": "National",
           "region": "US"
         }
       ],
       "links": {
-        "fixture": "https://www.espn.com/nba/game/_/gameId/401909316/mavericks-nuggets",
+        "fixture": "https://www.espn.com/f1/race/_/id/600057450",
         "recap": "",
         "results": "",
         "boxscore": "",
         "highlights": ""
       },
-      "sessions": [],
+      "sessions": [
+        {
+          "label": "FP1",
+          "kickoff": "2026-11-27T13:30:00Z",
+          "state": "scheduled",
+          "state_label": "Scheduled",
+          "status_detail": "11/27 - 8:30 AM EST"
+        },
+        {
+          "label": "FP2",
+          "kickoff": "2026-11-27T17:00:00Z",
+          "state": "scheduled",
+          "state_label": "Scheduled",
+          "status_detail": "11/27 - 12:00 PM EST"
+        },
+        {
+          "label": "FP3",
+          "kickoff": "2026-11-28T14:30:00Z",
+          "state": "scheduled",
+          "state_label": "Scheduled",
+          "status_detail": "11/28 - 9:30 AM EST"
+        },
+        {
+          "label": "Qual",
+          "kickoff": "2026-11-28T18:00:00Z",
+          "state": "scheduled",
+          "state_label": "Scheduled",
+          "status_detail": "11/28 - 1:00 PM EST"
+        },
+        {
+          "label": "Race",
+          "kickoff": "2026-11-29T16:00:00Z",
+          "state": "scheduled",
+          "state_label": "Scheduled",
+          "status_detail": "11/29 - 11:00 AM EST"
+        }
+      ],
       "lists": [
         "upcoming"
       ],
-      "href": "https://www.espn.com/nba/game/_/gameId/401909316/mavericks-nuggets",
+      "href": "https://www.espn.com/f1/race/_/id/600057450",
       "source": "ESPN",
-      "source_url": "https://www.espn.com/nba/game/_/gameId/401909316/mavericks-nuggets",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "source_url": "https://www.espn.com/f1/race/_/id/600057450",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
       "slug": "401884720-werder-bremen-vs-borussia-monchengladbach",
@@ -1153,9 +905,9 @@
       "href": "https://www.espn.com/soccer/match/_/gameId/401884720/borussia-monchengladbach-werder-bremen",
       "source": "ESPN",
       "source_url": "https://www.espn.com/soccer/match/_/gameId/401884720/borussia-monchengladbach-werder-bremen",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
       "slug": "401875004-venezia-vs-bologna",
@@ -1232,9 +984,9 @@
       "href": "https://www.espn.com/soccer/match/_/gameId/401875004/bologna-venezia",
       "source": "ESPN",
       "source_url": "https://www.espn.com/soccer/match/_/gameId/401875004/bologna-venezia",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
       "slug": "401879225-nottingham-forest-vs-chelsea",
@@ -1317,9 +1069,9 @@
       "href": "https://www.espn.com/soccer/match/_/gameId/401879225/chelsea-nottingham-forest",
       "source": "ESPN",
       "source_url": "https://www.espn.com/soccer/match/_/gameId/401879225/chelsea-nottingham-forest",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     },
     {
       "slug": "401882791-levante-vs-racing-santander",
@@ -1402,9 +1154,918 @@
       "href": "https://www.espn.com/soccer/match/_/gameId/401882791/racing-santander-levante",
       "source": "ESPN",
       "source_url": "https://www.espn.com/soccer/match/_/gameId/401882791/racing-santander-levante",
-      "observed_at": "2026-11-25T03:02:24.001Z",
+      "observed_at": "2026-11-27T05:03:11.973Z",
       "stale": false,
-      "fetched_at": "2026-11-25T03:02:24.001Z"
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909326-new-york-knicks-vs-miami-heat",
+      "id": "espn-401909326",
+      "title": "New York Knicks vs Miami Heat",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 7:00 PM EST",
+      "badge": "",
+      "home": {
+        "name": "New York Knicks",
+        "short_name": "Knicks",
+        "abbreviation": "NY",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ny.png",
+        "record": "12-6",
+        "form": "",
+        "color": "1d428a",
+        "link": "https://www.espn.com/nba/team/_/name/ny/new-york-knicks"
+      },
+      "away": {
+        "name": "Miami Heat",
+        "short_name": "Heat",
+        "abbreviation": "MIA",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/mia.png",
+        "record": "10-7",
+        "form": "",
+        "color": "98002e",
+        "link": "https://www.espn.com/nba/team/_/name/mia/miami-heat"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "00:00",
+      "time_utc": "00:00 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T00:00:00Z",
+      "venue": "Madison Square Garden",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 00:00 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Prime Video",
+          "type": "Streaming",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909326/heat-knicks",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909326/heat-knicks",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909326/heat-knicks",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909327-detroit-pistons-vs-milwaukee-bucks",
+      "id": "espn-401909327",
+      "title": "Detroit Pistons vs Milwaukee Bucks",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 7:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Detroit Pistons",
+        "short_name": "Pistons",
+        "abbreviation": "DET",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/det.png",
+        "record": "11-6",
+        "form": "",
+        "color": "1d428a",
+        "link": "https://www.espn.com/nba/team/_/name/det/detroit-pistons"
+      },
+      "away": {
+        "name": "Milwaukee Bucks",
+        "short_name": "Bucks",
+        "abbreviation": "MIL",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/mil.png",
+        "record": "2-17",
+        "form": "",
+        "color": "00471b",
+        "link": "https://www.espn.com/nba/team/_/name/mil/milwaukee-bucks"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "00:30",
+      "time_utc": "00:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T00:30:00Z",
+      "venue": "Little Caesars Arena",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 00:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "MyMi",
+          "type": "TV",
+          "market": "Away",
+          "region": "US"
+        },
+        {
+          "name": "Bucks App",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909327/bucks-pistons",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909327/bucks-pistons",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909327/bucks-pistons",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909328-indiana-pacers-vs-philadelphia-76ers",
+      "id": "espn-401909328",
+      "title": "Indiana Pacers vs Philadelphia 76ers",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 7:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Indiana Pacers",
+        "short_name": "Pacers",
+        "abbreviation": "IND",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ind.png",
+        "record": "6-12",
+        "form": "",
+        "color": "0c2340",
+        "link": "https://www.espn.com/nba/team/_/name/ind/indiana-pacers"
+      },
+      "away": {
+        "name": "Philadelphia 76ers",
+        "short_name": "76ers",
+        "abbreviation": "PHI",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/phi.png",
+        "record": "15-4",
+        "form": "",
+        "color": "1d428a",
+        "link": "https://www.espn.com/nba/team/_/name/phi/philadelphia-76ers"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "00:30",
+      "time_utc": "00:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T00:30:00Z",
+      "venue": "Gainbridge Fieldhouse",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 00:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909328/76ers-pacers",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909328/76ers-pacers",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909328/76ers-pacers",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909329-toronto-raptors-vs-brooklyn-nets",
+      "id": "espn-401909329",
+      "title": "Toronto Raptors vs Brooklyn Nets",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 7:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Toronto Raptors",
+        "short_name": "Raptors",
+        "abbreviation": "TOR",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/tor.png",
+        "record": "6-11",
+        "form": "",
+        "color": "d91244",
+        "link": "https://www.espn.com/nba/team/_/name/tor/toronto-raptors"
+      },
+      "away": {
+        "name": "Brooklyn Nets",
+        "short_name": "Nets",
+        "abbreviation": "BKN",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/bkn.png",
+        "record": "4-13",
+        "form": "",
+        "color": "000000",
+        "link": "https://www.espn.com/nba/team/_/name/bkn/brooklyn-nets"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "00:30",
+      "time_utc": "00:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T00:30:00Z",
+      "venue": "Scotiabank Arena",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 00:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "DAZN (YES)",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909329/nets-raptors",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909329/nets-raptors",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909329/nets-raptors",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909330-boston-celtics-vs-atlanta-hawks",
+      "id": "espn-401909330",
+      "title": "Boston Celtics vs Atlanta Hawks",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 8:00 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Boston Celtics",
+        "short_name": "Celtics",
+        "abbreviation": "BOS",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/bos.png",
+        "record": "12-6",
+        "form": "",
+        "color": "008348",
+        "link": "https://www.espn.com/nba/team/_/name/bos/boston-celtics"
+      },
+      "away": {
+        "name": "Atlanta Hawks",
+        "short_name": "Hawks",
+        "abbreviation": "ATL",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/atl.png",
+        "record": "11-6",
+        "form": "",
+        "color": "c8102e",
+        "link": "https://www.espn.com/nba/team/_/name/atl/atlanta-hawks"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "01:00",
+      "time_utc": "01:00 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T01:00:00Z",
+      "venue": "TD Garden",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 01:00 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909330/hawks-celtics",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909330/hawks-celtics",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909330/hawks-celtics",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909331-minnesota-timberwolves-vs-memphis-grizzlies",
+      "id": "espn-401909331",
+      "title": "Minnesota Timberwolves vs Memphis Grizzlies",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 8:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Minnesota Timberwolves",
+        "short_name": "Timberwolves",
+        "abbreviation": "MIN",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/min.png",
+        "record": "14-5",
+        "form": "",
+        "color": "266092",
+        "link": "https://www.espn.com/nba/team/_/name/min/minnesota-timberwolves"
+      },
+      "away": {
+        "name": "Memphis Grizzlies",
+        "short_name": "Grizzlies",
+        "abbreviation": "MEM",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/mem.png",
+        "record": "14-5",
+        "form": "",
+        "color": "5d76a9",
+        "link": "https://www.espn.com/nba/team/_/name/mem/memphis-grizzlies"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "01:30",
+      "time_utc": "01:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T01:30:00Z",
+      "venue": "Target Center",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 01:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "DAZN MIN",
+          "type": "Streaming",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "DAZN MEM",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909331/grizzlies-timberwolves",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909331/grizzlies-timberwolves",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909331/grizzlies-timberwolves",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909332-phoenix-suns-vs-dallas-mavericks",
+      "id": "espn-401909332",
+      "title": "Phoenix Suns vs Dallas Mavericks",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 9:00 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Phoenix Suns",
+        "short_name": "Suns",
+        "abbreviation": "PHX",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/phx.png",
+        "record": "9-8",
+        "form": "",
+        "color": "29127a",
+        "link": "https://www.espn.com/nba/team/_/name/phx/phoenix-suns"
+      },
+      "away": {
+        "name": "Dallas Mavericks",
+        "short_name": "Mavericks",
+        "abbreviation": "DAL",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png",
+        "record": "11-7",
+        "form": "",
+        "color": "0064b1",
+        "link": "https://www.espn.com/nba/team/_/name/dal/dallas-mavericks"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "02:00",
+      "time_utc": "02:00 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T02:00:00Z",
+      "venue": "Mortgage Matchup Center",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 02:00 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Suns Live",
+          "type": "Streaming",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "Arizona's Family 3TV",
+          "type": "TV",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "KFAA-TV",
+          "type": "TV",
+          "market": "Away",
+          "region": "US"
+        },
+        {
+          "name": "MavsTV",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909332/mavericks-suns",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909332/mavericks-suns",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909332/mavericks-suns",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909333-san-antonio-spurs-vs-los-angeles-lakers",
+      "id": "espn-401909333",
+      "title": "San Antonio Spurs vs Los Angeles Lakers",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 9:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "San Antonio Spurs",
+        "short_name": "Spurs",
+        "abbreviation": "SA",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/sa.png",
+        "record": "15-4",
+        "form": "",
+        "color": "000000",
+        "link": "https://www.espn.com/nba/team/_/name/sa/san-antonio-spurs"
+      },
+      "away": {
+        "name": "Los Angeles Lakers",
+        "short_name": "Lakers",
+        "abbreviation": "LAL",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png",
+        "record": "15-3",
+        "form": "",
+        "color": "552583",
+        "link": "https://www.espn.com/nba/team/_/name/lal/los-angeles-lakers"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "02:30",
+      "time_utc": "02:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T02:30:00Z",
+      "venue": "Frost Bank Center",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 02:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "Prime Video",
+          "type": "Streaming",
+          "market": "National",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909333/lakers-spurs",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909333/lakers-spurs",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909333/lakers-spurs",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909334-utah-jazz-vs-denver-nuggets",
+      "id": "espn-401909334",
+      "title": "Utah Jazz vs Denver Nuggets",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 9:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Utah Jazz",
+        "short_name": "Jazz",
+        "abbreviation": "UTAH",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/utah.png",
+        "record": "3-16",
+        "form": "",
+        "color": "4e008e",
+        "link": "https://www.espn.com/nba/team/_/name/utah/utah-jazz"
+      },
+      "away": {
+        "name": "Denver Nuggets",
+        "short_name": "Nuggets",
+        "abbreviation": "DEN",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/den.png",
+        "record": "10-6",
+        "form": "",
+        "color": "0e2240",
+        "link": "https://www.espn.com/nba/team/_/name/den/denver-nuggets"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "02:30",
+      "time_utc": "02:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T02:30:00Z",
+      "venue": "Delta Center",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 02:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "KJZZ-TV",
+          "type": "TV",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "Jazz+",
+          "type": "Streaming",
+          "market": "Home",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909334/nuggets-jazz",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909334/nuggets-jazz",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909334/nuggets-jazz",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909335-la-clippers-vs-new-orleans-pelicans",
+      "id": "espn-401909335",
+      "title": "LA Clippers vs New Orleans Pelicans",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 9:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "LA Clippers",
+        "short_name": "Clippers",
+        "abbreviation": "LAC",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lac.png",
+        "record": "4-13",
+        "form": "",
+        "color": "12173f",
+        "link": "https://www.espn.com/nba/team/_/name/lac/la-clippers"
+      },
+      "away": {
+        "name": "New Orleans Pelicans",
+        "short_name": "Pelicans",
+        "abbreviation": "NO",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/no.png",
+        "record": "5-14",
+        "form": "",
+        "color": "0a2240",
+        "link": "https://www.espn.com/nba/team/_/name/no/new-orleans-pelicans"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "02:30",
+      "time_utc": "02:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T02:30:00Z",
+      "venue": "Intuit Dome",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 02:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "ClipperVision",
+          "type": "Streaming",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "GCSEN",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        },
+        {
+          "name": "Pelicans.com",
+          "type": "Streaming",
+          "market": "Away",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909335/pelicans-clippers",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909335/pelicans-clippers",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909335/pelicans-clippers",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
+    },
+    {
+      "slug": "401909336-portland-trail-blazers-vs-golden-state-warriors",
+      "id": "espn-401909336",
+      "title": "Portland Trail Blazers vs Golden State Warriors",
+      "kind": "event",
+      "group": "basketball",
+      "sport": "Basketball",
+      "league": "NBA",
+      "league_key": "basketball/nba",
+      "state": "scheduled",
+      "state_label": "Scheduled",
+      "status_detail": "11/27 - 9:30 PM EST",
+      "badge": "",
+      "home": {
+        "name": "Portland Trail Blazers",
+        "short_name": "Trail Blazers",
+        "abbreviation": "POR",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/por.png",
+        "record": "12-6",
+        "form": "",
+        "color": "e03a3e",
+        "link": "https://www.espn.com/nba/team/_/name/por/portland-trail-blazers"
+      },
+      "away": {
+        "name": "Golden State Warriors",
+        "short_name": "Warriors",
+        "abbreviation": "GS",
+        "logo": "https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/gs.png",
+        "record": "10-8",
+        "form": "",
+        "color": "fdb927",
+        "link": "https://www.espn.com/nba/team/_/name/gs/golden-state-warriors"
+      },
+      "home_score": "",
+      "away_score": "",
+      "score": "",
+      "year": 2026,
+      "date": "2026-11-28",
+      "time": "02:30",
+      "time_utc": "02:30 UTC",
+      "date_label": "Sat 28 Nov",
+      "kickoff": "2026-11-28T02:30:00Z",
+      "venue": "Moda Center",
+      "overview": "",
+      "poster": "",
+      "backdrop": "",
+      "accent": "",
+      "genres": [
+        "Basketball"
+      ],
+      "meta": "NBA · Sat 28 Nov, 02:30 UTC",
+      "trailer": "",
+      "watch": [],
+      "broadcasts": [
+        {
+          "name": "KUNP 16",
+          "type": "TV",
+          "market": "Home",
+          "region": "US"
+        },
+        {
+          "name": "BlazerVision",
+          "type": "Streaming",
+          "market": "Home",
+          "region": "US"
+        }
+      ],
+      "links": {
+        "fixture": "https://www.espn.com/nba/game/_/gameId/401909336/warriors-trail-blazers",
+        "recap": "",
+        "results": "",
+        "boxscore": "",
+        "highlights": ""
+      },
+      "sessions": [],
+      "lists": [
+        "upcoming"
+      ],
+      "href": "https://www.espn.com/nba/game/_/gameId/401909336/warriors-trail-blazers",
+      "source": "ESPN",
+      "source_url": "https://www.espn.com/nba/game/_/gameId/401909336/warriors-trail-blazers",
+      "observed_at": "2026-11-27T05:03:11.973Z",
+      "stale": false,
+      "fetched_at": "2026-11-27T05:03:11.973Z"
     }
   ],
   "league_status": [
@@ -1448,7 +2109,7 @@
       "label": "NBA",
       "group": "basketball",
       "status": "fresh",
-      "count": 3
+      "count": 11
     },
     {
       "path": "racing/f1",

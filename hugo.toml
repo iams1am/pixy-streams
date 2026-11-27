@@ -1,4 +1,5 @@
 baseURL = "https://iams1am.github.io/pixy-streams/"
+enableRobotsTXT = true
 languageCode = "en-us"
 title = "Pixy Streams"
 theme = "alert"
@@ -151,5 +152,15 @@ theme = "alert"
 [outputFormats.search]
   mediaType = "application/json"
   baseName = "search"
+  isPlainText = true
+  notAlternative = true
+
+# Per-fixture calendar downloads for scheduled sports events.
+[mediaTypes."text/calendar"]
+  suffixes = ["ics"]
+
+[outputFormats.calendar]
+  mediaType = "text/calendar"
+  baseName = "event"
   isPlainText = true
   notAlternative = true

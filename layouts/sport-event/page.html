@@ -112,6 +112,11 @@
         {{ with $links.fixture }}
         <a class="btn btn-primary" href="{{ . }}" target="_blank" rel="noopener">Match centre on {{ $.Params.source }}</a>
         {{ end }}
+        {{ if and (eq $state "scheduled") .Params.kickoff }}
+        {{ with .OutputFormats.Get "calendar" }}
+        <a class="btn btn-ghost" href="{{ .RelPermalink }}" download="{{ printf "%s.ics" ($.Title | urlize) }}" aria-label="Add {{ $.Title }} to your calendar">Add to calendar</a>
+        {{ end }}
+        {{ end }}
         {{ range first 2 $watch }}
         <a class="btn btn-ghost" href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a>
         {{ end }}
